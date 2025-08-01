@@ -2,7 +2,7 @@
 
 ## 1. Short Introduction for CV/Resume
 
-**Software Architect & Full-Stack Developer** with 20+ years of experience designing and implementing scalable, high-performance enterprise solutions. Co-Founder & Managing Partner at SparkWorks, delivering cutting-edge technology solutions for Fortune 500 companies including Toyota, Bank Mandiri, Astra Group, and Panasonic. Expert in microservices architecture, cloud-native systems, AI/ML integration, and blockchain/Web3 development. Proven track record of improving system performance by up to 300%, reducing infrastructure costs by 25%, and leading multinational teams of 15+ engineers.
+**Software Architect & Full-Stack Developer** with 20+ years of experience designing and implementing scalable, high-performance enterprise solutions. Co-Founder & Managing Partner at SparkWorks, delivering cutting-edge technology solutions for Fortune 500 companies including Toyota, Bank Mandiri, Astra Group, and Panasonic. Expert in microservices architecture, cloud-native systems, AI/LLM integration, and blockchain/Web3 development. Proven track record of improving system performance by up to 300%, reducing infrastructure costs by 25%, and leading multinational teams of 15+ engineers.
 
 ## 2. Profile
 
@@ -12,7 +12,7 @@ Ricardo Alexander is a visionary software architect and technology entrepreneur 
 - **Enterprise Architecture**: Designed scalable systems handling 1M+ active users and processing 10,000+ transactions per second
 - **Performance Optimization**: Achieved remarkable improvements including reducing Toyota's costing system calculation from 3+ hours to 10-15 minutes
 - **Team Leadership**: Led cross-functional teams of 15+ engineers across multiple time zones and cultural contexts
-- **Innovation Driver**: Early adopter of emerging technologies including AI/ML, blockchain, microservices, and cloud-native architectures
+- **Innovation Driver**: Early adopter of emerging technologies including AI/LLM, blockchain, microservices, and cloud-native architectures
 - **Business Impact**: Delivered solutions that improved operational efficiency by 200%, reduced server costs by $200K annually, and enhanced system reliability by 99.9%
 
 **Philosophy**: Ricardo believes in bridging the gap between cutting-edge technology and practical business value, ensuring every solution delivers measurable impact while maintaining the highest standards of code quality and system reliability.
@@ -31,10 +31,10 @@ Gandhi Memorial National School, Jakarta
 ### Hard Skills
 
 #### **Programming Languages & Frameworks**
-- **Backend**: C# (.NET Core/.NET Framework), Java (Spring Boot), Python (AI/ML, Apache Airflow), Node.js (NestJS, Express), Solidity
+- **Backend**: C# (.NET Core/.NET Framework), Java (Spring Boot), Python (AI/LLM, Apache Airflow), Node.js (NestJS, Express), Solidity
 - **Frontend**: React, Angular, TypeScript, JavaScript, Flutter
 - **Mobile**: Flutter, React Native
-- **Blockchain/Web3**: Solidity, Hardhat, Ethers.js, Web3 Development on Ethereum
+- **Blockchain/Web3**: Solidity, Foundry, Hardhat, Ethers.js, Web3 Development on Ethereum
 - **Specialized**: Context Engineering, MCP Server Development
 - **Tinkering**: Golang, Rust
 
@@ -251,8 +251,8 @@ Gandhi Memorial National School, Jakarta
 ### **Specialized Project Categories**
 
 #### **Blockchain & Web3 Development**
-- **Capabilities**: Solidity smart contracts, Hardhat development environment, Ethers.js integration
-- **Projects**: DeFi platforms, Web3 application development
+- **Capabilities**: Solidity smart contracts, Hardhat & Foundry development environment, Ethers.js integration
+- **Projects**: Web3 application development
 - **Technologies**: Ethereum blockchain, smart contract security, decentralized architecture
 
 #### **AI & Machine Learning Integration**
@@ -280,7 +280,7 @@ Gandhi Memorial National School, Jakarta
 ### **Continuous Learning & Innovation**
 - **Personal Projects**: Teaching children coding, game development, and IoT with modern tools
 - **Future Ventures**: Planning educational venture focused on computational thinking for children
-- **Technology Adoption**: Early adopter of emerging technologies including Web3, AI/ML, and cloud-native solutions
+- **Technology Adoption**: Early adopter of emerging technologies including Web3, AI/LLM, and cloud-native solutions
 
 ### **Recognition & Impact**
 - **Performance Improvements**: Consistently delivered 200-300% performance improvements
@@ -293,7 +293,7 @@ Gandhi Memorial National School, Jakarta
 ## LinkedIn Sections
 
 ### 1. LinkedIn Title
-**Co-Founder & Managing Partner at SparkWorks | Software Architect | Full-Stack Developer | AI/ML Integration Expert | Blockchain/Web3 Developer**
+**Co-Founder & Managing Partner at SparkWorks | Software Architect | Full-Stack Developer | AI/LLM Integration Expert | Blockchain/Web3 Developer**
 
 ### 2. LinkedIn About Me
 
@@ -306,7 +306,7 @@ Passionate Software Architect and Technology Entrepreneur with 20+ years of expe
 • Bridge cutting-edge technology with practical business value
 
 💡 **Current Focus:**
-• AI/ML integration with Agentic AI and LLM applications
+• AI/LLM integration with Agentic AI and LLM applications
 • Blockchain/Web3 development on Ethereum platform
 • Cloud-native microservices architecture
 • Educational technology for computational thinking
@@ -315,7 +315,7 @@ Passionate Software Architect and Technology Entrepreneur with 20+ years of expe
 Languages: C#/.NET, Java, Python, Node.js, TypeScript, Solidity, Golang
 Frontend: React, Angular, Next.js, Flutter
 Cloud: AWS, Azure, GCP | Databases: SQL Server, PostgreSQL, MongoDB
-Emerging: AI/ML, Blockchain, Context Engineering
+Emerging: AI/LLM, Blockchain, Context Engineering
 
 🎯 **Philosophy:**
 Technology should empower businesses and improve lives. I'm committed to delivering solutions that not only meet technical requirements but drive real business transformation.

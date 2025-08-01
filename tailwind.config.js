@@ -8,6 +8,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
+        'outfit': ['Outfit', 'sans-serif'],
+        'space-grotesk': ['Space Grotesk', 'sans-serif'],
+        'jetbrains': ['JetBrains Mono', 'monospace'],
         'inter': ['Inter', 'sans-serif'],
         'orbitron': ['Orbitron', 'sans-serif'],
         'tinos': ['Tinos', 'sans-serif'],

@@ -3,14 +3,11 @@ import { motion, useInView } from 'motion/react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Float, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
-import { Linkedin, Mail, Github, ExternalLink, Code, Database, Cloud, Smartphone, Globe, Cpu } from 'lucide-react'
+import { Linkedin, Mail, Github, ExternalLink, Code, Database, Cloud, Smartphone, Globe, Cpu, Sun, Moon, Menu, X, ChevronDown } from 'lucide-react'
 
 // Types
 interface PortfolioProps {
-  theme?: 'dark' | 'light'
   showContact?: boolean
-  enableAnimations?: boolean
-  mobileOptimized?: boolean
 }
 
 interface Project {
@@ -27,6 +24,26 @@ interface Skill {
   technologies: string[]
   icon: React.ReactNode
   color: string
+}
+
+// Theme context
+const useTheme = () => {
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark')
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') as 'dark' | 'light' || 'dark'
+    setTheme(savedTheme)
+    document.documentElement.classList.toggle('dark', savedTheme === 'dark')
+  }, [])
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark'
+    setTheme(newTheme)
+    localStorage.setItem('theme', newTheme)
+    document.documentElement.classList.toggle('dark', newTheme === 'dark')
+  }
+
+  return { theme, toggleTheme }
 }
 
 // 3D Components
@@ -73,7 +90,90 @@ const Scene3D: React.FC = () => {
       <FloatingGeometry position={[0, -1, -2]} />
       <FloatingGeometry position={[-1, 2, -1]} />
       <FloatingGeometry position={[3, -0.5, 0]} />
+      <FloatingGeometry position={[-3, -1, 1]} />
+      <FloatingGeometry position={[1, 2.5, -2]} />
+      <FloatingGeometry position={[-2.5, -2, -1]} />
+      <FloatingGeometry position={[4, 1, -3]} />
+      <FloatingGeometry position={[-4, 0.5, 0]} />
+      <FloatingGeometry position={[0, -2.5, 1]} />
+      <FloatingGeometry position={[2.5, -1.5, -2]} />
     </>
+  )
+}
+
+// Navigation Component
+const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }> = ({ theme, toggleTheme }) => {
+  const [isOpen, setIsOpen] = useState(false)
+
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId)
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' })
+      setIsOpen(false)
+    }
+  }
+
+  return (
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-900/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-700/50">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <div className="flex items-center space-x-3">
+            <img src="/logo.png" alt="Ricardo Alexander" className="w-10 h-10 rounded-full" />
+            <span className="font-space-grotesk font-bold text-xl text-white">Ricardo Alexander</span>
+          </div>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-8">
+            <button onClick={() => scrollToSection('about')} className="text-gray-300 hover:text-cyan-400 transition-colors font-outfit">About</button>
+            <button onClick={() => scrollToSection('skills')} className="text-gray-300 hover:text-cyan-400 transition-colors font-outfit">Skills</button>
+            <button onClick={() => scrollToSection('projects')} className="text-gray-300 hover:text-cyan-400 transition-colors font-outfit">Projects</button>
+            <button onClick={() => scrollToSection('clients')} className="text-gray-300 hover:text-cyan-400 transition-colors font-outfit">Clients</button>
+            <button onClick={() => scrollToSection('contact')} className="text-gray-300 hover:text-cyan-400 transition-colors font-outfit">Contact</button>
+            
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors"
+            >
+              {theme === 'dark' ? <Sun className="w-5 h-5 text-yellow-400" /> : <Moon className="w-5 h-5 text-slate-400" />}
+            </button>
+          </div>
+
+          {/* Mobile menu button */}
+          <div className="md:hidden flex items-center space-x-2">
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors"
+            >
+              {theme === 'dark' ? <Sun className="w-5 h-5 text-yellow-400" /> : <Moon className="w-5 h-5 text-slate-400" />}
+            </button>
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors"
+            >
+              {isOpen ? <X className="w-5 h-5 text-white" /> : <Menu className="w-5 h-5 text-white" />}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Navigation */}
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="md:hidden bg-slate-800/95 backdrop-blur-lg rounded-lg mt-2 p-4 space-y-3"
+          >
+            <button onClick={() => scrollToSection('about')} className="block w-full text-left text-gray-300 hover:text-cyan-400 transition-colors font-outfit py-2">About</button>
+            <button onClick={() => scrollToSection('skills')} className="block w-full text-left text-gray-300 hover:text-cyan-400 transition-colors font-outfit py-2">Skills</button>
+            <button onClick={() => scrollToSection('projects')} className="block w-full text-left text-gray-300 hover:text-cyan-400 transition-colors font-outfit py-2">Projects</button>
+            <button onClick={() => scrollToSection('clients')} className="block w-full text-left text-gray-300 hover:text-cyan-400 transition-colors font-outfit py-2">Clients</button>
+            <button onClick={() => scrollToSection('contact')} className="block w-full text-left text-gray-300 hover:text-cyan-400 transition-colors font-outfit py-2">Contact</button>
+          </motion.div>
+        )}
+      </div>
+    </nav>
   )
 }
 
@@ -96,39 +196,45 @@ const staggerContainer = {
 const skills: Skill[] = [
   {
     category: "Languages & Frameworks",
-    technologies: ["C#/.NET", "Java/Spring Boot", "Python", "Node.js/NestJS", "TypeScript", "Solidity"],
+    technologies: ["C#/.NET", "Java/Spring Boot", "Python", "Node.js/NestJS", "TypeScript"],
     icon: <Code className="w-6 h-6" />,
     color: "text-cyan-400"
   },
   {
     category: "Frontend",
-    technologies: ["React", "Angular", "Flutter", "Next.js", "Vue.js"],
+    technologies: ["React", "Angular", "Next.js", "Vue.js", "TypeScript"],
     icon: <Globe className="w-6 h-6" />,
     color: "text-teal-400"
+  },
+  {
+    category: "Mobile Development",
+    technologies: ["React Native", "Flutter", "iOS", "Android"],
+    icon: <Smartphone className="w-6 h-6" />,
+    color: "text-green-400"
+  },
+  {
+    category: "Web3 & Blockchain",
+    technologies: ["Solidity", "Foundry", "Hardhat", "Ethers.js", "Web3.js"],
+    icon: <Cpu className="w-6 h-6" />,
+    color: "text-purple-400"
   },
   {
     category: "Cloud & DevOps",
     technologies: ["AWS", "Azure", "GCP", "Docker", "Kubernetes", "Jenkins"],
     icon: <Cloud className="w-6 h-6" />,
-    color: "text-purple-400"
+    color: "text-orange-400"
   },
   {
     category: "Databases",
     technologies: ["SQL Server", "PostgreSQL", "Oracle", "MongoDB", "Redis", "Neo4J"],
     icon: <Database className="w-6 h-6" />,
-    color: "text-orange-400"
-  },
-  {
-    category: "Mobile & Web3",
-    technologies: ["React Native", "Flutter", "Hardhat", "Ethers.js", "Web3.js"],
-    icon: <Smartphone className="w-6 h-6" />,
-    color: "text-green-400"
+    color: "text-pink-400"
   },
   {
     category: "Emerging Tech",
-    technologies: ["AI/ML", "Context Engineering", "MCP Servers", "Golang", "Rust"],
+    technologies: ["AI/LLM", "Context Engineering", "MCP Servers", "Golang", "Rust"],
     icon: <Cpu className="w-6 h-6" />,
-    color: "text-pink-400"
+    color: "text-indigo-400"
   }
 ]
 
@@ -141,10 +247,10 @@ const projects: Project[] = [
     metrics: "1-2M daily transactions"
   },
   {
-    title: "SparkWorks Platform",
+    title: "SparkWorks",
     description: "Co-founded and built enterprise platform serving Fortune 500 companies including Bank Mandiri, Astra Group, and Panasonic. Led technical strategy for 100+ projects.",
     impact: "Fortune 500 Partnerships",
-    technologies: ["React", "Node.js", "AWS", "Microservices", "PostgreSQL"],
+    technologies: ["React", "Angular", "Mobile", "Node.js", ".NET", "Microservices", "Java"],
     metrics: "20+ enterprise clients"
   },
   {
@@ -156,16 +262,24 @@ const projects: Project[] = [
   },
   {
     title: "Web3 & Blockchain Development",
-    description: "Developed DeFi platforms and Web3 applications using Solidity smart contracts with focus on security and decentralized architecture.",
+    description: "Developed blockchain platforms and Web3 applications using Solidity smart contracts with focus on security and decentralized architecture.",
     impact: "Blockchain Innovation",
-    technologies: ["Solidity", "Hardhat", "Ethers.js", "DeFi", "Smart Contracts"],
-    metrics: "Multiple DeFi implementations"
+    technologies: ["Solidity", "Foundry", "Hardhat", "Ethers.js", "Smart Contracts"],
+    metrics: "Multiple blockchain implementations"
   }
 ]
 
 const clients = [
-  "Toyota Group", "Bank Mandiri", "Astra Group", "Panasonic", "UOB Bank",
-  "BCA Finance", "Boston Consulting Group", "Accenture", "AstraPay", "BUMA"
+  "Toyota Group",
+  "Bank Mandiri", 
+  "Astra Group",
+  "Panasonic",
+  "UOB Bank",
+  "BCA Finance",
+  "Boston Consulting Group",
+  "Accenture",
+  "AstraPay",
+  "BUMA"
 ]
 
 // Components
@@ -201,11 +315,21 @@ const AnimatedCounter: React.FC<{ end: number; duration?: number; suffix?: strin
 const RicardoPortfolio: React.FC<PortfolioProps> = ({
   showContact = true
 }) => {
+  const { theme, toggleTheme } = useTheme()
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white overflow-x-hidden">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-white overflow-x-hidden transition-colors duration-300">
+      <style>{`
+        @keyframes gradient-shift {
+          0%, 100% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+        }
+      `}</style>
+      {/* Navigation */}
+      <Navigation theme={theme} toggleTheme={toggleTheme} />
+
       {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center">
+      <section id="hero" className="relative h-screen flex items-center justify-center pt-16">
         {/* 3D Background */}
         <div className="absolute inset-0 z-0">
           <Canvas camera={{ position: [0, 0, 5], fov: 60 }}>
@@ -224,31 +348,31 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
           transition={{ duration: 1, ease: "easeOut" }}
         >
           <motion.h1 
-            className="text-5xl md:text-7xl font-bold mb-4"
+            className="text-5xl md:text-7xl font-space-grotesk font-bold mb-4"
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2, duration: 0.8 }}
           >
-            <span className="bg-gradient-to-r from-cyan-400 to-teal-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-cyan-400 via-purple-500 to-teal-400 bg-clip-text text-transparent animate-pulse bg-[length:200%_100%]" style={{animation: 'gradient-shift 3s ease-in-out infinite'}}>
               Ricardo Alexander
             </span>
           </motion.h1>
           
           <motion.div
-            className="text-xl md:text-2xl text-gray-300 mb-6 max-w-4xl mx-auto"
+            className="text-xl md:text-2xl text-gray-700 dark:text-gray-300 mb-6 max-w-4xl mx-auto font-outfit"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.6 }}
           >
             <span className="text-orange-500 font-semibold">Tech Enthusiast & Software Architect</span>
             <br />
-            <span className="text-purple-400">Building Tomorrow's Systems Today</span>
+            <span className="text-purple-500 dark:text-purple-400">Building Tomorrow's Systems Today</span>
             <br />
-            <span className="text-sm text-cyan-400">AI/ML " Web3 " Enterprise Systems " Mobile</span>
+            <span className="text-sm text-cyan-500 dark:text-cyan-400 font-jetbrains">Full-stack ● Web ● Mobile ● Web3 ● AI/LLM</span>
           </motion.div>
 
           <motion.p
-            className="text-lg text-gray-400 mb-8"
+            className="text-lg text-gray-600 dark:text-gray-400 mb-8 font-outfit"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8, duration: 0.6 }}
@@ -262,23 +386,24 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1, duration: 0.6 }}
           >
-            <div className="animate-bounce">
-              <div className="w-6 h-10 border-2 border-cyan-400 rounded-full flex justify-center">
-                <div className="w-1 h-3 bg-cyan-400 rounded-full mt-2 animate-pulse"></div>
-              </div>
-            </div>
+            <button
+              onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })}
+              className="animate-bounce"
+            >
+              <ChevronDown className="w-8 h-8 text-cyan-400" />
+            </button>
           </motion.div>
         </motion.div>
       </section>
 
       {/* About Section */}
-      <section className="py-20 px-4 md:px-8 max-w-7xl mx-auto">
+      <section id="about" className="py-20 px-4 md:px-8 max-w-7xl mx-auto">
         <motion.div
           className="text-center mb-16"
           {...fadeInUp}
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+          <h2 className="text-4xl md:text-5xl font-space-grotesk font-bold mb-6">
+            <span className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
               About Me
             </span>
           </h2>
@@ -286,42 +411,42 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
 
         <div className="grid md:grid-cols-3 gap-8 mb-16">
           <motion.div
-            className="text-center p-6 rounded-lg bg-slate-800/50 backdrop-blur-sm border border-slate-700"
+            className="text-center p-6 rounded-lg bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border border-gray-200 dark:border-slate-700"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            <div className="text-4xl font-bold text-cyan-400 mb-2">
+            <div className="text-4xl font-bold text-cyan-500 mb-2 font-space-grotesk">
               <AnimatedCounter end={20} suffix="+" />
             </div>
-            <p className="text-gray-300">Years Experience</p>
+            <p className="text-gray-700 dark:text-gray-300 font-outfit">Years Experience</p>
           </motion.div>
 
           <motion.div
-            className="text-center p-6 rounded-lg bg-slate-800/50 backdrop-blur-sm border border-slate-700"
+            className="text-center p-6 rounded-lg bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border border-gray-200 dark:border-slate-700"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
             viewport={{ once: true }}
           >
-            <div className="text-4xl font-bold text-teal-400 mb-2">
+            <div className="text-4xl font-bold text-teal-500 mb-2 font-space-grotesk">
               <AnimatedCounter end={100} suffix="+" />
             </div>
-            <p className="text-gray-300">Projects Delivered</p>
+            <p className="text-gray-700 dark:text-gray-300 font-outfit">Projects Delivered</p>
           </motion.div>
 
           <motion.div
-            className="text-center p-6 rounded-lg bg-slate-800/50 backdrop-blur-sm border border-slate-700"
+            className="text-center p-6 rounded-lg bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border border-gray-200 dark:border-slate-700"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
             viewport={{ once: true }}
           >
-            <div className="text-4xl font-bold text-orange-400 mb-2">
+            <div className="text-4xl font-bold text-orange-500 mb-2 font-space-grotesk">
               <AnimatedCounter end={99} suffix=".9%" />
             </div>
-            <p className="text-gray-300">System Uptime</p>
+            <p className="text-gray-700 dark:text-gray-300 font-outfit">System Uptime</p>
           </motion.div>
         </div>
 
@@ -332,14 +457,14 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
         >
-          <p className="text-lg text-gray-300 leading-relaxed mb-6">
+          <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed mb-6 font-outfit">
             Passionate Software Architect and Technology Entrepreneur with 20+ years of experience 
             transforming complex business challenges into scalable, high-performance solutions. 
             As Co-Founder & Managing Partner of SparkWorks, I've partnered with Fortune 500 companies 
             like Toyota, Bank Mandiri, and Astra Group to drive digital transformation.
           </p>
-          <p className="text-lg text-gray-300 leading-relaxed">
-            My expertise spans enterprise architecture, AI/ML integration, blockchain development, 
+          <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed font-outfit">
+            My expertise spans enterprise architecture, AI/LLM integration, blockchain development, 
             and leading cross-functional teams. I believe in bridging cutting-edge technology 
             with practical business value, ensuring every solution delivers measurable impact.
           </p>
@@ -347,13 +472,13 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
       </section>
 
       {/* Skills Section */}
-      <section className="py-20 px-4 md:px-8 bg-slate-800/30">
+      <section id="skills" className="py-20 px-4 md:px-8 bg-gray-50 dark:bg-slate-800/30">
         <div className="max-w-7xl mx-auto">
           <motion.div
             className="text-center mb-16"
             {...fadeInUp}
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+            <h2 className="text-4xl md:text-5xl font-space-grotesk font-bold mb-6">
               <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
                 Technical Expertise
               </span>
@@ -370,7 +495,7 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
             {skills.map((skill) => (
               <motion.div
                 key={skill.category}
-                className="p-6 rounded-lg bg-slate-800/50 backdrop-blur-sm border border-slate-700 hover:border-cyan-400/50 transition-all duration-300 group"
+                className="p-6 rounded-lg bg-white/70 dark:bg-slate-800/50 backdrop-blur-sm border border-gray-200 dark:border-slate-700 hover:border-cyan-400/50 transition-all duration-300 group"
                 variants={fadeInUp}
                 whileHover={{ scale: 1.02, y: -2 }}
               >
@@ -378,13 +503,13 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
                   <div className={`${skill.color} mr-3 group-hover:scale-110 transition-transform`}>
                     {skill.icon}
                   </div>
-                  <h3 className="text-xl font-semibold text-white">{skill.category}</h3>
+                  <h3 className="text-xl font-semibold text-gray-800 dark:text-white font-space-grotesk">{skill.category}</h3>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {skill.technologies.map((tech) => (
                     <span
                       key={tech}
-                      className="px-3 py-1 text-sm bg-slate-700/50 text-gray-300 rounded-full border border-slate-600 hover:border-cyan-400/50 transition-colors"
+                      className="px-3 py-1 text-sm bg-gray-100 dark:bg-slate-700/50 text-gray-800 dark:text-gray-300 rounded-full border border-gray-200 dark:border-slate-600 hover:border-cyan-400/50 transition-colors font-jetbrains"
                     >
                       {tech}
                     </span>
@@ -397,13 +522,13 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
       </section>
 
       {/* Projects Section */}
-      <section className="py-20 px-4 md:px-8">
+      <section id="projects" className="py-20 px-4 md:px-8">
         <div className="max-w-7xl mx-auto">
           <motion.div
             className="text-center mb-16"
             {...fadeInUp}
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+            <h2 className="text-4xl md:text-5xl font-space-grotesk font-bold mb-6">
               <span className="bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">
                 Featured Projects
               </span>
@@ -414,15 +539,15 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
             {projects.map((project) => (
               <motion.div
                 key={project.title}
-                className="p-6 rounded-lg bg-slate-800/50 backdrop-blur-sm border border-slate-700 hover:border-orange-400/50 transition-all duration-300 group"
+                className="p-6 rounded-lg bg-white/70 dark:bg-slate-800/50 backdrop-blur-sm border border-gray-200 dark:border-slate-700 hover:border-orange-400/50 transition-all duration-300 group"
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
                 viewport={{ once: true }}
                 whileHover={{ scale: 1.02 }}
               >
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-xl font-bold text-white group-hover:text-orange-400 transition-colors">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4 gap-3">
+                  <h3 className="text-xl font-bold text-gray-800 dark:text-white group-hover:text-orange-500 transition-colors font-space-grotesk">
                     {project.title}
                   </h3>
                   {project.link && (
@@ -430,21 +555,21 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
                       href={project.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-cyan-400 hover:text-cyan-300 transition-colors"
+                      className="text-cyan-500 hover:text-cyan-400 transition-colors shrink-0"
                     >
                       <ExternalLink className="w-5 h-5" />
                     </a>
                   )}
                 </div>
 
-                <p className="text-gray-300 mb-4 leading-relaxed">{project.description}</p>
+                <p className="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed font-outfit">{project.description}</p>
 
-                <div className="mb-4">
-                  <span className="inline-block px-3 py-1 bg-gradient-to-r from-orange-500/20 to-red-500/20 text-orange-400 rounded-full text-sm font-semibold border border-orange-500/30">
+                <div className="mb-4 flex flex-wrap gap-2">
+                  <span className="inline-block px-3 py-1 bg-gradient-to-r from-orange-500/20 to-red-500/20 text-orange-500 dark:text-orange-400 rounded-full text-sm font-semibold border border-orange-500/30">
                     {project.impact}
                   </span>
                   {project.metrics && (
-                    <span className="inline-block ml-2 px-3 py-1 bg-slate-700/50 text-cyan-400 rounded-full text-sm">
+                    <span className="inline-block px-3 py-1 bg-gray-100 dark:bg-slate-700/50 text-cyan-700 dark:text-cyan-400 rounded-full text-sm font-jetbrains">
                       {project.metrics}
                     </span>
                   )}
@@ -454,7 +579,7 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
                   {project.technologies.map((tech) => (
                     <span
                       key={tech}
-                      className="px-2 py-1 text-xs bg-slate-700/50 text-gray-400 rounded border border-slate-600"
+                      className="px-2 py-1 text-xs bg-gray-100 dark:bg-slate-700/50 text-gray-700 dark:text-gray-400 rounded border border-gray-200 dark:border-slate-600 font-jetbrains"
                     >
                       {tech}
                     </span>
@@ -467,13 +592,13 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
       </section>
 
       {/* Client Testimonials */}
-      <section className="py-20 px-4 md:px-8 bg-slate-800/30">
+      <section id="clients" className="py-20 px-4 md:px-8 bg-gray-50 dark:bg-slate-800/30">
         <div className="max-w-7xl mx-auto">
           <motion.div
             className="text-center mb-16"
             {...fadeInUp}
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+            <h2 className="text-4xl md:text-5xl font-space-grotesk font-bold mb-6">
               <span className="bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent">
                 Trusted by Industry Leaders
               </span>
@@ -490,11 +615,13 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
             {clients.map((client) => (
               <motion.div
                 key={client}
-                className="text-center p-4 rounded-lg bg-slate-800/50 backdrop-blur-sm border border-slate-700 hover:border-green-400/50 transition-all duration-300"
+                className="text-center p-4 rounded-lg bg-white/70 dark:bg-slate-800/50 backdrop-blur-sm border border-gray-200 dark:border-slate-700 hover:border-green-400/50 transition-all duration-300 group"
                 variants={fadeInUp}
                 whileHover={{ scale: 1.05 }}
               >
-                <p className="text-gray-300 font-medium text-sm">{client}</p>
+                <p className="text-gray-700 dark:text-gray-300 font-medium text-sm font-outfit group-hover:text-green-500 transition-colors">
+                  {client}
+                </p>
               </motion.div>
             ))}
           </motion.div>
@@ -507,8 +634,8 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
             >
-              <div className="text-3xl font-bold text-green-400 mb-2">300%</div>
-              <p className="text-gray-300">Performance Improvements</p>
+              <div className="text-3xl font-bold text-green-500 mb-2 font-space-grotesk">300%</div>
+              <p className="text-gray-700 dark:text-gray-300 font-outfit">Performance Improvements</p>
             </motion.div>
 
             <motion.div
@@ -518,8 +645,8 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
               transition={{ duration: 0.6, delay: 0.1 }}
               viewport={{ once: true }}
             >
-              <div className="text-3xl font-bold text-blue-400 mb-2">$200K+</div>
-              <p className="text-gray-300">Annual Cost Savings</p>
+              <div className="text-3xl font-bold text-blue-500 mb-2 font-space-grotesk">$200K+</div>
+              <p className="text-gray-700 dark:text-gray-300 font-outfit">Annual Cost Savings</p>
             </motion.div>
 
             <motion.div
@@ -529,8 +656,8 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
               transition={{ duration: 0.6, delay: 0.2 }}
               viewport={{ once: true }}
             >
-              <div className="text-3xl font-bold text-purple-400 mb-2">99.9%</div>
-              <p className="text-gray-300">System Uptime</p>
+              <div className="text-3xl font-bold text-purple-500 mb-2 font-space-grotesk">99.9%</div>
+              <p className="text-gray-700 dark:text-gray-300 font-outfit">System Uptime</p>
             </motion.div>
           </div>
         </div>
@@ -538,18 +665,18 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
 
       {/* Contact Section */}
       {showContact && (
-        <section className="py-20 px-4 md:px-8">
+        <section id="contact" className="py-20 px-4 md:px-8">
           <div className="max-w-4xl mx-auto text-center">
             <motion.div
               className="mb-16"
               {...fadeInUp}
             >
-              <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <h2 className="text-4xl md:text-5xl font-space-grotesk font-bold mb-6">
                 <span className="bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">
                   Let's Build Something Amazing
                 </span>
               </h2>
-              <p className="text-xl text-gray-300 mb-8">
+              <p className="text-xl text-gray-700 dark:text-gray-300 mb-8 font-outfit">
                 Ready to transform your challenges into scalable solutions?
               </p>
             </motion.div>
@@ -565,7 +692,7 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
                 href="https://linkedin.com/in/ricardoalexander"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors group"
+                className="flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors group font-outfit"
                 variants={fadeInUp}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -575,8 +702,8 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
               </motion.a>
 
               <motion.a
-                href="mailto:ricardo@sparkworks.com"
-                className="flex items-center px-6 py-3 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors group"
+                href="mailto:ricardoalexanderh@gmail.com"
+                className="flex items-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors group font-outfit"
                 variants={fadeInUp}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -586,10 +713,21 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
               </motion.a>
 
               <motion.a
-                href="https://github.com/ricardoalexander"
+                href="mailto:ricardo.alexanderh@sparkworks.co.id"
+                className="flex items-center px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors group font-outfit"
+                variants={fadeInUp}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Mail className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+                Company Email
+              </motion.a>
+
+              <motion.a
+                href="https://github.com/ricardoalexanderh"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center px-6 py-3 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors group"
+                className="flex items-center px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors group font-outfit"
                 variants={fadeInUp}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -603,9 +741,9 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
       )}
 
       {/* Footer */}
-      <footer className="py-8 px-4 text-center border-t border-slate-700">
-        <p className="text-gray-400">
-          © 2025 Ricardo Alexander. Built with React, Three.js, and passion for innovation.
+      <footer className="py-8 px-4 text-center border-t border-gray-200 dark:border-slate-700">
+        <p className="text-gray-500 dark:text-gray-400 font-outfit">
+          © 2025 Ricardo Alexander. Built with passion for innovation.
         </p>
       </footer>
     </div>

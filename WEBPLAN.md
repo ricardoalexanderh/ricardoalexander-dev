@@ -103,7 +103,7 @@ Create a world-class, single-page portfolio website that showcases Ricardo Alexa
 - Interactive skill visualization (possibly 3D)
 - Technology categories with proficiency levels
 - Animated tech stack logos
-- Recent technology adoptions (AI/ML, Web3)
+- Recent technology adoptions (AI/LLM, Web3)
 
 **Animations**:
 - Skills: 3D skill spheres or animated progress rings
