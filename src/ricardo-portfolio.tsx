@@ -219,7 +219,7 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center space-x-2">
             <a
-              href="https://linkedin.com/in/ricardoalexander"
+              href="https://linkedin.com/in/ricardoalexanderh"
               target="_blank"
               rel="noopener noreferrer"
               className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors group"
