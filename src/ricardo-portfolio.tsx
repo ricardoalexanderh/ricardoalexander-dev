@@ -3,7 +3,7 @@ import { motion, useInView } from 'motion/react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Float, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
-import { Linkedin, Mail, Github, ExternalLink, Code, Database, Cloud, Smartphone, Globe, Cpu, Sun, Moon, Menu, X, ChevronDown, Play } from 'lucide-react'
+import { Linkedin, Mail, Github, ExternalLink, Code, Database, Cloud, Smartphone, Globe, Cpu, Sun, Moon, Menu, X, ChevronDown, Play, Zap } from 'lucide-react'
 
 // Types
 interface PortfolioProps {
@@ -321,6 +321,12 @@ const skills: Skill[] = [
     technologies: ["SQL Server", "PostgreSQL", "Oracle", "MongoDB", "Redis", "Neo4J"],
     icon: <Database className="w-6 h-6" />,
     color: "text-pink-400"
+  },
+  {
+    category: "Middleware & Integration",
+    technologies: ["Apache Airflow", "Kafka", "RabbitMQ", "Apache NiFi", "CQRS", "Event-Driven Architecture"],
+    icon: <Zap className="w-6 h-6" />,
+    color: "text-yellow-400"
   },
   {
     category: "Emerging Tech",
