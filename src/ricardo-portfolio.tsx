@@ -3,7 +3,7 @@ import { motion, useInView } from 'motion/react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Float, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
-import { Linkedin, Mail, Github, ExternalLink, Code, Database, Cloud, Smartphone, Globe, Cpu, Sun, Moon, Menu, X, ChevronDown } from 'lucide-react'
+import { Linkedin, Mail, Github, ExternalLink, Code, Database, Cloud, Smartphone, Globe, Cpu, Sun, Moon, Menu, X, ChevronDown, Play } from 'lucide-react'
 
 // Types
 interface PortfolioProps {
@@ -44,6 +44,64 @@ const useTheme = () => {
   }
 
   return { theme, toggleTheme }
+}
+
+// Video Modal Component
+const VideoModal: React.FC<{ isOpen: boolean; onClose: () => void; videoId: string }> = ({ isOpen, onClose, videoId }) => {
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape)
+      document.body.style.overflow = 'hidden'
+    }
+    
+    return () => {
+      document.removeEventListener('keydown', handleEscape)
+      document.body.style.overflow = 'unset'
+    }
+  }, [isOpen, onClose])
+
+  if (!isOpen) return null
+
+  return (
+    <motion.div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+    >
+      <motion.div
+        className="relative w-full max-w-4xl bg-slate-900 rounded-lg overflow-hidden shadow-2xl"
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 z-10 p-2 bg-black/50 hover:bg-black/70 text-white rounded-full transition-colors"
+        >
+          <X className="w-5 h-5" />
+        </button>
+        
+        {/* Video container with responsive aspect ratio */}
+        <div className="relative w-full pb-[56.25%] h-0"> {/* 16:9 aspect ratio */}
+          <iframe
+            className="absolute top-0 left-0 w-full h-full border-0"
+            src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`}
+            title="Professional Overview Video"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        </div>
+      </motion.div>
+    </motion.div>
+  )
 }
 
 // 3D Components
@@ -131,6 +189,24 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
             <button onClick={() => scrollToSection('clients')} className="text-gray-300 hover:text-cyan-400 transition-colors font-outfit">Clients</button>
             <button onClick={() => scrollToSection('contact')} className="text-gray-300 hover:text-cyan-400 transition-colors font-outfit">Contact</button>
             
+            {/* Social Links */}
+            <a
+              href="https://linkedin.com/in/ricardoalexander"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors group"
+            >
+              <Linkedin className="w-5 h-5 text-blue-400 group-hover:text-blue-300" />
+            </a>
+            <a
+              href="https://github.com/ricardoalexanderh"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors group"
+            >
+              <Github className="w-5 h-5 text-gray-300 group-hover:text-white" />
+            </a>
+            
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
@@ -142,6 +218,22 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
 
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center space-x-2">
+            <a
+              href="https://linkedin.com/in/ricardoalexander"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors group"
+            >
+              <Linkedin className="w-5 h-5 text-blue-400 group-hover:text-blue-300" />
+            </a>
+            <a
+              href="https://github.com/ricardoalexanderh"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors group"
+            >
+              <Github className="w-5 h-5 text-gray-300 group-hover:text-white" />
+            </a>
             <button
               onClick={toggleTheme}
               className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors"
@@ -316,6 +408,10 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
   showContact = true
 }) => {
   const { theme, toggleTheme } = useTheme()
+  const [isVideoOpen, setIsVideoOpen] = useState(false)
+  
+  // YouTube video ID for professional overview
+  const youtubeVideoId = "GHC_3oE1i6g"
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-white overflow-x-hidden transition-colors duration-300">
@@ -325,6 +421,13 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
           50% { background-position: 100% 50%; }
         }
       `}</style>
+      {/* Video Modal */}
+      <VideoModal 
+        isOpen={isVideoOpen} 
+        onClose={() => setIsVideoOpen(false)} 
+        videoId={youtubeVideoId} 
+      />
+      
       {/* Navigation */}
       <Navigation theme={theme} toggleTheme={toggleTheme} />
 
@@ -463,11 +566,66 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
             As Co-Founder & Managing Partner of SparkWorks, I've partnered with Fortune 500 companies 
             like Toyota, Bank Mandiri, and Astra Group to drive digital transformation.
           </p>
-          <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed font-outfit">
+          <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed mb-8 font-outfit">
             My expertise spans enterprise architecture, AI/LLM integration, blockchain development, 
             and leading cross-functional teams. I believe in bridging cutting-edge technology 
             with practical business value, ensuring every solution delivers measurable impact.
           </p>
+
+          {/* Video Overview & PDF Portfolio */}
+          <div className="mt-8 grid md:grid-cols-2 gap-6">
+            <motion.div
+              className="p-6 rounded-lg bg-gradient-to-br from-cyan-500/10 to-purple-500/10 border border-cyan-500/30"
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              viewport={{ once: true }}
+            >
+              <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-4 font-space-grotesk">
+                🎥 Professional Overview
+              </h3>
+              <p className="text-gray-700 dark:text-gray-300 mb-4 font-outfit">
+                Watch an AI-generated overview of my professional journey and expertise
+              </p>
+              <motion.button
+                onClick={() => setIsVideoOpen(true)}
+                className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white rounded-lg transition-all duration-300 font-outfit font-semibold"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Play className="w-5 h-5 mr-2" />
+                Watch Video Overview
+              </motion.button>
+            </motion.div>
+
+            <motion.div
+              className="p-6 rounded-lg bg-gradient-to-br from-orange-500/10 to-red-500/10 border border-orange-500/30"
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              viewport={{ once: true }}
+            >
+              <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-4 font-space-grotesk">
+                📄 Complete Portfolio
+              </h3>
+              <p className="text-gray-700 dark:text-gray-300 mb-4 font-outfit">
+                Download my comprehensive portfolio with detailed project experiences and client work
+              </p>
+              <motion.a
+                href="/Ricardo Alexander - Portfolio 2025.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-lg transition-all duration-300 font-outfit font-semibold"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+                Download PDF Portfolio
+              </motion.a>
+            </motion.div>
+          </div>
         </motion.div>
       </section>
 
@@ -689,19 +847,6 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
               viewport={{ once: true }}
             >
               <motion.a
-                href="https://linkedin.com/in/ricardoalexander"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors group font-outfit"
-                variants={fadeInUp}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Linkedin className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
-                LinkedIn
-              </motion.a>
-
-              <motion.a
                 href="mailto:ricardoalexanderh@gmail.com"
                 className="flex items-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors group font-outfit"
                 variants={fadeInUp}
@@ -721,19 +866,6 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
               >
                 <Mail className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
                 Company Email
-              </motion.a>
-
-              <motion.a
-                href="https://github.com/ricardoalexanderh"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors group font-outfit"
-                variants={fadeInUp}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Github className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
-                GitHub
               </motion.a>
             </motion.div>
           </div>
