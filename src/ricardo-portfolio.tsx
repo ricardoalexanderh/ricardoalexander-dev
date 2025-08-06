@@ -269,6 +269,456 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
   )
 }
 
+// Hero subtitle lines for typing animation
+const heroSubtitleLines = [
+  "Tech Enthusiast & Software Architect",
+  "Building Tomorrow's Systems Today", 
+  "Full-stack ● Web ● Mobile ● Web3 ● AI/LLM",
+  "Co-Founder & Managing Partner at SparkWorks"
+]
+
+// Hero subtitle typing animation component
+const HeroTypingAnimation: React.FC = () => {
+  const [displayText, setDisplayText] = useState('')
+  const [currentLineIndex, setCurrentLineIndex] = useState(0)
+  const [currentCharIndex, setCurrentCharIndex] = useState(0)
+
+  useEffect(() => {
+    const typeText = () => {
+      if (currentLineIndex < heroSubtitleLines.length) {
+        const currentLine = heroSubtitleLines[currentLineIndex]
+        
+        if (currentCharIndex < currentLine.length) {
+          setDisplayText(prev => {
+            const lines = prev.split('\n')
+            lines[currentLineIndex] = (lines[currentLineIndex] || '') + currentLine[currentCharIndex]
+            return lines.join('\n')
+          })
+          setCurrentCharIndex(prev => prev + 1)
+        } else {
+          // Line completed, move to next line after delay
+          setTimeout(() => {
+            setCurrentLineIndex(prev => prev + 1)
+            setCurrentCharIndex(0)
+            setDisplayText(prev => prev + (currentLineIndex < heroSubtitleLines.length - 1 ? '\n' : ''))
+          }, 150)
+        }
+      } else {
+        // Animation completed, restart after delay
+        setTimeout(() => {
+          setDisplayText('')
+          setCurrentLineIndex(0)
+          setCurrentCharIndex(0)
+        }, 3000)
+      }
+    }
+
+    const timer = setTimeout(typeText, Math.random() * 25 + 40)
+    return () => clearTimeout(timer)
+  }, [currentLineIndex, currentCharIndex])
+
+  return (
+    <div className="text-xl md:text-2xl text-gray-700 dark:text-gray-300 mb-6 max-w-4xl mx-auto font-outfit min-h-[120px]">
+      <div className="whitespace-pre-line">
+        {displayText.split('\n').map((line, index) => (
+          <div key={index} className="mb-1">
+            {index === 0 && <span className="text-orange-500 font-semibold">{line}</span>}
+            {index === 1 && <span className="text-purple-500 dark:text-purple-400">{line}</span>}
+            {index === 2 && <span className="text-sm text-cyan-500 dark:text-cyan-400 font-jetbrains">{line}</span>}
+            {index === 3 && <span className="text-lg text-gray-600 dark:text-gray-400 font-outfit">{line}</span>}
+            {index === currentLineIndex && currentCharIndex <= heroSubtitleLines[currentLineIndex]?.length && (
+              <span className="text-cyan-400 animate-pulse">|</span>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// Solidity code snippets for technical expertise animation
+const solidityCodeSnippets = [
+  "// SPDX-License-Identifier: MIT",
+  "pragma solidity ^0.8.19;",
+  "",
+  "import \"@openzeppelin/contracts/token/ERC20/ERC20.sol\";",
+  "import \"@openzeppelin/contracts/access/Ownable.sol\";",
+  "import \"@openzeppelin/contracts/security/ReentrancyGuard.sol\";",
+  "",
+  "contract DeFiYieldVault is ERC20, Ownable, ReentrancyGuard {",
+  "    using SafeMath for uint256;",
+  "",
+  "    struct Stake {",
+  "        uint256 amount;",
+  "        uint256 timestamp;",
+  "        uint256 rewardDebt;",
+  "    }",
+  "",
+  "    mapping(address => Stake) public stakes;",
+  "    uint256 public totalStaked;",
+  "    uint256 public rewardRate = 100; // 1% per day",
+  "    uint256 public constant PRECISION = 1e18;",
+  "",
+  "    event Staked(address indexed user, uint256 amount);",
+  "    event Withdrawn(address indexed user, uint256 amount);",
+  "    event RewardClaimed(address indexed user, uint256 reward);",
+  "",
+  "    modifier validAmount(uint256 _amount) {",
+  "        require(_amount > 0, \"Amount must be greater than 0\");",
+  "        _;",
+  "    }",
+  "",
+  "    constructor() ERC20(\"YieldToken\", \"YIELD\") {}",
+  "",
+  "    function stake(uint256 _amount) external payable validAmount(_amount) nonReentrant {",
+  "        require(msg.value == _amount, \"ETH amount mismatch\");",
+  "        ",
+  "        Stake storage userStake = stakes[msg.sender];",
+  "        ",
+  "        if (userStake.amount > 0) {",
+  "            uint256 pendingReward = calculateReward(msg.sender);",
+  "            if (pendingReward > 0) {",
+  "                _mint(msg.sender, pendingReward);",
+  "                emit RewardClaimed(msg.sender, pendingReward);",
+  "            }",
+  "        }",
+  "",
+  "        userStake.amount = userStake.amount.add(_amount);",
+  "        userStake.timestamp = block.timestamp;",
+  "        userStake.rewardDebt = userStake.amount.mul(getRewardPerToken());",
+  "        ",
+  "        totalStaked = totalStaked.add(_amount);",
+  "        emit Staked(msg.sender, _amount);",
+  "    }",
+  "",
+  "    function withdraw(uint256 _amount) external validAmount(_amount) nonReentrant {",
+  "        Stake storage userStake = stakes[msg.sender];",
+  "        require(userStake.amount >= _amount, \"Insufficient staked amount\");",
+  "        ",
+  "        uint256 pendingReward = calculateReward(msg.sender);",
+  "        if (pendingReward > 0) {",
+  "            _mint(msg.sender, pendingReward);",
+  "            emit RewardClaimed(msg.sender, pendingReward);",
+  "        }",
+  "",
+  "        userStake.amount = userStake.amount.sub(_amount);",
+  "        userStake.rewardDebt = userStake.amount.mul(getRewardPerToken());",
+  "        totalStaked = totalStaked.sub(_amount);",
+  "",
+  "        payable(msg.sender).transfer(_amount);",
+  "        emit Withdrawn(msg.sender, _amount);",
+  "    }",
+  "",
+  "    function calculateReward(address _user) public view returns (uint256) {",
+  "        Stake memory userStake = stakes[_user];",
+  "        if (userStake.amount == 0) return 0;",
+  "",
+  "        uint256 timeElapsed = block.timestamp.sub(userStake.timestamp);",
+  "        uint256 reward = userStake.amount",
+  "            .mul(rewardRate)",
+  "            .mul(timeElapsed)",
+  "            .div(86400) // seconds in a day",
+  "            .div(10000); // basis points",
+  "",
+  "        return reward;",
+  "    }",
+  "",
+  "    function getRewardPerToken() public view returns (uint256) {",
+  "        if (totalStaked == 0) return 0;",
+  "        return rewardRate.mul(PRECISION).div(totalStaked);",
+  "    }",
+  "",
+  "    function emergencyWithdraw() external onlyOwner {",
+  "        payable(owner()).transfer(address(this).balance);",
+  "    }",
+  "}",
+]
+
+// Solidity Math Animation Component for Technical Expertise
+const SolidityMathAnimation: React.FC = () => {
+  const [code, setCode] = useState('')
+  const [currentLine, setCurrentLine] = useState(0)
+  
+  useEffect(() => {
+    let lineIndex = 0
+    let charIndex = 0
+    let currentCodeLine = ''
+    
+    const typeWriter = () => {
+      if (lineIndex < solidityCodeSnippets.length) {
+        const currentSnippet = solidityCodeSnippets[lineIndex]
+        
+        if (charIndex < currentSnippet.length) {
+          currentCodeLine += currentSnippet[charIndex]
+          setCode(prev => {
+            const lines = prev.split('\n')
+            lines[lineIndex] = currentCodeLine
+            return lines.join('\n')
+          })
+          charIndex++
+          setTimeout(typeWriter, Math.random() * 40 + 20) // Faster typing for Solidity
+        } else {
+          // Line completed, move to next line
+          setCode(prev => prev + (lineIndex < solidityCodeSnippets.length - 1 ? '\n' : ''))
+          lineIndex++
+          charIndex = 0
+          currentCodeLine = ''
+          setCurrentLine(lineIndex)
+          setTimeout(typeWriter, Math.random() * 150 + 50) // Shorter pause between lines
+        }
+      } else {
+        // Animation completed, restart after delay
+        setTimeout(() => {
+          setCode('')
+          setCurrentLine(0)
+          lineIndex = 0
+          charIndex = 0
+          currentCodeLine = ''
+          typeWriter()
+        }, 4000)
+      }
+    }
+
+    const timer = setTimeout(typeWriter, 500) // Initial delay
+    return () => clearTimeout(timer)
+  }, [])
+
+  return (
+    <div className="absolute inset-0 overflow-hidden opacity-8 dark:opacity-15 pointer-events-none">
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-blue-500/5" />
+      <pre className="absolute top-0 left-0 w-full h-full text-xs leading-relaxed font-mono text-purple-600 dark:text-purple-400 p-6 overflow-hidden">
+        <div className="animate-pulse text-blue-500 mb-2">
+          // Smart Contract Development - Solidity DeFi Vault
+        </div>
+        <div className="relative">
+          {code.split('\n').map((line, index) => (
+            <div 
+              key={index} 
+              className={`${
+                index === currentLine ? 'text-yellow-500 animate-pulse' : ''
+              } ${
+                line.includes('//') || line.includes('SPDX') ? 'text-gray-500' : 
+                line.includes('contract') || line.includes('function') || line.includes('modifier') ? 'text-blue-500' :
+                line.includes('mapping') || line.includes('struct') || line.includes('uint256') || line.includes('address') ? 'text-green-500' :
+                line.includes('require') || line.includes('emit') || line.includes('if') || line.includes('return') ? 'text-orange-500' :
+                line.includes('public') || line.includes('external') || line.includes('private') || line.includes('view') ? 'text-cyan-500' :
+                line.includes('import') || line.includes('pragma') ? 'text-pink-500' :
+                'text-purple-500'
+              }`}
+            >
+              {line}
+              {index === currentLine && (
+                <span className="animate-blink text-purple-400">|</span>
+              )}
+            </div>
+          ))}
+        </div>
+        
+        {/* Floating blockchain symbols */}
+        <div className="absolute top-4 right-4 space-y-2 text-right">
+          <div className="animate-bounce delay-0 text-purple-500">⬣</div>
+          <div className="animate-bounce delay-200 text-blue-500">◈</div>
+          <div className="animate-bounce delay-400 text-green-500">⟐</div>
+          <div className="animate-bounce delay-600 text-cyan-500">◊</div>
+        </div>
+        
+        {/* Smart contract metrics */}
+        <div className="absolute bottom-4 right-4 text-right text-gray-600 dark:text-gray-500 space-y-1">
+          <div className="animate-pulse delay-100">Gas: ~50,000</div>
+          <div className="animate-pulse delay-300">APY: 12.5%</div>
+          <div className="animate-pulse delay-500">TVL: $2.3M</div>
+        </div>
+      </pre>
+      
+      <style>{`
+        @keyframes blink {
+          0%, 50% { opacity: 1; }
+          51%, 100% { opacity: 0; }
+        }
+        
+        .animate-blink {
+          animation: blink 1s infinite;
+        }
+      `}</style>
+    </div>
+  )
+}
+
+// Crypto code snippets for animation
+const cryptoCodeSnippets = [
+  "// Calculate SHA-256 hash for blockchain",
+  "const hash = await crypto.subtle.digest('SHA-256', data);",
+  "const hashArray = Array.from(new Uint8Array(hash));",
+  "const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');",
+  "",
+  "// Generate Ethereum address from public key",
+  "const publicKey = secp256k1.publicKeyCreate(privateKey);",
+  "const address = '0x' + keccak256(publicKey.slice(1)).slice(-20).toString('hex');",
+  "",
+  "// Elliptic Curve Digital Signature Algorithm (ECDSA)",
+  "interface ECDSASignature {",
+  "  r: bigint;",
+  "  s: bigint;",
+  "  recovery?: number;",
+  "}",
+  "",
+  "// Merkle Tree calculation for block verification",
+  "function calculateMerkleRoot(transactions: string[]): string {",
+  "  if (transactions.length === 0) return '';",
+  "  if (transactions.length === 1) return transactions[0];",
+  "",
+  "  const level: string[] = [];",
+  "  for (let i = 0; i < transactions.length; i += 2) {",
+  "    const left = transactions[i];",
+  "    const right = transactions[i + 1] || left;",
+  "    const combined = left + right;",
+  "    level.push(sha256(combined));",
+  "  }",
+  "  return calculateMerkleRoot(level);",
+  "}",
+  "",
+  "// Smart contract gas estimation",
+  "const gasPrice = await web3.eth.getGasPrice();",
+  "const gasEstimate = await contract.methods.transfer(to, amount).estimateGas();",
+  "const transactionCost = gasPrice * gasEstimate;",
+  "",
+  "// DeFi yield calculation with compound interest",
+  "const calculateAPY = (principal: number, rate: number, periods: number): number => {",
+  "  return principal * Math.pow(1 + rate / periods, periods) - principal;",
+  "};",
+  "",
+  "// Zero-knowledge proof verification",
+  "const zkProof = {",
+  "  pi_a: [BigInt('0x...'), BigInt('0x...')],",
+  "  pi_b: [[BigInt('0x...'), BigInt('0x...')], [BigInt('0x...'), BigInt('0x...')]],",
+  "  pi_c: [BigInt('0x...'), BigInt('0x...')],",
+  "  protocol: 'groth16',",
+  "  curve: 'bn128'",
+  "};",
+  "",
+  "// Layer 2 state channel implementation",
+  "class PaymentChannel {",
+  "  private nonce: number = 0;",
+  "  private balance: Map<string, bigint> = new Map();",
+  "",
+  "  updateState(from: string, to: string, amount: bigint): void {",
+  "    this.nonce++;",
+  "    const fromBalance = this.balance.get(from) || 0n;",
+  "    const toBalance = this.balance.get(to) || 0n;",
+  "    this.balance.set(from, fromBalance - amount);",
+  "    this.balance.set(to, toBalance + amount);",
+  "  }",
+  "}",
+]
+
+// Crypto Math Animation Component
+const CryptoMathAnimation: React.FC = () => {
+  const [code, setCode] = useState('')
+  const [currentLine, setCurrentLine] = useState(0)
+
+  useEffect(() => {
+    let lineIndex = 0
+    let charIndex = 0
+    let currentCodeLine = ''
+    
+    const typeWriter = () => {
+      if (lineIndex < cryptoCodeSnippets.length) {
+        const currentSnippet = cryptoCodeSnippets[lineIndex]
+        
+        if (charIndex < currentSnippet.length) {
+          currentCodeLine += currentSnippet[charIndex]
+          setCode(prev => {
+            const lines = prev.split('\n')
+            lines[lineIndex] = currentCodeLine
+            return lines.join('\n')
+          })
+          charIndex++
+          setTimeout(typeWriter, Math.random() * 50 + 30) // Variable typing speed
+        } else {
+          // Line completed, move to next line
+          setCode(prev => prev + (lineIndex < cryptoCodeSnippets.length - 1 ? '\n' : ''))
+          lineIndex++
+          charIndex = 0
+          currentCodeLine = ''
+          setCurrentLine(lineIndex)
+          setTimeout(typeWriter, Math.random() * 200 + 100) // Pause between lines
+        }
+      } else {
+        // Animation completed, restart after delay
+        setTimeout(() => {
+          setCode('')
+          setCurrentLine(0)
+          lineIndex = 0
+          charIndex = 0
+          currentCodeLine = ''
+          typeWriter()
+        }, 5000)
+      }
+    }
+
+    const timer = setTimeout(typeWriter, 1000) // Initial delay
+    return () => clearTimeout(timer)
+  }, [])
+
+  return (
+    <div className="absolute inset-0 overflow-hidden opacity-10 dark:opacity-20 pointer-events-none">
+      <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-purple-500/5" />
+      <pre className="absolute top-0 left-0 w-full h-full text-xs leading-relaxed font-mono text-cyan-600 dark:text-cyan-400 p-8 overflow-hidden">
+        <div className="animate-pulse text-green-500 mb-2">
+          // Blockchain & Crypto
+        </div>
+        <div className="relative">
+          {code.split('\n').map((line, index) => (
+            <div 
+              key={index} 
+              className={`${
+                index === currentLine ? 'text-yellow-500 animate-pulse' : ''
+              } ${
+                line.includes('//') ? 'text-gray-500' : 
+                line.includes('const') || line.includes('function') || line.includes('class') ? 'text-purple-500' :
+                line.includes('interface') || line.includes('type') ? 'text-blue-500' :
+                line.includes('await') || line.includes('async') ? 'text-orange-500' :
+                'text-cyan-500'
+              }`}
+            >
+              {line}
+              {index === currentLine && (
+                <span className="animate-blink text-cyan-400">|</span>
+              )}
+            </div>
+          ))}
+        </div>
+        
+        {/* Floating crypto symbols */}
+        <div className="absolute top-4 right-4 space-y-2 text-right">
+          <div className="animate-bounce delay-0 text-yellow-500">₿</div>
+          <div className="animate-bounce delay-200 text-purple-500">Ξ</div>
+          <div className="animate-bounce delay-400 text-green-500">◊</div>
+          <div className="animate-bounce delay-600 text-blue-500">₳</div>
+        </div>
+        
+        {/* Mathematical formulas */}
+        <div className="absolute bottom-4 right-4 text-right text-gray-600 dark:text-gray-500 space-y-1">
+          <div className="animate-pulse delay-100">Hash = SHA256(block + nonce)</div>
+          <div className="animate-pulse delay-300">APY = (1 + r/n)ⁿ - 1</div>
+          <div className="animate-pulse delay-500">Gas = gasPrice × gasLimit</div>
+        </div>
+      </pre>
+      
+      <style>{`
+        @keyframes blink {
+          0%, 50% { opacity: 1; }
+          51%, 100% { opacity: 0; }
+        }
+        
+        .animate-blink {
+          animation: blink 1s infinite;
+        }
+      `}</style>
+    </div>
+  )
+}
+
 // Animation variants
 const fadeInUp = {
   initial: { opacity: 0, y: 50 },
@@ -468,26 +918,12 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
           </motion.h1>
           
           <motion.div
-            className="text-xl md:text-2xl text-gray-700 dark:text-gray-300 mb-6 max-w-4xl mx-auto font-outfit"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.6 }}
           >
-            <span className="text-orange-500 font-semibold">Tech Enthusiast & Software Architect</span>
-            <br />
-            <span className="text-purple-500 dark:text-purple-400">Building Tomorrow's Systems Today</span>
-            <br />
-            <span className="text-sm text-cyan-500 dark:text-cyan-400 font-jetbrains">Full-stack ● Web ● Mobile ● Web3 ● AI/LLM</span>
+            <HeroTypingAnimation />
           </motion.div>
-
-          <motion.p
-            className="text-lg text-gray-600 dark:text-gray-400 mb-8 font-outfit"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8, duration: 0.6 }}
-          >
-            Co-Founder & Managing Partner at SparkWorks
-          </motion.p>
 
           <motion.div
             className="flex justify-center"
@@ -506,7 +942,10 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
       </section>
 
       {/* About Section */}
-      <section id="about" className="py-20 px-4 md:px-8 max-w-7xl mx-auto">
+      <section id="about" className="relative py-20 px-4 md:px-8">
+        <div className="max-w-7xl mx-auto">
+        {/* Crypto Math Animation Background */}
+        <CryptoMathAnimation />
         <motion.div
           className="text-center mb-16"
           {...fadeInUp}
@@ -633,10 +1072,13 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
             </motion.div>
           </div>
         </motion.div>
+        </div>
       </section>
 
       {/* Skills Section */}
-      <section id="skills" className="py-20 px-4 md:px-8 bg-gray-50 dark:bg-slate-800/30">
+      <section id="skills" className="relative py-20 px-4 md:px-8 bg-gray-50 dark:bg-slate-800/30">
+        {/* Solidity Animation Background */}
+        <SolidityMathAnimation />
         <div className="max-w-7xl mx-auto">
           <motion.div
             className="text-center mb-16"
