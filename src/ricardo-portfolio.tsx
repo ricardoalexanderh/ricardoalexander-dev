@@ -812,7 +812,7 @@ const projects: Project[] = [
     title: "Web3 & Blockchain Development",
     description: "Learned blockchain platforms and Web3 applications using Solidity smart contracts with focus on security and decentralized architecture.",
     //impact: "Blockchain Innovation",
-    impact: "",
+    impact: "Web3 Learning Path",
     technologies: ["Solidity", "Foundry", "Hardhat", "Ethers.js", "Smart Contracts"],
     //metrics: "Multiple blockchain implementations"
     metrics: ""
