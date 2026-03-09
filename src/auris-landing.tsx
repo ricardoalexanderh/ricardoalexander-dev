@@ -158,13 +158,13 @@ const AurisLanding: React.FC = () => {
     },
     {
       icon: '\uD83C\uDF99',
-      title: 'You reply by voice',
-      desc: 'Your voice is transcribed instantly, right inside your browser \u2014 no servers, no cloud APIs. Say "yes", "explain that", "option A", or anything natural \u2014 Auris understands.',
+      title: 'You talk back \u2014 or talk first',
+      desc: 'Reply to Claude\u2019s output with "yes", "option A", or "skip". Or instruct Claude directly \u2014 "Tell Claude to fix the auth bug", "Ask Claude how to optimize this query". Your voice is transcribed instantly, right inside your browser \u2014 no servers, no cloud.',
     },
     {
       icon: '\uD83E\uDDE0',
-      title: 'Intent understood',
-      desc: 'A built-in rule engine catches common commands instantly \u2014 yes, no, skip, repeat, save, option A. Anything more nuanced goes to your AI provider: Claude, OpenAI, Gemini, Ollama, LM Studio, Groq, DeepSeek, Mistral, xAI, or Custom.',
+      title: 'Intent understood. Action taken.',
+      desc: 'A built-in rule engine catches common commands instantly \u2014 yes, no, skip, repeat, save. Voice-to-Claude commands get confirmed and sent. Status queries like "What\u2019s happening?" or "Any errors?" are answered on the spot. Anything more nuanced goes to your AI provider.',
     },
   ]
 
