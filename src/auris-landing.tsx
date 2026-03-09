@@ -1094,6 +1094,8 @@ const AurisLanding: React.FC = () => {
           /* Grids */
           .auris-flow-grid { grid-template-columns: 1fr; }
           .auris-features-grid { grid-template-columns: 1fr; }
+          .auris-providers-row { flex-wrap: wrap; justify-content: center; }
+          .auris-provider-pill { flex-shrink: 1; }
           .auris-persona-tabs { gap: 0.35rem; }
           .auris-persona-tab { font-size: 0.72rem; padding: 0.35rem 0.75rem; }
           .auris-persona-card { padding: 1.5rem; }
