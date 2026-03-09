@@ -206,7 +206,6 @@ const AurisLanding: React.FC = () => {
         @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=DM+Sans:ital,wght@0,300;0,400;1,300&display=swap');
 
         *, *::before, *::after { box-sizing: border-box; }
-        html { overflow-x: hidden; }
 
         .auris-page {
           --bg: #09090f;
@@ -232,6 +231,7 @@ const AurisLanding: React.FC = () => {
           line-height: 1.6;
           min-height: 100vh;
           position: relative;
+          overflow-x: clip;
           scroll-behavior: smooth;
         }
 
@@ -366,7 +366,6 @@ const AurisLanding: React.FC = () => {
           max-width: 700px;
           margin: 0 auto 2.5rem;
           font-weight: 300; font-style: italic;
-          white-space: nowrap;
           animation: auris-fadeUp 0.6s 0.2s ease both;
         }
         .auris-hero-actions {
@@ -793,16 +792,14 @@ const AurisLanding: React.FC = () => {
         .auris-hamburger {
           display: none;
           background: none; border: none; cursor: pointer;
-          width: 36px; height: 36px;
+          width: 32px; height: 32px;
           flex-direction: column; align-items: center; justify-content: center; gap: 5px;
-          padding: 4px; z-index: 101;
-          flex-shrink: 0; overflow: visible;
+          padding: 0; z-index: 101;
         }
         .auris-hamburger span {
           display: block; width: 20px; height: 2px;
           background: var(--bright); border-radius: 2px;
           transition: all 0.3s;
-          transform-origin: center center;
         }
         .auris-hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(2.5px, 2.5px); }
         .auris-hamburger.open span:nth-child(2) { opacity: 0; }
@@ -833,25 +830,25 @@ const AurisLanding: React.FC = () => {
         @media (max-width: 900px) {
           .auris-features-grid { grid-template-columns: repeat(2, 1fr); }
         }
-        @media (max-width: 768px) {
+        @media (max-width: 640px) {
           .auris-hamburger { display: flex; }
           .auris-nav-links { display: none; }
-          .auris-nav { padding: 1rem 1.25rem; width: 100%; max-width: 100vw; }
+          .auris-nav { padding: 1rem 1.25rem; }
           .auris-container { padding: 0 1.25rem; }
-          .auris-hero { padding: 6rem 1.25rem 3rem; min-height: auto; }
-          .auris-hero h1 { font-size: clamp(1.6rem, 6vw, 2.2rem); }
-          .auris-tagline { white-space: normal; font-size: clamp(0.85rem, 2.5vw, 1rem); font-style: italic; }
-          .auris-badge { font-size: 0.7rem; padding: 0.3rem 0.75rem; white-space: normal; text-align: center; line-height: 1.4; }
-          .auris-hero-actions { flex-direction: column; width: 100%; max-width: 400px; margin: 0 auto; }
-          .auris-btn-primary, .auris-btn-secondary { width: 100%; text-align: center; justify-content: center; }
-          .auris-price-hint { font-size: 0.72rem; }
-          .auris-demo-container { margin-top: 3rem; }
+          .auris-hero { padding: 5rem 1.25rem 3rem; min-height: auto; }
+          .auris-hero h1 { font-size: 1.6rem; }
+          .auris-tagline { font-size: 0.9rem; font-style: italic; }
+          .auris-badge { font-size: 0.65rem; padding: 0.3rem 0.75rem; white-space: normal; text-align: center; line-height: 1.4; }
           .auris-demo-label { font-size: 0.65rem; }
           .auris-demo-window { border-radius: 10px; }
           .auris-titlebar-label { font-size: 0.6rem; }
           .auris-mic-btn { width: 30px; height: 30px; }
           .auris-waveform { height: 22px; }
-          .auris-slide-arrow { width: 28px; height: 28px; font-size: 0.75rem; }
+          .auris-slide-arrow { width: 24px; height: 24px; font-size: 0.7rem; }
+          .auris-hero-actions { flex-direction: column; width: 100%; }
+          .auris-btn-primary, .auris-btn-secondary { width: 100%; text-align: center; justify-content: center; box-sizing: border-box; }
+          .auris-price-hint { font-size: 0.72rem; }
+          .auris-demo-container { margin-top: 3rem; }
           .auris-slide { padding: 1rem; }
           .auris-demo-output { padding: 0.75rem; font-size: 0.8rem; }
           .auris-voice-bar { padding: 0.5rem 0.75rem; gap: 0.75rem; }
@@ -871,7 +868,6 @@ const AurisLanding: React.FC = () => {
           section { padding: 4rem 0 !important; }
         }
         @media (max-width: 400px) {
-          .auris-hero h1 { font-size: 1.4rem; }
           .auris-privacy-grid { grid-template-columns: 1fr; }
           .auris-titlebar-meta { display: none; }
         }
