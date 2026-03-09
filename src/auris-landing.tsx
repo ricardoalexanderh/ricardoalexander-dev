@@ -83,6 +83,10 @@ const AurisLanding: React.FC = () => {
 
   const faqData = [
     {
+      q: 'How do I install Auris?',
+      a: 'Auris is a Chrome extension. Install it from the Chrome Web Store with one click — no sign-up, no account, no configuration required. Once installed, open Claude Code for Web (claude.ai) and Auris activates automatically. The extension icon in your toolbar lets you access settings, switch personas, and control voice output.',
+    },
+    {
       q: 'Do I need an API key to use Auris?',
       a: "For voice, no \u2014 speech recognition and text-to-speech run entirely inside your browser with zero API keys. For AI summarization and intent understanding, it depends on your provider. Claude, OpenAI, Gemini, Groq, and cloud providers require their respective API key. Ollama and LM Studio run locally and need no key at all. Keys are stored in Chrome\u2019s encrypted local storage \u2014 Auris never sees them.",
     },
@@ -164,7 +168,7 @@ const AurisLanding: React.FC = () => {
     { icon: '\uD83C\uDF0D', title: 'Multiple Voice Options', desc: 'Pick from a variety of natural-sounding English voices with different tones and styles. Multi-language support coming in a future release.' },
     { icon: '\u26A1', title: 'Instant Command Engine', desc: 'A built-in rule engine catches "yes", "no", "skip", "repeat", "option A", "save" \u2014 instantly, no API call. Anything more nuanced falls back to your AI provider.' },
     { icon: '\uD83C\uDF9A', title: 'Verbosity + Personas per Type', desc: 'Set Brief, Normal, or Detailed summaries per output type. Errors get full detail; completions stay quick. Specialized AI prompts per output category.' },
-    { icon: '\uD83C\uDF99', title: '"Hey Auris" Wake Word & DND', desc: 'Activate Auris hands-free with a customizable wake word like "Hey Auris" — no buttons needed. Enable Do Not Disturb to silence Auris while you\u2019re heads-down. Toggle auto-read or trigger manually per output.' },
+    { icon: '\uD83C\uDF99', title: '"Hey Auris" Wake Word', desc: 'Activate Auris hands-free with a customizable wake word like "Hey Auris" — no buttons needed.' },
     { icon: '\uD83D\uDCC1', title: 'Session History', desc: 'Every output and conversation saved locally. Configurable max sessions, auto-clear after N days. Export as Markdown or JSON.' },
     { icon: '\u2699\uFE0F', title: 'Full Settings Portability', desc: 'Export and import your entire Auris config as JSON. Test your provider connection and browse available models \u2014 all from the settings panel.' },
   ]
@@ -184,7 +188,7 @@ const AurisLanding: React.FC = () => {
     '8 voice personas \u2014 Professional, Friendly, Concise, Pirate, and more',
     '3 verbosity levels \u2014 Brief, Normal, Detailed',
     'Instant rule engine + natural language fallback',
-    'Customizable "Hey Auris" wake word & Do Not Disturb mode',
+    'Customizable "Hey Auris" wake word for hands-free activation',
     'Session history with auto-clear & export (MD / JSON)',
     'Settings import / export',
     'Web Speech API fallback if local models fail',
