@@ -171,7 +171,9 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId)
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' })
+      const navHeight = 64
+      const top = element.getBoundingClientRect().top + window.scrollY - navHeight
+      window.scrollTo({ top, behavior: 'smooth' })
       setIsOpen(false)
     }
   }
@@ -216,25 +218,30 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
                 className="flex items-center gap-1 text-gray-300 hover:text-cyan-400 transition-colors font-outfit"
               >
                 Products
-                <ChevronDown className={`w-4 h-4 transition-transform ${productsOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${productsOpen ? 'rotate-180' : ''}`} />
               </button>
               {productsOpen && (
                 <div className="absolute top-full right-0 pt-2">
-                  <div className="w-56 bg-slate-800/95 backdrop-blur-lg rounded-lg border border-slate-700/50 shadow-xl overflow-hidden">
+                  <motion.div
+                    initial={{ opacity: 0, y: -8, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ duration: 0.18, ease: 'easeOut' }}
+                    className="w-72 bg-slate-800/95 backdrop-blur-lg rounded-xl border border-slate-700/50 shadow-2xl overflow-hidden"
+                  >
                     <button
                       onClick={() => {
                         navigate('/products/auris')
                         setProductsOpen(false)
                       }}
-                      className="flex items-center gap-3 w-full px-4 py-3 text-left text-gray-300 hover:text-cyan-400 hover:bg-slate-700/50 transition-colors font-outfit"
+                      className="flex items-center gap-4 w-full px-5 py-4 text-left text-gray-300 hover:text-cyan-400 hover:bg-slate-700/40 transition-all duration-200 font-outfit group"
                     >
-                      <span className="text-lg">&#x25C8;</span>
+                      <span className="text-2xl text-purple-400 group-hover:text-cyan-400 transition-colors duration-200">&#x25C8;</span>
                       <div>
-                        <div className="font-medium">Auris</div>
-                        <div className="text-xs text-gray-500">AI voice assistant for Claude Code Web</div>
+                        <div className="font-semibold text-sm">Auris</div>
+                        <div className="text-xs text-gray-400 mt-0.5">AI voice assistant for <span className="text-cyan-400 font-medium">Claude Code</span> Web</div>
                       </div>
                     </button>
-                  </div>
+                  </motion.div>
                 </div>
               )}
             </div>
@@ -323,17 +330,26 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
                 <ChevronDown className={`w-4 h-4 transition-transform ${mobileProductsOpen ? 'rotate-180' : ''}`} />
               </button>
               {mobileProductsOpen && (
-                <button
-                  onClick={() => {
-                    navigate('/products/auris')
-                    setIsOpen(false)
-                    setMobileProductsOpen(false)
-                  }}
-                  className="flex items-center gap-3 w-full pl-4 py-2 text-left text-gray-300 hover:text-cyan-400 transition-colors font-outfit"
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  transition={{ duration: 0.2 }}
                 >
-                  <span>&#x25C8;</span>
-                  <span>Auris</span>
-                </button>
+                  <button
+                    onClick={() => {
+                      navigate('/products/auris')
+                      setIsOpen(false)
+                      setMobileProductsOpen(false)
+                    }}
+                    className="flex items-center gap-3 w-full pl-4 py-2 text-left text-gray-300 hover:text-cyan-400 transition-colors font-outfit"
+                  >
+                    <span className="text-purple-400">&#x25C8;</span>
+                    <div>
+                      <div className="font-medium text-sm">Auris</div>
+                      <div className="text-xs text-gray-400">AI voice assistant for <span className="text-cyan-400">Claude Code</span> Web</div>
+                    </div>
+                  </button>
+                </motion.div>
               )}
             </div>
           </motion.div>
