@@ -476,6 +476,30 @@ const AurisLanding: React.FC = () => {
         }
         .auris-price-hint strong { color: var(--green); }
 
+        /* HERO SCROLL HINT */
+        .auris-hero-scroll-hint {
+          display: flex; align-items: center; justify-content: center;
+          width: 44px; height: 44px;
+          margin: 3rem auto 0;
+          border: 1px solid var(--border);
+          border-radius: 50%;
+          color: var(--muted);
+          text-decoration: none;
+          transition: border-color 0.3s, color 0.3s;
+          animation: auris-fadeUp 0.6s 0.6s ease both;
+        }
+        .auris-hero-scroll-hint:hover {
+          border-color: var(--accent); color: var(--bright);
+        }
+        .auris-hero-scroll-hint svg {
+          width: 20px; height: 20px;
+          animation: auris-hero-bounce 2s ease-in-out infinite;
+        }
+        @keyframes auris-hero-bounce {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(4px); }
+        }
+
         /* DEMO SLIDESHOW */
         .auris-demo-container {
           margin-top: 3rem;
@@ -1237,6 +1261,11 @@ const AurisLanding: React.FC = () => {
             </div>
           </div>
         </div>
+        <a href="#how" className="auris-hero-scroll-hint" aria-label="Scroll to content">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </a>
       </section>
 
       {/* HOW IT WORKS */}
