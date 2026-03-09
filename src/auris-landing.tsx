@@ -232,6 +232,8 @@ const AurisLanding: React.FC = () => {
           min-height: 100vh;
           position: relative;
           scroll-behavior: smooth;
+          overflow-x: hidden;
+          width: 100%;
         }
 
         .auris-page::before {
@@ -251,7 +253,7 @@ const AurisLanding: React.FC = () => {
           animation: auris-breathe 8s ease-in-out infinite;
         }
 
-        .auris-container { max-width: 1200px; margin: 0 auto; padding: 0 2.5rem; position: relative; z-index: 1; }
+        .auris-container { max-width: 1200px; margin: 0 auto; padding: 0 2.5rem; position: relative; z-index: 1; box-sizing: border-box; width: 100%; }
 
         @keyframes auris-breathe {
           0%, 100% { opacity: 0.6; transform: translateX(-50%) scale(1); }
@@ -842,18 +844,19 @@ const AurisLanding: React.FC = () => {
           .auris-container { padding: 0 1rem; }
 
           /* Hero */
-          .auris-hero { padding: 4.5rem 1rem 2.5rem; min-height: auto; }
-          .auris-hero h1 { font-size: clamp(1.5rem, 7vw, 2rem); }
-          .auris-tagline { font-size: 0.9rem; font-style: italic; }
-          .auris-badge { font-size: 0.65rem; padding: 0.3rem 0.75rem; white-space: normal; text-align: center; line-height: 1.4; }
-          .auris-hero-actions { flex-direction: column; width: 100%; }
-          .auris-btn-primary, .auris-btn-secondary { width: 100%; text-align: center; justify-content: center; }
-          .auris-price-hint { font-size: 0.72rem; }
+          .auris-hero { padding: 4.5rem 1rem 2.5rem; min-height: auto; overflow: hidden; max-width: 100%; }
+          .auris-hero .auris-container { max-width: 100%; overflow: hidden; padding: 0 1rem; }
+          .auris-hero h1 { font-size: clamp(1.5rem, 7vw, 2rem); word-break: break-word; max-width: 100%; }
+          .auris-tagline { font-size: 0.9rem; font-style: italic; max-width: 100%; word-break: break-word; }
+          .auris-badge { font-size: 0.65rem; padding: 0.3rem 0.75rem; white-space: normal; text-align: center; line-height: 1.4; max-width: 100%; }
+          .auris-hero-actions { flex-direction: column; width: 100%; max-width: 100%; }
+          .auris-btn-primary, .auris-btn-secondary { width: 100%; text-align: center; justify-content: center; box-sizing: border-box; }
+          .auris-price-hint { font-size: 0.72rem; max-width: 100%; word-break: break-word; }
 
           /* Demo slideshow */
-          .auris-demo-container { margin-top: 2.5rem; }
+          .auris-demo-container { margin-top: 2.5rem; max-width: 100%; overflow: hidden; }
           .auris-demo-label { font-size: 0.65rem; }
-          .auris-demo-window { border-radius: 10px; }
+          .auris-demo-window { border-radius: 10px; max-width: 100%; }
           .auris-titlebar-label { font-size: 0.6rem; }
           .auris-titlebar-meta { display: none; }
           .auris-slide { padding: 0.75rem; }
@@ -862,13 +865,13 @@ const AurisLanding: React.FC = () => {
           .auris-voice-bar { padding: 0.5rem 0.6rem; gap: 0.6rem; }
           .auris-mic-btn { width: 30px; height: 30px; }
           .auris-waveform { height: 22px; }
-          .auris-voice-transcript { font-size: 0.7rem; }
+          .auris-voice-transcript { font-size: 0.7rem; white-space: normal; word-break: break-word; }
           .auris-slide-arrow { width: 24px; height: 24px; font-size: 0.7rem; }
 
           /* Sections */
           .auris-section-title { font-size: 1.5rem; }
           .auris-section-sub { font-size: 0.9rem; margin-bottom: 2.5rem; }
-          section { padding: 4rem 0 !important; }
+          section { padding: 4rem 0 !important; overflow: hidden; max-width: 100%; }
 
           /* Grids */
           .auris-flow-grid { grid-template-columns: 1fr; }
