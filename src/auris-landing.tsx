@@ -231,8 +231,8 @@ const AurisLanding: React.FC = () => {
           line-height: 1.6;
           min-height: 100vh;
           position: relative;
-          overflow-x: clip;
           scroll-behavior: smooth;
+          width: 100%;
         }
 
         .auris-page::before {
@@ -283,7 +283,7 @@ const AurisLanding: React.FC = () => {
 
         /* NAV */
         .auris-nav {
-          position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+          position: fixed; top: 0; left: 0; right: 0; z-index: 101;
           padding: 1.2rem 2rem;
           display: flex; align-items: center; justify-content: space-between;
           border-bottom: 1px solid transparent;
@@ -630,7 +630,7 @@ const AurisLanding: React.FC = () => {
         /* PERSONAS */
         .auris-personas-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
           gap: 1.25rem;
         }
         .auris-persona-card {
@@ -792,18 +792,21 @@ const AurisLanding: React.FC = () => {
         .auris-hamburger {
           display: none;
           background: none; border: none; cursor: pointer;
-          width: 32px; height: 32px;
+          width: 40px; height: 40px;
           flex-direction: column; align-items: center; justify-content: center; gap: 5px;
           padding: 0; z-index: 101;
+          -webkit-tap-highlight-color: transparent;
+          flex-shrink: 0;
         }
         .auris-hamburger span {
-          display: block; width: 20px; height: 2px;
+          display: block; width: 22px; height: 2px;
           background: var(--bright); border-radius: 2px;
-          transition: all 0.3s;
+          transition: transform 0.3s, opacity 0.3s;
+          transform-origin: center center;
         }
-        .auris-hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(2.5px, 2.5px); }
-        .auris-hamburger.open span:nth-child(2) { opacity: 0; }
-        .auris-hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(2.5px, -2.5px); }
+        .auris-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .auris-hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+        .auris-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
         /* MOBILE MENU */
         .auris-mobile-menu {
@@ -812,7 +815,7 @@ const AurisLanding: React.FC = () => {
           background: rgba(9,9,15,0.97);
           backdrop-filter: blur(16px);
           -webkit-backdrop-filter: blur(16px);
-          z-index: 99;
+          z-index: 100;
           flex-direction: column; align-items: center; justify-content: center;
           gap: 2rem;
         }
@@ -827,49 +830,77 @@ const AurisLanding: React.FC = () => {
           font-size: 1rem; margin-top: 1rem;
         }
 
+        /* Tablet */
         @media (max-width: 900px) {
           .auris-features-grid { grid-template-columns: repeat(2, 1fr); }
         }
+
+        /* Mobile: portrait + landscape */
         @media (max-width: 640px) {
           .auris-hamburger { display: flex; }
           .auris-nav-links { display: none; }
-          .auris-nav { padding: 1rem 1.25rem; }
-          .auris-container { padding: 0 1.25rem; }
-          .auris-hero { padding: 5rem 1.25rem 3rem; min-height: auto; }
-          .auris-hero h1 { font-size: 1.6rem; }
+          .auris-nav { padding: 0.75rem 1rem; }
+          .auris-container { padding: 0 1rem; }
+
+          /* Hero */
+          .auris-hero { padding: 4.5rem 1rem 2.5rem; min-height: auto; }
+          .auris-hero h1 { font-size: clamp(1.5rem, 7vw, 2rem); }
           .auris-tagline { font-size: 0.9rem; font-style: italic; }
           .auris-badge { font-size: 0.65rem; padding: 0.3rem 0.75rem; white-space: normal; text-align: center; line-height: 1.4; }
+          .auris-hero-actions { flex-direction: column; width: 100%; }
+          .auris-btn-primary, .auris-btn-secondary { width: 100%; text-align: center; justify-content: center; }
+          .auris-price-hint { font-size: 0.72rem; }
+
+          /* Demo slideshow */
+          .auris-demo-container { margin-top: 2.5rem; }
           .auris-demo-label { font-size: 0.65rem; }
           .auris-demo-window { border-radius: 10px; }
           .auris-titlebar-label { font-size: 0.6rem; }
+          .auris-titlebar-meta { display: none; }
+          .auris-slide { padding: 0.75rem; }
+          .auris-demo-output { padding: 0.6rem; font-size: 0.8rem; }
+          .auris-output-text { word-break: break-word; }
+          .auris-voice-bar { padding: 0.5rem 0.6rem; gap: 0.6rem; }
           .auris-mic-btn { width: 30px; height: 30px; }
           .auris-waveform { height: 22px; }
-          .auris-slide-arrow { width: 24px; height: 24px; font-size: 0.7rem; }
-          .auris-hero-actions { flex-direction: column; width: 100%; }
-          .auris-btn-primary, .auris-btn-secondary { width: 100%; text-align: center; justify-content: center; box-sizing: border-box; }
-          .auris-price-hint { font-size: 0.72rem; }
-          .auris-demo-container { margin-top: 3rem; }
-          .auris-slide { padding: 1rem; }
-          .auris-demo-output { padding: 0.75rem; font-size: 0.8rem; }
-          .auris-voice-bar { padding: 0.5rem 0.75rem; gap: 0.75rem; }
           .auris-voice-transcript { font-size: 0.7rem; }
+          .auris-slide-arrow { width: 24px; height: 24px; font-size: 0.7rem; }
+
+          /* Sections */
           .auris-section-title { font-size: 1.5rem; }
           .auris-section-sub { font-size: 0.9rem; margin-bottom: 2.5rem; }
+          section { padding: 4rem 0 !important; }
+
+          /* Grids */
           .auris-flow-grid { grid-template-columns: 1fr; }
           .auris-features-grid { grid-template-columns: 1fr; }
           .auris-personas-grid { grid-template-columns: 1fr; }
           .auris-privacy-grid { grid-template-columns: 1fr 1fr; }
+
+          /* Pricing */
           .auris-pricing-inner { grid-template-columns: 1fr !important; }
-          .auris-pricing-left { border-right: none !important; border-bottom: 1px solid var(--border); }
+          .auris-pricing-left { border-right: none !important; border-bottom: 1px solid var(--border); padding: 1.5rem; }
           .auris-pricing-divider { display: none; }
-          .auris-plan-card { padding: 1.25rem; }
+          .auris-plan-features { padding: 1.5rem; }
+
+          /* FAQ */
           .auris-faq-q { font-size: 0.9rem; }
           .auris-faq-a { font-size: 0.82rem; }
-          section { padding: 4rem 0 !important; }
         }
+
+        /* Small phones */
         @media (max-width: 400px) {
+          .auris-hero h1 { font-size: 1.4rem; }
           .auris-privacy-grid { grid-template-columns: 1fr; }
-          .auris-titlebar-meta { display: none; }
+          .auris-badge { font-size: 0.6rem; padding: 0.25rem 0.6rem; }
+        }
+
+        /* Mobile landscape */
+        @media (max-height: 500px) and (orientation: landscape) {
+          .auris-hero { min-height: auto; padding: 4rem 2rem 2rem; }
+          .auris-hero-actions { flex-direction: row; width: auto; }
+          .auris-btn-primary, .auris-btn-secondary { width: auto; }
+          .auris-demo-container { margin-top: 2rem; }
         }
       `}</style>
 
