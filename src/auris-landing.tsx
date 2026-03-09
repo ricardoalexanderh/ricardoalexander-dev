@@ -5,6 +5,7 @@ const AurisLanding: React.FC = () => {
   const [scrolled, setScrolled] = useState(false)
   const [openFaq, setOpenFaq] = useState<number | null>(null)
   const [currentSlide, setCurrentSlide] = useState(0)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const slideTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const touchXRef = useRef(0)
   const navigate = useNavigate()
@@ -788,17 +789,81 @@ const AurisLanding: React.FC = () => {
         }
         .auris-footer-sub { font-size: 0.8rem; color: var(--muted); font-style: italic; }
 
+        /* HAMBURGER */
+        .auris-hamburger {
+          display: none;
+          background: none; border: none; cursor: pointer;
+          width: 32px; height: 32px;
+          flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+          padding: 0; z-index: 101;
+        }
+        .auris-hamburger span {
+          display: block; width: 20px; height: 2px;
+          background: var(--bright); border-radius: 2px;
+          transition: all 0.3s;
+        }
+        .auris-hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(2.5px, 2.5px); }
+        .auris-hamburger.open span:nth-child(2) { opacity: 0; }
+        .auris-hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(2.5px, -2.5px); }
+
+        /* MOBILE MENU */
+        .auris-mobile-menu {
+          display: none;
+          position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+          background: rgba(9,9,15,0.97);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          z-index: 99;
+          flex-direction: column; align-items: center; justify-content: center;
+          gap: 2rem;
+        }
+        .auris-mobile-menu.open { display: flex; }
+        .auris-mobile-menu a {
+          font-family: 'Syne', sans-serif; font-weight: 600;
+          font-size: 1.4rem; color: var(--subtle);
+          text-decoration: none; transition: color 0.2s;
+        }
+        .auris-mobile-menu a:hover { color: var(--bright); }
+        .auris-mobile-menu .auris-nav-cta {
+          font-size: 1rem; margin-top: 1rem;
+        }
+
         @media (max-width: 900px) {
           .auris-features-grid { grid-template-columns: repeat(2, 1fr); }
         }
         @media (max-width: 640px) {
+          .auris-hamburger { display: flex; }
+          .auris-nav-links { display: none; }
+          .auris-nav { padding: 1rem 1.25rem; }
+          .auris-container { padding: 0 1.25rem; }
+          .auris-hero { padding: 6rem 1.25rem 3rem; min-height: auto; }
+          .auris-hero h1 { font-size: 1.8rem; }
+          .auris-tagline { white-space: normal; font-size: 0.95rem; }
+          .auris-hero-actions { flex-direction: column; width: 100%; }
+          .auris-btn-primary, .auris-btn-secondary { width: 100%; text-align: center; justify-content: center; box-sizing: border-box; }
+          .auris-price-hint { font-size: 0.72rem; }
+          .auris-demo-container { margin-top: 3rem; }
+          .auris-slide { padding: 1rem; }
+          .auris-demo-output { padding: 0.75rem; font-size: 0.8rem; }
+          .auris-voice-bar { padding: 0.5rem 0.75rem; gap: 0.75rem; }
+          .auris-voice-transcript { font-size: 0.7rem; }
+          .auris-section-title { font-size: 1.5rem; }
+          .auris-section-sub { font-size: 0.9rem; margin-bottom: 2.5rem; }
+          .auris-flow-grid { grid-template-columns: 1fr; }
           .auris-features-grid { grid-template-columns: 1fr; }
+          .auris-personas-grid { grid-template-columns: 1fr; }
+          .auris-privacy-grid { grid-template-columns: 1fr 1fr; }
           .auris-pricing-inner { grid-template-columns: 1fr !important; }
           .auris-pricing-left { border-right: none !important; border-bottom: 1px solid var(--border); }
           .auris-pricing-divider { display: none; }
-          .auris-nav-links a:not(.auris-nav-cta) { display: none; }
-          .auris-hero h1 { font-size: 1.8rem; }
-          .auris-tagline { white-space: normal; }
+          .auris-plan-card { padding: 1.25rem; }
+          .auris-faq-q { font-size: 0.9rem; }
+          .auris-faq-a { font-size: 0.82rem; }
+          section { padding: 4rem 0 !important; }
+        }
+        @media (max-width: 400px) {
+          .auris-privacy-grid { grid-template-columns: 1fr; }
+          .auris-titlebar-meta { display: none; }
         }
       `}</style>
 
@@ -816,7 +881,19 @@ const AurisLanding: React.FC = () => {
           <a href="#pricing">Pricing</a>
           <a href="#pricing" className="auris-nav-cta">Get Auris &mdash; $29</a>
         </div>
+        <button className={`auris-hamburger ${mobileMenuOpen ? 'open' : ''}`} onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+          <span /><span /><span />
+        </button>
       </nav>
+
+      {/* MOBILE MENU */}
+      <div className={`auris-mobile-menu ${mobileMenuOpen ? 'open' : ''}`}>
+        <a href="#how" onClick={() => setMobileMenuOpen(false)}>How it works</a>
+        <a href="#features" onClick={() => setMobileMenuOpen(false)}>Features</a>
+        <a href="#personas" onClick={() => setMobileMenuOpen(false)}>Personas</a>
+        <a href="#pricing" onClick={() => setMobileMenuOpen(false)}>Pricing</a>
+        <a href="#pricing" className="auris-nav-cta" onClick={() => setMobileMenuOpen(false)}>Get Auris &mdash; $29</a>
+      </div>
 
       {/* HERO */}
       <section id="hero" className="auris-hero">
