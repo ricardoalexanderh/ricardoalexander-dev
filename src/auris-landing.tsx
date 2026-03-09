@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 
 const AurisLanding: React.FC = () => {
   const [scrolled, setScrolled] = useState(false)
+  const [showScrollTop, setShowScrollTop] = useState(false)
   const [openFaq, setOpenFaq] = useState<number | null>(null)
   const [currentSlide, setCurrentSlide] = useState(0)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -27,7 +28,10 @@ const AurisLanding: React.FC = () => {
 
   // Nav scroll effect
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 40)
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 40)
+      setShowScrollTop(window.scrollY > 600)
+    }
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
@@ -863,6 +867,31 @@ const AurisLanding: React.FC = () => {
         .auris-footer-logo .ear-icon { color: var(--accent); font-size: 1.1rem; }
         .auris-footer-sub { font-size: 0.8rem; color: var(--muted); font-style: italic; }
 
+        /* SCROLL TO TOP */
+        .auris-scroll-top {
+          position: fixed;
+          bottom: 2rem; right: 2rem;
+          width: 44px; height: 44px;
+          border-radius: 50%;
+          background: var(--surface);
+          border: 1px solid var(--border);
+          color: var(--muted);
+          font-size: 1.2rem;
+          cursor: pointer;
+          display: flex; align-items: center; justify-content: center;
+          opacity: 0; pointer-events: none;
+          transform: translateY(12px);
+          transition: opacity 0.3s, transform 0.3s, border-color 0.2s, color 0.2s;
+          z-index: 100;
+        }
+        .auris-scroll-top.visible {
+          opacity: 1; pointer-events: auto;
+          transform: translateY(0);
+        }
+        .auris-scroll-top:hover {
+          border-color: var(--accent); color: var(--bright);
+        }
+
         /* HAMBURGER */
         .auris-hamburger {
           display: none;
@@ -1267,6 +1296,15 @@ const AurisLanding: React.FC = () => {
           <p className="auris-footer-sub">An AI voice assistant for Claude Code for Web &mdash; keeping you in flow.</p>
         </div>
       </footer>
+
+      {/* Scroll to top */}
+      <button
+        className={`auris-scroll-top ${showScrollTop ? 'visible' : ''}`}
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        aria-label="Scroll to top"
+      >
+        ↑
+      </button>
     </div>
   )
 }
