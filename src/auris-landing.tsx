@@ -230,7 +230,7 @@ const AurisLanding: React.FC = () => {
     'Session history with auto-clear & export (MD / JSON)',
     'Settings import / export',
     'Web Speech API fallback if local models fail',
-    'Zero telemetry \u00B7 Read-only page access \u00B7 All future V1 updates',
+    'Zero telemetry \u00B7 Non-intrusive page access \u00B7 All future V1 updates',
   ]
 
   const waveformBars = Array.from({ length: 10 }, (_, i) => i)
