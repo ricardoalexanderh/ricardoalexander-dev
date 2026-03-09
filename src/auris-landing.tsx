@@ -812,6 +812,7 @@ const AurisLanding: React.FC = () => {
         <div className="auris-nav-links">
           <a href="#how">How it works</a>
           <a href="#features">Features</a>
+          <a href="#personas">Personas</a>
           <a href="#pricing">Pricing</a>
           <a href="#pricing" className="auris-nav-cta">Get Auris &mdash; $29</a>
         </div>
@@ -1033,9 +1034,29 @@ const AurisLanding: React.FC = () => {
                 </div>
               </div>
             </div>
+            <div className="auris-persona-card auris-reveal">
+              <div className="auris-persona-name">{'\uD83D\uDCAA'} Encouraging</div>
+              <div className="auris-persona-desc">Positive and motivating. Keeps morale high even when bugs pile up.</div>
+              <div className="auris-persona-example">
+                <div className="auris-persona-example-inner">
+                  <div className="auris-persona-example-label">Error detected</div>
+                  You&apos;re doing great! Just a small bump &mdash; there&apos;s a null pointer on line 42 of auth.ts. The user object needs a quick check before accessing the token. You&apos;ve got this, it&apos;s an easy fix!
+                </div>
+              </div>
+            </div>
+            <div className="auris-persona-card auris-reveal">
+              <div className="auris-persona-name">{'\uD83E\uDD23'} Comedic</div>
+              <div className="auris-persona-desc">Laugh through the pain. Because debugging should at least be entertaining.</div>
+              <div className="auris-persona-example">
+                <div className="auris-persona-example-inner">
+                  <div className="auris-persona-example-label">Error detected</div>
+                  Plot twist! Line 42 of auth.ts just tried to access a token on a user that doesn&apos;t exist. It&apos;s like checking the fridge for leftovers you never cooked. Add a null check and we&apos;re back in business!
+                </div>
+              </div>
+            </div>
           </div>
           <p className="auris-reveal" style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.82rem', color: 'var(--muted)', fontFamily: 'DM Mono, monospace' }}>
-            + Encouraging &middot; Comedic &mdash; 8 personas total, switchable anytime
+            8 personas total, switchable anytime
           </p>
         </div>
       </section>
