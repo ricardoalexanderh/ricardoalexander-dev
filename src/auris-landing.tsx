@@ -1023,6 +1023,7 @@ const AurisLanding: React.FC = () => {
           <a href="#features">Features</a>
           <a href="#personas">Personas</a>
           <a href="#pricing">Pricing</a>
+          <a href="#faq">FAQ</a>
           <a href="#pricing" className="auris-nav-cta">Get Auris &mdash; $29</a>
         </div>
         <button className={`auris-hamburger ${mobileMenuOpen ? 'open' : ''}`} onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
@@ -1036,6 +1037,7 @@ const AurisLanding: React.FC = () => {
         <a href="#features" onClick={() => setMobileMenuOpen(false)}>Features</a>
         <a href="#personas" onClick={() => setMobileMenuOpen(false)}>Personas</a>
         <a href="#pricing" onClick={() => setMobileMenuOpen(false)}>Pricing</a>
+        <a href="#faq" onClick={() => setMobileMenuOpen(false)}>FAQ</a>
         <a href="#pricing" className="auris-nav-cta" onClick={() => setMobileMenuOpen(false)}>Get Auris &mdash; $29</a>
       </div>
 
