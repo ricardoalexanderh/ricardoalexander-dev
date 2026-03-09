@@ -234,7 +234,7 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
                       <span className="text-2xl text-purple-400 group-hover:text-cyan-400 transition-colors duration-200">&#x25C8;</span>
                       <div>
                         <div className="font-semibold text-sm">Auris</div>
-                        <div className="text-xs text-gray-400 mt-0.5">Chrome Extension &mdash; AI voice assistant for <span className="text-cyan-400 font-medium">Claude Code</span> Web</div>
+                        <div className="text-xs text-gray-400 mt-0.5">Chrome Extension &mdash; AI voice assistant for <span style={{ color: '#D97757' }} className="font-medium">Claude Code</span> Web</div>
                       </div>
                     </button>
                   </motion.div>
@@ -343,7 +343,7 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
                     <span className="text-purple-400">&#x25C8;</span>
                     <div>
                       <div className="font-medium text-sm">Auris</div>
-                      <div className="text-xs text-gray-400">Chrome Extension &mdash; AI voice assistant for <span className="text-cyan-400">Claude Code</span> Web</div>
+                      <div className="text-xs text-gray-400">Chrome Extension &mdash; AI voice assistant for <span style={{ color: '#D97757' }}>Claude Code</span> Web</div>
                     </div>
                   </button>
                 </motion.div>
