@@ -1047,18 +1047,11 @@ const AurisLanding: React.FC = () => {
       <section id="hero" className="auris-hero">
         <div className="auris-container">
           <div className="auris-badge">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 192 192" style={{ flexShrink: 0 }}>
-              <path d="M160 32H32v128l32-32h96z" fill="#4285F4"/>
-              <path d="M32 32v128l32-32V32z" fill="#356AC3"/>
-              <path d="M160 32v96h-64l-32 32H32l128-128z" fill="#4285F4"/>
-              <path d="M96 80a24 24 0 1 0 0 48 24 24 0 0 0 0-48zm0 40a16 16 0 1 1 0-32 16 16 0 0 1 0 32z" fill="#fff"/>
-              <path d="M96 88a16 16 0 1 0 0 32 16 16 0 0 0 0-32z" fill="#fff" fillOpacity="0.4"/>
-              <circle cx="96" cy="104" r="8" fill="#fff"/>
-            </svg>
+            <img src="/chrome-web-store-icon.svg" alt="Chrome Web Store" width="16" height="16" style={{ flexShrink: 0 }} />
             Chrome Extension
           </div>
           <h1>Your AI Coding Assistant,<br /><span className="auris-gradient-text">out loud.</span></h1>
-          <p className="auris-tagline">An AI voice assistant for <span style={{ color: '#D97757', fontWeight: 600 }}>Claude Code</span> for Web &mdash; keeping you in flow.</p>
+          <p className="auris-tagline">An AI voice assistant for <span style={{ color: '#D97757', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}><img src="/claude-ai-icon.svg" alt="Claude" width="18" height="18" style={{ verticalAlign: 'middle' }} />Claude Code</span> for Web &mdash; keeping you in flow.</p>
           <div className="auris-hero-actions">
             <a href="https://chromewebstore.google.com" target="_blank" rel="noopener noreferrer" className="auris-btn-primary">Get Auris</a>
             <a href="#how" className="auris-btn-secondary">See how it works &rarr;</a>
