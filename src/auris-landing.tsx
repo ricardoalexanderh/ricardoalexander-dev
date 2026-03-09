@@ -836,9 +836,16 @@ const AurisLanding: React.FC = () => {
           .auris-nav-links { display: none; }
           .auris-nav { padding: 1rem 1.25rem; }
           .auris-container { padding: 0 1.25rem; }
-          .auris-hero { padding: 6rem 1.25rem 3rem; min-height: auto; }
-          .auris-hero h1 { font-size: 1.8rem; }
-          .auris-tagline { white-space: normal; font-size: 0.95rem; }
+          .auris-hero { padding: 5rem 1.25rem 3rem; min-height: auto; }
+          .auris-hero h1 { font-size: 1.6rem; }
+          .auris-tagline { white-space: normal; font-size: 0.9rem; font-style: italic; }
+          .auris-badge { font-size: 0.65rem; padding: 0.3rem 0.75rem; white-space: normal; text-align: center; line-height: 1.4; }
+          .auris-demo-label { font-size: 0.65rem; }
+          .auris-demo-window { border-radius: 10px; }
+          .auris-titlebar-label { font-size: 0.6rem; }
+          .auris-mic-btn { width: 30px; height: 30px; }
+          .auris-waveform { height: 22px; }
+          .auris-slide-arrow { width: 24px; height: 24px; font-size: 0.7rem; }
           .auris-hero-actions { flex-direction: column; width: 100%; }
           .auris-btn-primary, .auris-btn-secondary { width: 100%; text-align: center; justify-content: center; box-sizing: border-box; }
           .auris-price-hint { font-size: 0.72rem; }
