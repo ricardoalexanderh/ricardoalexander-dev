@@ -94,7 +94,7 @@ const AurisLanding: React.FC = () => {
     },
     {
       q: 'Does it only work with Claude Code for Web?',
-      a: 'V1 is focused entirely on Claude Code for Web (claude.ai). Auris watches the DOM, classifies every output, and never modifies the page. Support for other AI coding tools (Cursor, Windsurf, GitHub Copilot) is planned for V2.',
+      a: 'V1 is focused entirely on Claude Code for Web (claude.ai). Auris watches the DOM, classifies every output, and never modifies the page. Support for other web AI coding tools is planned for V2.',
     },
   ]
 
