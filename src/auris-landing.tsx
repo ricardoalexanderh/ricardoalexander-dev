@@ -201,12 +201,11 @@ const AurisLanding: React.FC = () => {
   }
 
   return (
-    <div className="auris-page">
+    <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=DM+Sans:ital,wght@0,300;0,400;1,300&display=swap');
 
         *, *::before, *::after { box-sizing: border-box; }
-        html, body { overflow-x: hidden; max-width: 100vw; }
 
         .auris-page {
           --bg: #09090f;
@@ -233,6 +232,9 @@ const AurisLanding: React.FC = () => {
           min-height: 100vh;
           position: relative;
           scroll-behavior: smooth;
+          overflow-x: hidden;
+          max-width: 100%;
+          width: 100%;
         }
 
         .auris-page::before {
@@ -904,9 +906,7 @@ const AurisLanding: React.FC = () => {
         }
       `}</style>
 
-      <div className="auris-ambient" />
-
-      {/* NAV */}
+      {/* NAV — outside .auris-page so overflow-x:hidden doesn't break position:fixed */}
       <nav className={`auris-nav ${scrolled ? 'scrolled' : ''}`}>
         <div className="auris-nav-logo" onClick={() => navigate('/')}>
           <span className="ear-icon">{'\u25C8'}</span> Auris
@@ -923,7 +923,7 @@ const AurisLanding: React.FC = () => {
         </button>
       </nav>
 
-      {/* MOBILE MENU */}
+      {/* MOBILE MENU — also outside .auris-page */}
       <div className={`auris-mobile-menu ${mobileMenuOpen ? 'open' : ''}`}>
         <a href="#how" onClick={() => setMobileMenuOpen(false)}>How it works</a>
         <a href="#features" onClick={() => setMobileMenuOpen(false)}>Features</a>
@@ -931,6 +931,9 @@ const AurisLanding: React.FC = () => {
         <a href="#pricing" onClick={() => setMobileMenuOpen(false)}>Pricing</a>
         <a href="#pricing" className="auris-nav-cta" onClick={() => setMobileMenuOpen(false)}>Get Auris &mdash; $29</a>
       </div>
+
+    <div className="auris-page">
+      <div className="auris-ambient" />
 
       {/* HERO */}
       <section id="hero" className="auris-hero">
@@ -1245,6 +1248,7 @@ const AurisLanding: React.FC = () => {
         </div>
       </footer>
     </div>
+    </>
   )
 }
 
