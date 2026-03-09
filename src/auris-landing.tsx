@@ -11,7 +11,7 @@ const AurisLanding: React.FC = () => {
   const touchXRef = useRef(0)
 
   const scrollToNextSection = useCallback(() => {
-    const ids = ['hero', 'how', 'outputs', 'voice-commands', 'providers', 'features', 'personas', 'privacy', 'pricing', 'faq']
+    const ids = ['how', 'outputs', 'voice-commands', 'providers', 'features', 'personas', 'privacy', 'pricing', 'faq']
     const scrollY = window.scrollY
     for (const id of ids) {
       const el = document.getElementById(id)
@@ -745,6 +745,7 @@ const AurisLanding: React.FC = () => {
           border: 1px solid var(--border);
           border-radius: 14px;
           padding: 2rem;
+          overflow: hidden;
         }
         .auris-voice-cmd-heading {
           font-family: 'Syne', sans-serif;
@@ -1118,6 +1119,10 @@ const AurisLanding: React.FC = () => {
           .auris-features-grid { grid-template-columns: 1fr; }
           .auris-providers-row { flex-wrap: wrap; justify-content: center; }
           .auris-provider-pill { flex-shrink: 1; }
+
+          /* Voice commands */
+          .auris-voice-cmd-group { padding: 1.5rem; }
+          .auris-voice-cmd-examples code { white-space: normal; word-break: break-word; }
           .auris-persona-tabs { gap: 0.35rem; }
           .auris-persona-tab { font-size: 0.72rem; padding: 0.35rem 0.75rem; }
           .auris-persona-card { padding: 1.5rem; }
