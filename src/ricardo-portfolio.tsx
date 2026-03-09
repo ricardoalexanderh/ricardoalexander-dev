@@ -4,6 +4,7 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { Float, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
 import { Linkedin, Mail, Github, ExternalLink, Code, Database, Cloud, Smartphone, Globe, Cpu, Sun, Moon, Menu, X, ChevronDown, Play, Zap } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
 // Types
 interface PortfolioProps {
@@ -162,6 +163,10 @@ const Scene3D: React.FC = () => {
 // Navigation Component
 const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }> = ({ theme, toggleTheme }) => {
   const [isOpen, setIsOpen] = useState(false)
+  const [productsOpen, setProductsOpen] = useState(false)
+  const [mobileProductsOpen, setMobileProductsOpen] = useState(false)
+  const productsRef = useRef<HTMLDivElement>(null)
+  const navigate = useNavigate()
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId)
@@ -170,6 +175,17 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
       setIsOpen(false)
     }
   }
+
+  // Close products dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (productsRef.current && !productsRef.current.contains(e.target as Node)) {
+        setProductsOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-900/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-700/50">
@@ -188,7 +204,35 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
             <button onClick={() => scrollToSection('projects')} className="text-gray-300 hover:text-cyan-400 transition-colors font-outfit">Projects</button>
             <button onClick={() => scrollToSection('clients')} className="text-gray-300 hover:text-cyan-400 transition-colors font-outfit">Clients</button>
             <button onClick={() => scrollToSection('contact')} className="text-gray-300 hover:text-cyan-400 transition-colors font-outfit">Contact</button>
-            
+
+            {/* Products Dropdown */}
+            <div className="relative" ref={productsRef}>
+              <button
+                onClick={() => setProductsOpen(!productsOpen)}
+                className="flex items-center gap-1 text-gray-300 hover:text-cyan-400 transition-colors font-outfit"
+              >
+                Products
+                <ChevronDown className={`w-4 h-4 transition-transform ${productsOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {productsOpen && (
+                <div className="absolute top-full right-0 mt-2 w-56 bg-slate-800/95 backdrop-blur-lg rounded-lg border border-slate-700/50 shadow-xl overflow-hidden">
+                  <button
+                    onClick={() => {
+                      navigate('/products/auris')
+                      setProductsOpen(false)
+                    }}
+                    className="flex items-center gap-3 w-full px-4 py-3 text-left text-gray-300 hover:text-cyan-400 hover:bg-slate-700/50 transition-colors font-outfit"
+                  >
+                    <span className="text-lg">&#x25C8;</span>
+                    <div>
+                      <div className="font-medium">Auris</div>
+                      <div className="text-xs text-gray-500">AI voice assistant for Claude</div>
+                    </div>
+                  </button>
+                </div>
+              )}
+            </div>
+
             {/* Social Links */}
             <a
               href="https://linkedin.com/in/ricardoalexanderh"
@@ -262,6 +306,30 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
             <button onClick={() => scrollToSection('projects')} className="block w-full text-left text-gray-300 hover:text-cyan-400 transition-colors font-outfit py-2">Projects</button>
             <button onClick={() => scrollToSection('clients')} className="block w-full text-left text-gray-300 hover:text-cyan-400 transition-colors font-outfit py-2">Clients</button>
             <button onClick={() => scrollToSection('contact')} className="block w-full text-left text-gray-300 hover:text-cyan-400 transition-colors font-outfit py-2">Contact</button>
+
+            {/* Products submenu */}
+            <div className="border-t border-slate-700/50 pt-2 mt-2">
+              <button
+                onClick={() => setMobileProductsOpen(!mobileProductsOpen)}
+                className="flex items-center justify-between w-full text-left text-gray-300 hover:text-cyan-400 transition-colors font-outfit py-2"
+              >
+                Products
+                <ChevronDown className={`w-4 h-4 transition-transform ${mobileProductsOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {mobileProductsOpen && (
+                <button
+                  onClick={() => {
+                    navigate('/products/auris')
+                    setIsOpen(false)
+                    setMobileProductsOpen(false)
+                  }}
+                  className="flex items-center gap-3 w-full pl-4 py-2 text-left text-gray-300 hover:text-cyan-400 transition-colors font-outfit"
+                >
+                  <span>&#x25C8;</span>
+                  <span>Auris</span>
+                </button>
+              )}
+            </div>
           </motion.div>
         )}
       </div>
