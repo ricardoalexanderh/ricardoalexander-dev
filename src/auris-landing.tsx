@@ -3,11 +3,27 @@ import React, { useState, useEffect, useRef, useCallback } from 'react'
 const AurisLanding: React.FC = () => {
   const [scrolled, setScrolled] = useState(false)
   const [showScrollTop, setShowScrollTop] = useState(false)
+  const [atBottom, setAtBottom] = useState(false)
   const [openFaq, setOpenFaq] = useState<number | null>(null)
   const [currentSlide, setCurrentSlide] = useState(0)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const slideTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const touchXRef = useRef(0)
+
+  const scrollToNextSection = useCallback(() => {
+    const ids = ['hero', 'how', 'outputs', 'voice-commands', 'providers', 'features', 'personas', 'privacy', 'pricing', 'faq']
+    const scrollY = window.scrollY
+    for (const id of ids) {
+      const el = document.getElementById(id)
+      if (el) {
+        const top = el.getBoundingClientRect().top + window.scrollY
+        if (top > scrollY + 80) {
+          el.scrollIntoView({ behavior: 'smooth' })
+          return
+        }
+      }
+    }
+  }, [])
 
   const totalSlides = 12
   const [personaSlide, setPersonaSlide] = useState(0)
@@ -33,6 +49,7 @@ const AurisLanding: React.FC = () => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 40)
       setShowScrollTop(window.scrollY > 600)
+      setAtBottom(window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 100)
     }
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
@@ -955,6 +972,43 @@ const AurisLanding: React.FC = () => {
           border-color: var(--accent); color: var(--bright);
         }
 
+        .auris-scroll-next {
+          position: fixed;
+          bottom: 2rem; right: 2rem;
+          width: 44px; height: 44px;
+          border-radius: 50%;
+          background: var(--surface);
+          border: 1px solid var(--border);
+          color: var(--muted);
+          font-size: 1.2rem;
+          cursor: pointer;
+          display: flex; align-items: center; justify-content: center;
+          opacity: 0; pointer-events: none;
+          transform: translateY(12px);
+          transition: opacity 0.3s, transform 0.3s, border-color 0.2s, color 0.2s;
+          z-index: 100;
+        }
+        .auris-scroll-next.visible {
+          opacity: 1; pointer-events: auto;
+          transform: translateY(0);
+        }
+        .auris-scroll-next:hover {
+          border-color: var(--accent); color: var(--bright);
+        }
+        .auris-scroll-next svg {
+          width: 18px; height: 18px;
+          animation: auris-bounce-down 2s ease-in-out infinite;
+        }
+        @keyframes auris-bounce-down {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(3px); }
+        }
+
+        /* When scroll-top is also visible, push next-section up */
+        .auris-scroll-next.has-top {
+          bottom: 5rem;
+        }
+
         /* HAMBURGER */
         .auris-hamburger {
           display: none;
@@ -1417,6 +1471,17 @@ const AurisLanding: React.FC = () => {
         aria-label="Scroll to top"
       >
         ↑
+      </button>
+
+      {/* Scroll to next section */}
+      <button
+        className={`auris-scroll-next ${!atBottom ? 'visible' : ''} ${showScrollTop && !atBottom ? 'has-top' : ''}`}
+        onClick={scrollToNextSection}
+        aria-label="Scroll to next section"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
       </button>
     </div>
   )
