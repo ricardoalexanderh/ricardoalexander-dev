@@ -394,7 +394,7 @@ const AurisLanding: React.FC = () => {
         }
         .auris-origin-note p {
           font-size: 0.9rem; line-height: 1.8;
-          color: var(--dim); margin: 0 0 0.6rem;
+          color: var(--body); margin: 0 0 0.6rem;
         }
         .auris-origin-punchline {
           color: var(--bright) !important; font-weight: 500;
