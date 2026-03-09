@@ -387,13 +387,29 @@ const AurisLanding: React.FC = () => {
         }
         .auris-nav-cta:hover { opacity: 0.88 !important; transform: translateY(-1px); }
 
+        /* ORIGIN NOTE */
+        .auris-origin-note {
+          max-width: 540px; margin: 0 auto;
+          padding: 6.5rem 2rem 0;
+          text-align: center;
+        }
+        .auris-origin-note p {
+          font-style: italic; font-size: 0.95rem; line-height: 1.7;
+          color: var(--dim); margin: 0;
+        }
+        .auris-origin-attr {
+          display: block; margin-top: 0.75rem;
+          font-size: 0.8rem; color: var(--body);
+          font-weight: 500; letter-spacing: 0.02em;
+        }
+
         /* HERO */
         .auris-hero {
           min-height: auto;
           display: flex; flex-direction: column;
           align-items: center; justify-content: flex-start;
           text-align: center;
-          padding: 7rem 2rem 4rem;
+          padding: 3rem 2rem 4rem;
           position: relative;
         }
 
@@ -402,7 +418,7 @@ const AurisLanding: React.FC = () => {
           .auris-hero {
             min-height: 100vh;
             justify-content: center;
-            padding: 8rem 2rem 5rem;
+            padding: 4rem 2rem 5rem;
           }
         }
         .auris-badge {
@@ -1061,8 +1077,12 @@ const AurisLanding: React.FC = () => {
           .auris-nav { padding: 0.75rem 1rem; }
           .auris-container { padding: 0 1rem; }
 
+          /* Origin note */
+          .auris-origin-note { padding: 5rem 1rem 0; }
+          .auris-origin-note p { font-size: 0.85rem; }
+
           /* Hero */
-          .auris-hero { padding: 4.5rem 1rem 2.5rem; min-height: auto; overflow: hidden; max-width: 100%; }
+          .auris-hero { padding: 2.5rem 1rem 2.5rem; min-height: auto; overflow: hidden; max-width: 100%; }
           .auris-hero .auris-container { max-width: 100%; overflow: hidden; padding: 0 1rem; }
           .auris-hero h1 { font-size: clamp(1.5rem, 7vw, 2rem); word-break: break-word; max-width: 100%; }
           .auris-tagline { font-size: 0.9rem; font-style: italic; max-width: 100%; word-break: break-word; }
@@ -1156,6 +1176,12 @@ const AurisLanding: React.FC = () => {
         <a href="#pricing" onClick={() => setMobileMenuOpen(false)}>Pricing</a>
         <a href="#faq" onClick={() => setMobileMenuOpen(false)}>FAQ</a>
         <a href="https://chromewebstore.google.com" target="_blank" rel="noopener noreferrer" className="auris-nav-cta" onClick={() => setMobileMenuOpen(false)}>Get Auris</a>
+      </div>
+
+      {/* ORIGIN NOTE */}
+      <div className="auris-origin-note auris-reveal">
+        <p>"I run Claude Code for Web on one screen and do everything else on the other. I kept forgetting it was there &mdash; missing when it finished, missing when it asked me something. Auris is the fix: it just talks to me."</p>
+        <span className="auris-origin-attr">&mdash; Ricardo</span>
       </div>
 
       {/* HERO */}
