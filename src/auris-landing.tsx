@@ -347,8 +347,8 @@ const AurisLanding: React.FC = () => {
         }
         .auris-hero h1 {
           font-family: 'Syne', sans-serif;
-          font-size: clamp(3rem, 7vw, 6rem);
-          font-weight: 800; line-height: 1.0;
+          font-size: clamp(2.2rem, 5vw, 4rem);
+          font-weight: 800; line-height: 1.05;
           letter-spacing: -0.03em;
           color: var(--bright);
           margin: 0 0 1rem;
@@ -362,9 +362,10 @@ const AurisLanding: React.FC = () => {
         .auris-tagline {
           font-size: clamp(1rem, 2.2vw, 1.3rem);
           color: var(--subtle);
-          max-width: 560px;
+          max-width: 700px;
           margin: 0 auto 2.5rem;
           font-weight: 300; font-style: italic;
+          white-space: nowrap;
           animation: auris-fadeUp 0.6s 0.2s ease both;
         }
         .auris-hero-actions {
@@ -796,7 +797,8 @@ const AurisLanding: React.FC = () => {
           .auris-pricing-left { border-right: none !important; border-bottom: 1px solid var(--border); }
           .auris-pricing-divider { display: none; }
           .auris-nav-links a:not(.auris-nav-cta) { display: none; }
-          .auris-hero h1 { font-size: 2.8rem; }
+          .auris-hero h1 { font-size: 1.8rem; }
+          .auris-tagline { white-space: normal; }
         }
       `}</style>
 
