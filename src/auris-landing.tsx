@@ -206,6 +206,7 @@ const AurisLanding: React.FC = () => {
         @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=DM+Sans:ital,wght@0,300;0,400;1,300&display=swap');
 
         *, *::before, *::after { box-sizing: border-box; }
+        html, body { overflow-x: hidden; max-width: 100vw; }
 
         .auris-page {
           --bg: #09090f;
@@ -232,7 +233,6 @@ const AurisLanding: React.FC = () => {
           min-height: 100vh;
           position: relative;
           scroll-behavior: smooth;
-          width: 100%;
         }
 
         .auris-page::before {
@@ -252,7 +252,7 @@ const AurisLanding: React.FC = () => {
           animation: auris-breathe 8s ease-in-out infinite;
         }
 
-        .auris-container { max-width: 1100px; margin: 0 auto; padding: 0 2rem; position: relative; z-index: 1; }
+        .auris-container { max-width: 1200px; margin: 0 auto; padding: 0 2.5rem; position: relative; z-index: 1; }
 
         @keyframes auris-breathe {
           0%, 100% { opacity: 0.6; transform: translateX(-50%) scale(1); }
@@ -348,7 +348,7 @@ const AurisLanding: React.FC = () => {
         }
         .auris-hero h1 {
           font-family: 'Syne', sans-serif;
-          font-size: clamp(2.2rem, 5vw, 4rem);
+          font-size: clamp(2.2rem, 5vw, 4.5rem);
           font-weight: 800; line-height: 1.05;
           letter-spacing: -0.03em;
           color: var(--bright);
@@ -415,7 +415,7 @@ const AurisLanding: React.FC = () => {
           background: var(--surface);
           border: 1px solid var(--border);
           border-radius: 14px; overflow: hidden;
-          max-width: 680px; margin: 0 auto;
+          max-width: 740px; margin: 0 auto;
           box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(123,108,255,0.08);
         }
         .auris-demo-titlebar {
@@ -591,7 +591,7 @@ const AurisLanding: React.FC = () => {
         /* OUTPUT PILLS */
         .auris-outputs-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+          grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr));
           gap: 1rem; margin-top: 3rem;
         }
         .auris-output-pill {
@@ -682,7 +682,7 @@ const AurisLanding: React.FC = () => {
         /* PRIVACY */
         .auris-privacy-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
           gap: 2rem; text-align: center;
         }
         .auris-privacy-icon { font-size: 2rem; margin-bottom: 0.75rem; }
@@ -756,7 +756,7 @@ const AurisLanding: React.FC = () => {
         }
 
         /* FAQ */
-        .auris-faq-list { max-width: 680px; margin: 3rem auto 0; }
+        .auris-faq-list { max-width: 740px; margin: 3rem auto 0; }
         .auris-faq-item { border-bottom: 1px solid var(--border); padding: 1.5rem 0; }
         .auris-faq-item:first-child { border-top: 1px solid var(--border); }
         .auris-faq-q {
