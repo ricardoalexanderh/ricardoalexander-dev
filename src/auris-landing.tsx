@@ -90,8 +90,8 @@ const AurisLanding: React.FC = () => {
       a: "On first install, Auris downloads its local voice models \u2014 around 113MB total. This is a one-time download cached in your browser forever. After that, everything is instant. If the local models fail for any reason, Auris automatically falls back to the browser\u2019s built-in Web Speech API.",
     },
     {
-      q: 'What languages does voice support?',
-      a: 'Auris ships with 50+ voices across 10 languages: American English, British English, Japanese, Mandarin, Korean, French, Hindi, Italian, Brazilian Portuguese, and Spanish. The voice picker is organized by language, with gender indicators per voice. Speech recognition is English-first in V1, with multilingual STT on the V2 roadmap.',
+      q: 'What languages does Auris support?',
+      a: 'V1 supports English only — both text-to-speech and speech recognition are optimized for English. Multi-language support is on the roadmap for a future release.',
     },
     {
       q: 'Does it only work with Claude Code for Web?',
@@ -152,7 +152,7 @@ const AurisLanding: React.FC = () => {
     { icon: '\uD83D\uDD12', title: '100% On-device Voice', desc: 'All voice processing runs directly inside your browser \u2014 nothing recorded, nothing uploaded, nothing sent anywhere. Falls back to Web Speech API if needed.' },
     { icon: '\uD83E\uDDE9', title: '10 AI Provider Presets', desc: 'Claude, OpenAI, Gemini, Ollama, LM Studio, Groq, DeepSeek, Mistral, xAI, and more. Selecting a preset auto-fills the URL and model defaults. Switch anytime.' },
     { icon: '\uD83C\uDFAD', title: '8 Voice Personas', desc: 'Choose how Auris talks to you \u2014 Professional, Friendly, Concise, Encouraging, Zen, Comedic, Sarcastic, or Pirate. Your assistant, your tone.' },
-    { icon: '\uD83C\uDF0D', title: '50+ Voices, 10 Languages', desc: 'Pick from 50+ Kokoro voices across American English, British English, Japanese, Mandarin, Korean, French, Hindi, Italian, Portuguese, and Spanish.' },
+    { icon: '\uD83C\uDF0D', title: 'Multiple Voice Options', desc: 'Pick from a variety of natural-sounding English voices with different tones and styles. Multi-language support coming in a future release.' },
     { icon: '\u26A1', title: 'Instant Command Engine', desc: 'A built-in rule engine catches "yes", "no", "skip", "repeat", "option A", "save" \u2014 instantly, no API call. Anything more nuanced falls back to your AI provider.' },
     { icon: '\uD83C\uDF9A', title: 'Verbosity + Personas per Type', desc: 'Set Brief, Normal, or Detailed summaries per output type. Errors get full detail; completions stay quick. Specialized AI prompts per output category.' },
     { icon: '\uD83C\uDF99', title: 'Push-to-Talk & DND', desc: 'Bind any key as push-to-talk. Enable Do Not Disturb to silence Auris while you\u2019re heads-down. Toggle auto-read or trigger manually per output.' },
@@ -168,7 +168,7 @@ const AurisLanding: React.FC = () => {
   ]
 
   const pricingFeatures = [
-    'On-device voice \u2014 50+ voices, 10 languages',
+    'On-device voice \u2014 multiple English voices',
     'All 10 Claude Code output types, classified & spoken',
     'AI-powered summaries with specialized prompts per type',
     '10 AI provider presets \u2014 Claude, OpenAI, Gemini, Ollama, LM Studio & more',
