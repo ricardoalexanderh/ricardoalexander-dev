@@ -70,6 +70,7 @@ const AurisLanding: React.FC = () => {
     { type: 't-test', label: 'Test Result', text: 'All 47 tests passed in 3.2 seconds. 2 new tests added for the null user case. No regressions detected. Coverage increased from 84% to 87%.', transcript: '"nice, commit it"' },
     { type: 't-followup', label: 'Follow-up Question', text: 'Should I also update the API route handlers that call this function? They may need to handle the null case explicitly before sending a response to the client.', transcript: '"yes, handle the null"' },
     { type: 't-general', label: 'General Response', text: "The pattern you're using is a common defensive programming technique. Returning null or undefined is idiomatic in TypeScript when a value is genuinely optional, and it pushes error handling to the caller where it belongs.", transcript: '"got it, skip"' },
+    { type: 't-persona', label: 'Voice Persona \u2014 Pirate', text: "Arrr! Ye had a null pointer hidin\u2019 on line 42, cap\u2019n! The user object be undefined before ye plundered its token. I\u2019ve patched the hull \u2014 added a guard clause and updated the types. All 47 tests be passin\u2019, no scurvy regressions!", transcript: '"switch to zen"' },
   ]
 
   const faqData = [
@@ -190,6 +191,7 @@ const AurisLanding: React.FC = () => {
     't-completion': '#34d399', 't-search': '#7b6cff', 't-option': '#a78bfa',
     't-file': '#f472b6', 't-test': '#34d399', 't-followup': '#fb923c',
     't-general': '#94a3b8',
+    't-persona': '#e879f9',
   }
 
   const slideColorBg: Record<string, string> = {
@@ -198,6 +200,7 @@ const AurisLanding: React.FC = () => {
     't-search': 'rgba(123,108,255,0.07)', 't-option': 'rgba(167,139,250,0.07)',
     't-file': 'rgba(244,114,182,0.07)', 't-test': 'rgba(52,211,153,0.07)',
     't-followup': 'rgba(251,146,60,0.07)', 't-general': 'rgba(148,163,184,0.07)',
+    't-persona': 'rgba(232,121,249,0.07)',
   }
 
   return (
@@ -377,6 +380,12 @@ const AurisLanding: React.FC = () => {
           margin: 0 auto 2.5rem;
           font-weight: 300; font-style: italic;
           animation: auris-fadeUp 0.6s 0.2s ease both;
+        }
+        .auris-claude-logo {
+          display: inline-block;
+          width: 1.15em; height: 1.15em;
+          vertical-align: -0.15em;
+          margin-right: 0.15em;
         }
         .auris-hero-actions {
           display: flex; gap: 1rem; align-items: center; justify-content: center;
@@ -950,10 +959,10 @@ const AurisLanding: React.FC = () => {
         <div className="auris-container">
           <div className="auris-badge">
             <span className="auris-badge-dot" />
-            Chrome Extension &middot; Claude Code for Web &middot; On-device Voice
+            Chrome Extension
           </div>
           <h1>Your AI Coding Assistant,<br /><span className="auris-gradient-text">out loud.</span></h1>
-          <p className="auris-tagline">An AI voice assistant for Claude Code for Web &mdash; keeping you in flow.</p>
+          <p className="auris-tagline">An AI voice assistant for <svg className="auris-claude-logo" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16.009 8.736a.804.804 0 0 0-.6-.282.804.804 0 0 0-.6.282L12 12.498 9.191 8.736a.804.804 0 0 0-.6-.282.804.804 0 0 0-.6.282.89.89 0 0 0-.173.733l1.686 6.752a2.4 2.4 0 0 0 2.334 1.833h.324a2.4 2.4 0 0 0 2.334-1.833l1.686-6.752a.89.89 0 0 0-.173-.733Z" fill="#D97757"/><path d="M8.577 5.946a.89.89 0 0 1 .173-.733.804.804 0 0 1 .6-.282c.24 0 .462.108.6.282l5.618 7.525a.89.89 0 0 1-.173.733.804.804 0 1 1-1.2 0L8.577 5.946Z" fill="#D97757" opacity="0.5"/></svg> Claude Code for Web &mdash; keeping you in flow.</p>
           <div className="auris-hero-actions">
             <a href="#pricing" className="auris-btn-primary">Get Auris &mdash; $29</a>
             <a href="#how" className="auris-btn-secondary">See how it works &rarr;</a>
@@ -962,7 +971,7 @@ const AurisLanding: React.FC = () => {
 
           {/* DEMO SLIDESHOW */}
           <div className="auris-demo-container">
-            <p className="auris-demo-label">Auris side panel &mdash; 10 output types, all spoken aloud</p>
+            <p className="auris-demo-label">Auris side panel &mdash; 10 output types + voice personas, all spoken aloud</p>
             <div
               className="auris-demo-window"
               onMouseEnter={() => { if (slideTimerRef.current) clearInterval(slideTimerRef.current) }}
