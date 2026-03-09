@@ -794,14 +794,16 @@ const AurisLanding: React.FC = () => {
         .auris-hamburger {
           display: none;
           background: none; border: none; cursor: pointer;
-          width: 32px; height: 32px;
+          width: 36px; height: 36px;
           flex-direction: column; align-items: center; justify-content: center; gap: 5px;
-          padding: 0; z-index: 101;
+          padding: 4px; z-index: 101;
+          flex-shrink: 0; overflow: visible;
         }
         .auris-hamburger span {
           display: block; width: 20px; height: 2px;
           background: var(--bright); border-radius: 2px;
           transition: all 0.3s;
+          transform-origin: center center;
         }
         .auris-hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(2.5px, 2.5px); }
         .auris-hamburger.open span:nth-child(2) { opacity: 0; }
@@ -836,7 +838,7 @@ const AurisLanding: React.FC = () => {
           .auris-page { overflow-x: hidden; max-width: 100vw; }
           .auris-hamburger { display: flex; }
           .auris-nav-links { display: none; }
-          .auris-nav { padding: 1rem 1rem; }
+          .auris-nav { padding: 1rem 1rem; overflow: visible; }
           .auris-container { padding: 0 1rem; max-width: 100%; overflow: hidden; }
           .auris-hero { padding: 5rem 1rem 3rem; min-height: auto; overflow: hidden; }
           .auris-hero h1 { font-size: 1.5rem; word-wrap: break-word; overflow-wrap: break-word; }
