@@ -156,7 +156,7 @@ const AurisLanding: React.FC = () => {
     { icon: '\uD83C\uDF0D', title: 'Multiple Voice Options', desc: 'Pick from a variety of natural-sounding English voices with different tones and styles. Multi-language support coming in a future release.' },
     { icon: '\u26A1', title: 'Instant Command Engine', desc: 'A built-in rule engine catches "yes", "no", "skip", "repeat", "option A", "save" \u2014 instantly, no API call. Anything more nuanced falls back to your AI provider.' },
     { icon: '\uD83C\uDF9A', title: 'Verbosity + Personas per Type', desc: 'Set Brief, Normal, or Detailed summaries per output type. Errors get full detail; completions stay quick. Specialized AI prompts per output category.' },
-    { icon: '\uD83C\uDF99', title: 'Push-to-Talk & DND', desc: 'Bind any key as push-to-talk. Enable Do Not Disturb to silence Auris while you\u2019re heads-down. Toggle auto-read or trigger manually per output.' },
+    { icon: '\uD83C\uDF99', title: '"Hey Auris" Wake Word & DND', desc: 'Activate Auris hands-free with a customizable wake word like "Hey Auris" — no buttons needed. Enable Do Not Disturb to silence Auris while you\u2019re heads-down. Toggle auto-read or trigger manually per output.' },
     { icon: '\uD83D\uDCC1', title: 'Session History', desc: 'Every output and conversation saved locally. Configurable max sessions, auto-clear after N days. Export as Markdown or JSON.' },
     { icon: '\u2699\uFE0F', title: 'Full Settings Portability', desc: 'Export and import your entire Auris config as JSON. Test your provider connection and browse available models \u2014 all from the settings panel.' },
   ]
@@ -176,7 +176,7 @@ const AurisLanding: React.FC = () => {
     '8 voice personas \u2014 Professional, Friendly, Concise, Pirate, and more',
     '3 verbosity levels \u2014 Brief, Normal, Detailed',
     'Instant rule engine + natural language fallback',
-    'Push-to-talk key binding & Do Not Disturb mode',
+    'Customizable "Hey Auris" wake word & Do Not Disturb mode',
     'Session history with auto-clear & export (MD / JSON)',
     'Settings import / export',
     'Web Speech API fallback if local models fail',
@@ -380,12 +380,6 @@ const AurisLanding: React.FC = () => {
           margin: 0 auto 2.5rem;
           font-weight: 300; font-style: italic;
           animation: auris-fadeUp 0.6s 0.2s ease both;
-        }
-        .auris-claude-logo {
-          display: inline-block;
-          width: 1.15em; height: 1.15em;
-          vertical-align: -0.15em;
-          margin-right: 0.15em;
         }
         .auris-hero-actions {
           display: flex; gap: 1rem; align-items: center; justify-content: center;
@@ -962,7 +956,7 @@ const AurisLanding: React.FC = () => {
             Chrome Extension
           </div>
           <h1>Your AI Coding Assistant,<br /><span className="auris-gradient-text">out loud.</span></h1>
-          <p className="auris-tagline">An AI voice assistant for <svg className="auris-claude-logo" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16.009 8.736a.804.804 0 0 0-.6-.282.804.804 0 0 0-.6.282L12 12.498 9.191 8.736a.804.804 0 0 0-.6-.282.804.804 0 0 0-.6.282.89.89 0 0 0-.173.733l1.686 6.752a2.4 2.4 0 0 0 2.334 1.833h.324a2.4 2.4 0 0 0 2.334-1.833l1.686-6.752a.89.89 0 0 0-.173-.733Z" fill="#D97757"/><path d="M8.577 5.946a.89.89 0 0 1 .173-.733.804.804 0 0 1 .6-.282c.24 0 .462.108.6.282l5.618 7.525a.89.89 0 0 1-.173.733.804.804 0 1 1-1.2 0L8.577 5.946Z" fill="#D97757" opacity="0.5"/></svg> Claude Code for Web &mdash; keeping you in flow.</p>
+          <p className="auris-tagline">An AI voice assistant for <span style={{ color: '#D97757', fontWeight: 600 }}>Claude Code</span> for Web &mdash; keeping you in flow.</p>
           <div className="auris-hero-actions">
             <a href="#pricing" className="auris-btn-primary">Get Auris &mdash; $29</a>
             <a href="#how" className="auris-btn-secondary">See how it works &rarr;</a>
