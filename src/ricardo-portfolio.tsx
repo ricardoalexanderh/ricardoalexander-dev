@@ -206,29 +206,35 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
             <button onClick={() => scrollToSection('contact')} className="text-gray-300 hover:text-cyan-400 transition-colors font-outfit">Contact</button>
 
             {/* Products Dropdown */}
-            <div className="relative" ref={productsRef}>
+            <div
+              className="relative"
+              ref={productsRef}
+              onMouseEnter={() => setProductsOpen(true)}
+              onMouseLeave={() => setProductsOpen(false)}
+            >
               <button
-                onClick={() => setProductsOpen(!productsOpen)}
                 className="flex items-center gap-1 text-gray-300 hover:text-cyan-400 transition-colors font-outfit"
               >
                 Products
                 <ChevronDown className={`w-4 h-4 transition-transform ${productsOpen ? 'rotate-180' : ''}`} />
               </button>
               {productsOpen && (
-                <div className="absolute top-full right-0 mt-2 w-56 bg-slate-800/95 backdrop-blur-lg rounded-lg border border-slate-700/50 shadow-xl overflow-hidden">
-                  <button
-                    onClick={() => {
-                      navigate('/products/auris')
-                      setProductsOpen(false)
-                    }}
-                    className="flex items-center gap-3 w-full px-4 py-3 text-left text-gray-300 hover:text-cyan-400 hover:bg-slate-700/50 transition-colors font-outfit"
-                  >
-                    <span className="text-lg">&#x25C8;</span>
-                    <div>
-                      <div className="font-medium">Auris</div>
-                      <div className="text-xs text-gray-500">AI voice assistant for Claude</div>
-                    </div>
-                  </button>
+                <div className="absolute top-full right-0 pt-2">
+                  <div className="w-56 bg-slate-800/95 backdrop-blur-lg rounded-lg border border-slate-700/50 shadow-xl overflow-hidden">
+                    <button
+                      onClick={() => {
+                        navigate('/products/auris')
+                        setProductsOpen(false)
+                      }}
+                      className="flex items-center gap-3 w-full px-4 py-3 text-left text-gray-300 hover:text-cyan-400 hover:bg-slate-700/50 transition-colors font-outfit"
+                    >
+                      <span className="text-lg">&#x25C8;</span>
+                      <div>
+                        <div className="font-medium">Auris</div>
+                        <div className="text-xs text-gray-500">AI voice assistant for Claude Code Web</div>
+                      </div>
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
