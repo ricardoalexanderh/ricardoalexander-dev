@@ -9,7 +9,7 @@ const AurisLanding: React.FC = () => {
   const slideTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const touchXRef = useRef(0)
 
-  const totalSlides = 10
+  const totalSlides = 12
   const [personaSlide, setPersonaSlide] = useState(0)
 
   useEffect(() => {
@@ -85,6 +85,8 @@ const AurisLanding: React.FC = () => {
     { type: 't-test', label: 'Test Result', text: 'All 47 tests passed in 3.2 seconds. 2 new tests added for the null user case. No regressions detected. Coverage increased from 84% to 87%.', transcript: '"nice, commit it"' },
     { type: 't-followup', label: 'Follow-up Question', text: 'Should I also update the API route handlers that call this function? They may need to handle the null case explicitly before sending a response to the client.', transcript: '"yes, handle the null"' },
     { type: 't-general', label: 'General Response', text: "The pattern you're using is a common defensive programming technique. Returning null or undefined is idiomatic in TypeScript when a value is genuinely optional, and it pushes error handling to the caller where it belongs.", transcript: '"got it, skip"' },
+    { type: 't-instruct', label: 'Voice Command to Claude', text: 'You said: "Tell Claude to fix the auth bug in the login component." Auris will send this to Claude Code. Say "send" to confirm or "cancel" to discard.', transcript: '"send"' },
+    { type: 't-status', label: 'Status Query', text: 'Session active for 24 minutes. Last 3 outputs: test results (all passed), file change (auth.ts), and a follow-up question. 0 errors. 0 pending permissions.', transcript: '"what\'s happening?"' },
   ]
 
   const faqData = [
@@ -115,6 +117,14 @@ const AurisLanding: React.FC = () => {
     {
       q: 'Does it only work with Claude Code for Web?',
       a: 'V1 is focused entirely on Claude Code for Web (claude.ai). Auris watches the DOM, classifies every output, and never modifies the page. Support for other web AI coding tools is planned for V2.',
+    },
+    {
+      q: 'Can I send commands to Claude by voice?',
+      a: 'Yes. Say "Tell Claude to..." or "Ask Claude..." followed by your instruction. Auris transcribes your command, optionally reads it back for confirmation, and sends it directly to Claude Code. You can also enable auto-submit to skip the confirmation step. A 5-second cooldown prevents accidental spam.',
+    },
+    {
+      q: 'Can I check what Claude is doing without looking at the screen?',
+      a: 'Yes. Say "What\u2019s happening?" for a quick status update, "What did I miss?" for a summary since your last interaction, "Any errors?" for an error count, or "How long?" for session duration. Auris answers from session context \u2014 no screen needed.',
     },
   ]
 
@@ -173,6 +183,9 @@ const AurisLanding: React.FC = () => {
     { icon: '\uD83C\uDFAD', title: '8 Voice Personas', desc: 'Choose how Auris talks to you \u2014 Professional, Friendly, Concise, Encouraging, Zen, Comedic, Sarcastic, or Pirate. Your assistant, your tone.' },
     { icon: '\uD83C\uDF0D', title: 'Multiple Voice Options', desc: 'Pick from a variety of natural-sounding English voices with different tones and styles. Multi-language support coming in a future release.' },
     { icon: '\u26A1', title: 'Instant Command Engine', desc: 'A built-in rule engine catches "yes", "no", "skip", "repeat", "option A", "save" \u2014 instantly, no API call. Anything more nuanced falls back to your AI provider.' },
+    { icon: '\uD83D\uDCAC', title: 'Voice-to-Claude Commands', desc: 'Speak directly to Claude Code \u2014 "Tell Claude to fix the auth bug" or "Ask Claude how to optimize this". Optional confirmation flow before sending. Auto-submit available.' },
+    { icon: '\uD83D\uDCE1', title: 'Hands-free Status Queries', desc: 'Ask "What\u2019s happening?", "Any errors?", "Pending permissions?", or "What did I miss?" \u2014 Auris answers instantly from session context, no screen required.' },
+    { icon: '\uD83D\uDEE1', title: 'Confirmation Before Send', desc: 'Auris reads back your command before sending to Claude. Say "send" to confirm, "cancel" to discard. Disable confirmation or enable auto-submit from settings.' },
     { icon: '\uD83C\uDF9A', title: 'Verbosity + Personas per Type', desc: 'Set Brief, Normal, or Detailed summaries per output type. Errors get full detail; completions stay quick. Specialized AI prompts per output category.' },
     { icon: '\uD83C\uDF99', title: '"Hey Auris" Wake Word', desc: 'Activate Auris hands-free with a customizable wake word like "Hey Auris" — no buttons needed.' },
     { icon: '\uD83D\uDCC1', title: 'Session History', desc: 'Every output and conversation saved locally. Configurable max sessions, auto-clear after N days. Export as Markdown or JSON.' },
@@ -194,6 +207,8 @@ const AurisLanding: React.FC = () => {
     '8 voice personas \u2014 Professional, Friendly, Concise, Pirate, and more',
     '3 verbosity levels \u2014 Brief, Normal, Detailed',
     'Instant rule engine + natural language fallback',
+    'Voice-to-Claude commands \u2014 speak instructions directly to Claude Code',
+    'Hands-free status queries \u2014 "What\u2019s happening?", "Any errors?", and more',
     'Customizable "Hey Auris" wake word for hands-free activation',
     'Session history with auto-clear & export (MD / JSON)',
     'Settings import / export',
@@ -209,6 +224,8 @@ const AurisLanding: React.FC = () => {
     't-completion': '#34d399', 't-search': '#7b6cff', 't-option': '#a78bfa',
     't-file': '#f472b6', 't-test': '#34d399', 't-followup': '#fb923c',
     't-general': '#94a3b8',
+    't-instruct': '#06b6d4',
+    't-status': '#f59e0b',
   }
 
   const slideColorBg: Record<string, string> = {
@@ -217,6 +234,7 @@ const AurisLanding: React.FC = () => {
     't-search': 'rgba(123,108,255,0.07)', 't-option': 'rgba(167,139,250,0.07)',
     't-file': 'rgba(244,114,182,0.07)', 't-test': 'rgba(52,211,153,0.07)',
     't-followup': 'rgba(251,146,60,0.07)', 't-general': 'rgba(148,163,184,0.07)',
+    't-instruct': 'rgba(6,182,212,0.07)', 't-status': 'rgba(245,158,11,0.07)',
   }
 
   const personas = [
@@ -646,6 +664,48 @@ const AurisLanding: React.FC = () => {
         .auris-output-pill:hover { border-color: var(--dim); color: var(--bright); }
         .auris-pill-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
+        /* VOICE COMMANDS SECTION */
+        .auris-voice-cmds-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 2rem;
+          margin-top: 3rem;
+        }
+        .auris-voice-cmd-group {
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: 14px;
+          padding: 2rem;
+        }
+        .auris-voice-cmd-heading {
+          font-family: 'Syne', sans-serif;
+          font-weight: 700;
+          font-size: 1.1rem;
+          color: var(--bright);
+          margin-bottom: 0.5rem;
+        }
+        .auris-voice-cmd-desc {
+          color: var(--muted);
+          font-size: 0.85rem;
+          line-height: 1.55;
+          margin-bottom: 1.25rem;
+        }
+        .auris-voice-cmd-examples {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+        }
+        .auris-voice-cmd-examples code {
+          background: var(--bg);
+          border: 1px solid var(--border);
+          border-radius: 8px;
+          padding: 0.4rem 0.75rem;
+          font-family: 'DM Mono', monospace;
+          font-size: 0.78rem;
+          color: var(--accent);
+          white-space: nowrap;
+        }
+
         /* PROVIDERS */
         .auris-providers-label {
           text-align: center; font-family: 'DM Mono', monospace;
@@ -940,6 +1000,7 @@ const AurisLanding: React.FC = () => {
         /* Tablet */
         @media (max-width: 900px) {
           .auris-features-grid { grid-template-columns: repeat(2, 1fr); }
+          .auris-voice-cmds-grid { grid-template-columns: 1fr; }
         }
 
         /* Mobile: portrait + landscape */
@@ -1061,7 +1122,7 @@ const AurisLanding: React.FC = () => {
 
           {/* DEMO SLIDESHOW */}
           <div className="auris-demo-container">
-            <p className="auris-demo-label">Auris side panel &mdash; 10 output types + voice personas, all spoken aloud</p>
+            <p className="auris-demo-label">Auris side panel &mdash; 10 output types + voice commands + status queries, all spoken aloud</p>
             <div
               className="auris-demo-window"
               onMouseEnter={() => { if (slideTimerRef.current) clearInterval(slideTimerRef.current) }}
@@ -1156,6 +1217,53 @@ const AurisLanding: React.FC = () => {
                 {item.label}
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* WHAT YOU CAN SAY */}
+      <section id="voice-commands" style={{ padding: '5rem 0', position: 'relative', zIndex: 1 }}>
+        <div className="auris-container">
+          <p className="auris-section-label auris-reveal">What you can say</p>
+          <h2 className="auris-section-title auris-reveal">Talk back. Send commands. Stay in flow.</h2>
+          <p className="auris-section-sub auris-reveal">Auris doesn&apos;t just read &mdash; it listens. Reply to Claude, instruct it directly, or check status without touching the screen.</p>
+
+          <div className="auris-voice-cmds-grid auris-reveal">
+            <div className="auris-voice-cmd-group">
+              <h3 className="auris-voice-cmd-heading">Quick replies</h3>
+              <p className="auris-voice-cmd-desc">Respond instantly to Claude&apos;s output &mdash; no AI call needed.</p>
+              <div className="auris-voice-cmd-examples">
+                <code>&ldquo;yes&rdquo;</code>
+                <code>&ldquo;no&rdquo;</code>
+                <code>&ldquo;skip&rdquo;</code>
+                <code>&ldquo;option B&rdquo;</code>
+                <code>&ldquo;read again&rdquo;</code>
+                <code>&ldquo;save this&rdquo;</code>
+                <code>&ldquo;explain&rdquo;</code>
+              </div>
+            </div>
+
+            <div className="auris-voice-cmd-group">
+              <h3 className="auris-voice-cmd-heading">Instruct Claude</h3>
+              <p className="auris-voice-cmd-desc">Speak a command and Auris types it into Claude Code for you. Optional confirmation before sending.</p>
+              <div className="auris-voice-cmd-examples">
+                <code>&ldquo;Tell Claude to fix the auth bug&rdquo;</code>
+                <code>&ldquo;Ask Claude how to optimize this query&rdquo;</code>
+                <code>&ldquo;Write create a unit test for the parser&rdquo;</code>
+              </div>
+            </div>
+
+            <div className="auris-voice-cmd-group">
+              <h3 className="auris-voice-cmd-heading">Status queries</h3>
+              <p className="auris-voice-cmd-desc">Ask what&apos;s happening without looking at the screen.</p>
+              <div className="auris-voice-cmd-examples">
+                <code>&ldquo;What&apos;s happening?&rdquo;</code>
+                <code>&ldquo;Any errors?&rdquo;</code>
+                <code>&ldquo;What did I miss?&rdquo;</code>
+                <code>&ldquo;Pending permissions?&rdquo;</code>
+                <code>&ldquo;How long?&rdquo;</code>
+              </div>
+            </div>
           </div>
         </div>
       </section>
