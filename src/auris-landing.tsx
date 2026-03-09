@@ -220,7 +220,6 @@ const AurisLanding: React.FC = () => {
     { emoji: '\uD83E\uDD23', name: 'Comedic', desc: 'Laugh through the pain. Because debugging should at least be entertaining.', example: "Plot twist! Line 42 of auth.ts just tried to access a token on a user that doesn\u2019t exist. It\u2019s like checking the fridge for leftovers you never cooked. Add a null check and we\u2019re back in business!" },
   ]
 
-  const totalPersonas = personas.length
 
   return (
     <div className="auris-page">
@@ -660,68 +659,61 @@ const AurisLanding: React.FC = () => {
         .auris-provider-pip { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 
         /* PERSONAS SLIDER */
-        .auris-persona-slider {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-          max-width: 640px;
-          margin: 0 auto;
-        }
-        .auris-persona-slide-container {
-          flex: 1;
-          min-width: 0;
-        }
-        .auris-persona-slide {
-          animation: auris-personaFade 0.35s ease;
-        }
-        @keyframes auris-personaFade {
-          from { opacity: 0; transform: translateX(12px); }
-          to { opacity: 1; transform: translateX(0); }
-        }
-        .auris-persona-arrow {
-          background: var(--surface);
-          border: 1px solid var(--border);
-          color: var(--muted);
-          width: 40px; height: 40px;
-          border-radius: 50%;
-          font-size: 1.4rem;
-          cursor: pointer;
-          display: flex; align-items: center; justify-content: center;
-          transition: all 0.2s;
-          flex-shrink: 0;
-        }
-        .auris-persona-arrow:hover { border-color: var(--accent); color: var(--bright); }
-        .auris-persona-dots {
+        .auris-persona-tabs {
           display: flex;
           justify-content: center;
+          flex-wrap: wrap;
           gap: 0.5rem;
-          margin-top: 1.25rem;
+          margin-bottom: 1.75rem;
         }
-        .auris-persona-dot {
-          width: 8px; height: 8px;
-          border-radius: 50%;
-          background: var(--dim);
-          border: none;
+        .auris-persona-tab {
+          display: flex; align-items: center; gap: 0.4rem;
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: 999px;
+          padding: 0.45rem 1rem;
+          font-size: 0.8rem; font-weight: 500;
+          color: var(--muted);
           cursor: pointer;
-          transition: all 0.2s;
-          padding: 0;
+          transition: all 0.25s;
+          font-family: 'DM Sans', sans-serif;
         }
-        .auris-persona-dot.active {
-          background: var(--accent);
-          transform: scale(1.3);
+        .auris-persona-tab:hover { border-color: var(--dim); color: var(--body); }
+        .auris-persona-tab.active {
+          border-color: var(--accent);
+          color: var(--bright);
+          background: rgba(123,108,255,0.08);
+          box-shadow: 0 0 16px rgba(123,108,255,0.15);
+        }
+        .auris-persona-tab .tab-emoji { font-size: 1rem; }
+        .auris-persona-slide-wrap {
+          max-width: 600px;
+          margin: 0 auto;
+        }
+        .auris-persona-slide {
+          animation: auris-personaFade 0.4s ease;
+        }
+        @keyframes auris-personaFade {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
         }
         .auris-persona-card {
           background: var(--surface);
           border: 1px solid var(--border);
-          border-radius: 12px;
-          padding: 1.5rem;
-          transition: border-color 0.3s, transform 0.2s;
+          border-radius: 16px;
+          padding: 2rem;
+          text-align: center;
+          position: relative;
         }
-        .auris-persona-card:hover { border-color: var(--dim); }
-        .auris-persona-name {
+        .auris-persona-card-emoji {
+          font-size: 2.5rem;
+          margin-bottom: 0.75rem;
+          line-height: 1;
+        }
+        .auris-persona-card-title {
           font-family: 'Syne', sans-serif; font-weight: 700;
-          color: var(--bright); font-size: 1rem; margin-bottom: 0.5rem;
-          display: flex; align-items: center; gap: 0.5rem;
+          color: var(--bright); font-size: 1.25rem;
+          margin-bottom: 0.25rem;
         }
         .auris-persona-tag {
           font-family: 'DM Mono', monospace; font-size: 0.65rem;
@@ -954,7 +946,9 @@ const AurisLanding: React.FC = () => {
           /* Grids */
           .auris-flow-grid { grid-template-columns: 1fr; }
           .auris-features-grid { grid-template-columns: 1fr; }
-          .auris-persona-arrow { width: 32px; height: 32px; font-size: 1.1rem; }
+          .auris-persona-tabs { gap: 0.35rem; }
+          .auris-persona-tab { font-size: 0.72rem; padding: 0.35rem 0.75rem; }
+          .auris-persona-card { padding: 1.5rem; }
           .auris-privacy-grid { grid-template-columns: 1fr 1fr; }
 
           /* Pricing */
@@ -1167,17 +1161,24 @@ const AurisLanding: React.FC = () => {
           <p className="auris-section-label auris-reveal">Voice Personas</p>
           <h2 className="auris-section-title auris-reveal">8 personas. Your assistant, your tone.</h2>
           <p className="auris-section-sub auris-reveal">Auris doesn&apos;t just read &mdash; it speaks with personality. Pick the voice that matches your workflow.</p>
-          <div className="auris-persona-slider auris-reveal">
-            <button className="auris-persona-arrow auris-persona-arrow-left" onClick={() => setPersonaSlide((personaSlide - 1 + totalPersonas) % totalPersonas)} aria-label="Previous persona">&lsaquo;</button>
-            <div className="auris-persona-slide-container">
-              {personas.map((p, i) => (
-                <div
-                  key={i}
-                  className={`auris-persona-slide ${i === personaSlide ? 'active' : ''}`}
-                  style={{ display: i === personaSlide ? 'block' : 'none' }}
-                >
+          <div className="auris-persona-tabs auris-reveal">
+            {personas.map((p, i) => (
+              <button
+                key={i}
+                className={`auris-persona-tab ${i === personaSlide ? 'active' : ''}`}
+                onClick={() => setPersonaSlide(i)}
+              >
+                <span className="tab-emoji">{p.emoji}</span> {p.name}
+              </button>
+            ))}
+          </div>
+          <div className="auris-persona-slide-wrap auris-reveal">
+            {personas.map((p, i) => (
+              i === personaSlide && (
+                <div key={i} className="auris-persona-slide">
                   <div className="auris-persona-card">
-                    <div className="auris-persona-name">{p.emoji} {p.name} {p.tag && <span className="auris-persona-tag">{p.tag}</span>}</div>
+                    <div className="auris-persona-card-emoji">{p.emoji}</div>
+                    <div className="auris-persona-card-title">{p.name} {p.tag && <span className="auris-persona-tag">{p.tag}</span>}</div>
                     <div className="auris-persona-desc">{p.desc}</div>
                     <div className="auris-persona-example">
                       <div className="auris-persona-example-inner">
@@ -1187,23 +1188,9 @@ const AurisLanding: React.FC = () => {
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
-            <button className="auris-persona-arrow auris-persona-arrow-right" onClick={() => setPersonaSlide((personaSlide + 1) % totalPersonas)} aria-label="Next persona">&rsaquo;</button>
-          </div>
-          <div className="auris-persona-dots">
-            {personas.map((_, i) => (
-              <button
-                key={i}
-                className={`auris-persona-dot ${i === personaSlide ? 'active' : ''}`}
-                onClick={() => setPersonaSlide(i)}
-                aria-label={`Go to persona ${i + 1}`}
-              />
+              )
             ))}
           </div>
-          <p className="auris-reveal" style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.82rem', color: 'var(--muted)', fontFamily: 'DM Mono, monospace' }}>
-            {personaSlide + 1} / {totalPersonas} &middot; switchable anytime
-          </p>
         </div>
       </section>
 
