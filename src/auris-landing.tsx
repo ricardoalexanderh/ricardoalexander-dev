@@ -11,6 +11,7 @@ const AurisLanding: React.FC = () => {
   const navigate = useNavigate()
 
   const totalSlides = 10
+  const [personaSlide, setPersonaSlide] = useState(0)
 
   const startAutoSlide = useCallback(() => {
     if (slideTimerRef.current) clearInterval(slideTimerRef.current)
@@ -36,6 +37,14 @@ const AurisLanding: React.FC = () => {
     startAutoSlide()
     return () => { if (slideTimerRef.current) clearInterval(slideTimerRef.current) }
   }, [startAutoSlide])
+
+  // Persona slideshow auto-play
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setPersonaSlide((prev) => (prev + 1) % 8)
+    }, 5000)
+    return () => clearInterval(timer)
+  }, [])
 
   // Scroll reveal observer
   useEffect(() => {
@@ -70,7 +79,6 @@ const AurisLanding: React.FC = () => {
     { type: 't-test', label: 'Test Result', text: 'All 47 tests passed in 3.2 seconds. 2 new tests added for the null user case. No regressions detected. Coverage increased from 84% to 87%.', transcript: '"nice, commit it"' },
     { type: 't-followup', label: 'Follow-up Question', text: 'Should I also update the API route handlers that call this function? They may need to handle the null case explicitly before sending a response to the client.', transcript: '"yes, handle the null"' },
     { type: 't-general', label: 'General Response', text: "The pattern you're using is a common defensive programming technique. Returning null or undefined is idiomatic in TypeScript when a value is genuinely optional, and it pushes error handling to the caller where it belongs.", transcript: '"got it, skip"' },
-    { type: 't-persona', label: 'Voice Persona \u2014 Pirate', text: "Arrr! Ye had a null pointer hidin\u2019 on line 42, cap\u2019n! The user object be undefined before ye plundered its token. I\u2019ve patched the hull \u2014 added a guard clause and updated the types. All 47 tests be passin\u2019, no scurvy regressions!", transcript: '"switch to zen"' },
   ]
 
   const faqData = [
@@ -191,7 +199,6 @@ const AurisLanding: React.FC = () => {
     't-completion': '#34d399', 't-search': '#7b6cff', 't-option': '#a78bfa',
     't-file': '#f472b6', 't-test': '#34d399', 't-followup': '#fb923c',
     't-general': '#94a3b8',
-    't-persona': '#e879f9',
   }
 
   const slideColorBg: Record<string, string> = {
@@ -200,8 +207,20 @@ const AurisLanding: React.FC = () => {
     't-search': 'rgba(123,108,255,0.07)', 't-option': 'rgba(167,139,250,0.07)',
     't-file': 'rgba(244,114,182,0.07)', 't-test': 'rgba(52,211,153,0.07)',
     't-followup': 'rgba(251,146,60,0.07)', 't-general': 'rgba(148,163,184,0.07)',
-    't-persona': 'rgba(232,121,249,0.07)',
   }
+
+  const personas = [
+    { emoji: '\uD83D\uDC54', name: 'Professional', tag: 'Default', desc: 'Clear, direct, no filler. Gets to the point fast.', example: "Null pointer on line 42 of auth.ts. The user object isn\u2019t checked before accessing its token property. Recommend adding a null guard." },
+    { emoji: '\uD83D\uDE04', name: 'Friendly', desc: 'Warm and approachable. Like pair-programming with a patient colleague.', example: "Hey, looks like there\u2019s a null pointer issue on line 42 of auth.ts. The user object might not exist when we try to grab the token. Easy fix though \u2014 just need a quick null check!" },
+    { emoji: '\u26A1', name: 'Concise', desc: 'Minimal words, maximum signal. For when you just need the facts.', example: 'Null pointer, auth.ts line 42. Missing null check on user object.' },
+    { emoji: '\uD83E\uDDD8', name: 'Zen', desc: 'Calm and measured. Keeps stress low during tough debugging sessions.', example: "A small issue has surfaced on line 42 of auth.ts. The user object needs a gentle check before we access its token. Nothing to worry about \u2014 a simple guard will resolve this." },
+    { emoji: '\uD83C\uDFAD', name: 'Sarcastic', desc: 'Dry wit included. For devs who appreciate a roast with their bugs.', example: "Oh wonderful, another null pointer. Line 42, auth.ts. Apparently we thought the user would always exist. Spoiler: they don\u2019t. Add a null check, please." },
+    { emoji: '\uD83C\uDFF4\u200D\u2620\uFE0F', name: 'Pirate', desc: 'Arrr! For the adventurous developer sailing through code.', example: "Blimey! We\u2019ve hit a null pointer on line 42 of auth.ts, cap\u2019n! The user object be missin\u2019 before we plunder its token. Best add a null guard before we sink the ship!" },
+    { emoji: '\uD83D\uDCAA', name: 'Encouraging', desc: 'Positive and motivating. Keeps morale high even when bugs pile up.', example: "You\u2019re doing great! Just a small bump \u2014 there\u2019s a null pointer on line 42 of auth.ts. The user object needs a quick check before accessing the token. You\u2019ve got this, it\u2019s an easy fix!" },
+    { emoji: '\uD83E\uDD23', name: 'Comedic', desc: 'Laugh through the pain. Because debugging should at least be entertaining.', example: "Plot twist! Line 42 of auth.ts just tried to access a token on a user that doesn\u2019t exist. It\u2019s like checking the fridge for leftovers you never cooked. Add a null check and we\u2019re back in business!" },
+  ]
+
+  const totalPersonas = personas.length
 
   return (
     <div className="auris-page">
@@ -640,11 +659,56 @@ const AurisLanding: React.FC = () => {
         .auris-provider-pill:hover { border-color: var(--accent); color: var(--bright); }
         .auris-provider-pip { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 
-        /* PERSONAS */
-        .auris-personas-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
-          gap: 1.25rem;
+        /* PERSONAS SLIDER */
+        .auris-persona-slider {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          max-width: 640px;
+          margin: 0 auto;
+        }
+        .auris-persona-slide-container {
+          flex: 1;
+          min-width: 0;
+        }
+        .auris-persona-slide {
+          animation: auris-personaFade 0.35s ease;
+        }
+        @keyframes auris-personaFade {
+          from { opacity: 0; transform: translateX(12px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+        .auris-persona-arrow {
+          background: var(--surface);
+          border: 1px solid var(--border);
+          color: var(--muted);
+          width: 40px; height: 40px;
+          border-radius: 50%;
+          font-size: 1.4rem;
+          cursor: pointer;
+          display: flex; align-items: center; justify-content: center;
+          transition: all 0.2s;
+          flex-shrink: 0;
+        }
+        .auris-persona-arrow:hover { border-color: var(--accent); color: var(--bright); }
+        .auris-persona-dots {
+          display: flex;
+          justify-content: center;
+          gap: 0.5rem;
+          margin-top: 1.25rem;
+        }
+        .auris-persona-dot {
+          width: 8px; height: 8px;
+          border-radius: 50%;
+          background: var(--dim);
+          border: none;
+          cursor: pointer;
+          transition: all 0.2s;
+          padding: 0;
+        }
+        .auris-persona-dot.active {
+          background: var(--accent);
+          transform: scale(1.3);
         }
         .auris-persona-card {
           background: var(--surface);
@@ -653,7 +717,7 @@ const AurisLanding: React.FC = () => {
           padding: 1.5rem;
           transition: border-color 0.3s, transform 0.2s;
         }
-        .auris-persona-card:hover { border-color: var(--dim); transform: translateY(-2px); }
+        .auris-persona-card:hover { border-color: var(--dim); }
         .auris-persona-name {
           font-family: 'Syne', sans-serif; font-weight: 700;
           color: var(--bright); font-size: 1rem; margin-bottom: 0.5rem;
@@ -890,7 +954,7 @@ const AurisLanding: React.FC = () => {
           /* Grids */
           .auris-flow-grid { grid-template-columns: 1fr; }
           .auris-features-grid { grid-template-columns: 1fr; }
-          .auris-personas-grid { grid-template-columns: 1fr; }
+          .auris-persona-arrow { width: 32px; height: 32px; font-size: 1.1rem; }
           .auris-privacy-grid { grid-template-columns: 1fr 1fr; }
 
           /* Pricing */
@@ -1103,90 +1167,42 @@ const AurisLanding: React.FC = () => {
           <p className="auris-section-label auris-reveal">Voice Personas</p>
           <h2 className="auris-section-title auris-reveal">8 personas. Your assistant, your tone.</h2>
           <p className="auris-section-sub auris-reveal">Auris doesn&apos;t just read &mdash; it speaks with personality. Pick the voice that matches your workflow.</p>
-          <div className="auris-personas-grid">
-            <div className="auris-persona-card auris-reveal">
-              <div className="auris-persona-name">{'\uD83D\uDC54'} Professional <span className="auris-persona-tag">Default</span></div>
-              <div className="auris-persona-desc">Clear, direct, no filler. Gets to the point fast.</div>
-              <div className="auris-persona-example">
-                <div className="auris-persona-example-inner">
-                  <div className="auris-persona-example-label">Error detected</div>
-                  Null pointer on line 42 of auth.ts. The user object isn&apos;t checked before accessing its token property. Recommend adding a null guard.
+          <div className="auris-persona-slider auris-reveal">
+            <button className="auris-persona-arrow auris-persona-arrow-left" onClick={() => setPersonaSlide((personaSlide - 1 + totalPersonas) % totalPersonas)} aria-label="Previous persona">&lsaquo;</button>
+            <div className="auris-persona-slide-container">
+              {personas.map((p, i) => (
+                <div
+                  key={i}
+                  className={`auris-persona-slide ${i === personaSlide ? 'active' : ''}`}
+                  style={{ display: i === personaSlide ? 'block' : 'none' }}
+                >
+                  <div className="auris-persona-card">
+                    <div className="auris-persona-name">{p.emoji} {p.name} {p.tag && <span className="auris-persona-tag">{p.tag}</span>}</div>
+                    <div className="auris-persona-desc">{p.desc}</div>
+                    <div className="auris-persona-example">
+                      <div className="auris-persona-example-inner">
+                        <div className="auris-persona-example-label">Error detected</div>
+                        {p.example}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ))}
             </div>
-            <div className="auris-persona-card auris-reveal">
-              <div className="auris-persona-name">{'\uD83D\uDE04'} Friendly</div>
-              <div className="auris-persona-desc">Warm and approachable. Like pair-programming with a patient colleague.</div>
-              <div className="auris-persona-example">
-                <div className="auris-persona-example-inner">
-                  <div className="auris-persona-example-label">Error detected</div>
-                  Hey, looks like there&apos;s a null pointer issue on line 42 of auth.ts. The user object might not exist when we try to grab the token. Easy fix though &mdash; just need a quick null check!
-                </div>
-              </div>
-            </div>
-            <div className="auris-persona-card auris-reveal">
-              <div className="auris-persona-name">{'\u26A1'} Concise</div>
-              <div className="auris-persona-desc">Minimal words, maximum signal. For when you just need the facts.</div>
-              <div className="auris-persona-example">
-                <div className="auris-persona-example-inner">
-                  <div className="auris-persona-example-label">Error detected</div>
-                  Null pointer, auth.ts line 42. Missing null check on user object.
-                </div>
-              </div>
-            </div>
-            <div className="auris-persona-card auris-reveal">
-              <div className="auris-persona-name">{'\uD83E\uDDD8'} Zen</div>
-              <div className="auris-persona-desc">Calm and measured. Keeps stress low during tough debugging sessions.</div>
-              <div className="auris-persona-example">
-                <div className="auris-persona-example-inner">
-                  <div className="auris-persona-example-label">Error detected</div>
-                  A small issue has surfaced on line 42 of auth.ts. The user object needs a gentle check before we access its token. Nothing to worry about &mdash; a simple guard will resolve this.
-                </div>
-              </div>
-            </div>
-            <div className="auris-persona-card auris-reveal">
-              <div className="auris-persona-name">{'\uD83C\uDFAD'} Sarcastic</div>
-              <div className="auris-persona-desc">Dry wit included. For devs who appreciate a roast with their bugs.</div>
-              <div className="auris-persona-example">
-                <div className="auris-persona-example-inner">
-                  <div className="auris-persona-example-label">Error detected</div>
-                  Oh wonderful, another null pointer. Line 42, auth.ts. Apparently we thought the user would always exist. Spoiler: they don&apos;t. Add a null check, please.
-                </div>
-              </div>
-            </div>
-            <div className="auris-persona-card auris-reveal">
-              <div className="auris-persona-name">{'\uD83C\uDFF4\u200D\u2620\uFE0F'} Pirate</div>
-              <div className="auris-persona-desc">Arrr! For the adventurous developer sailing through code.</div>
-              <div className="auris-persona-example">
-                <div className="auris-persona-example-inner">
-                  <div className="auris-persona-example-label">Error detected</div>
-                  Blimey! We&apos;ve hit a null pointer on line 42 of auth.ts, cap&apos;n! The user object be missin&apos; before we plunder its token. Best add a null guard before we sink the ship!
-                </div>
-              </div>
-            </div>
-            <div className="auris-persona-card auris-reveal">
-              <div className="auris-persona-name">{'\uD83D\uDCAA'} Encouraging</div>
-              <div className="auris-persona-desc">Positive and motivating. Keeps morale high even when bugs pile up.</div>
-              <div className="auris-persona-example">
-                <div className="auris-persona-example-inner">
-                  <div className="auris-persona-example-label">Error detected</div>
-                  You&apos;re doing great! Just a small bump &mdash; there&apos;s a null pointer on line 42 of auth.ts. The user object needs a quick check before accessing the token. You&apos;ve got this, it&apos;s an easy fix!
-                </div>
-              </div>
-            </div>
-            <div className="auris-persona-card auris-reveal">
-              <div className="auris-persona-name">{'\uD83E\uDD23'} Comedic</div>
-              <div className="auris-persona-desc">Laugh through the pain. Because debugging should at least be entertaining.</div>
-              <div className="auris-persona-example">
-                <div className="auris-persona-example-inner">
-                  <div className="auris-persona-example-label">Error detected</div>
-                  Plot twist! Line 42 of auth.ts just tried to access a token on a user that doesn&apos;t exist. It&apos;s like checking the fridge for leftovers you never cooked. Add a null check and we&apos;re back in business!
-                </div>
-              </div>
-            </div>
+            <button className="auris-persona-arrow auris-persona-arrow-right" onClick={() => setPersonaSlide((personaSlide + 1) % totalPersonas)} aria-label="Next persona">&rsaquo;</button>
           </div>
-          <p className="auris-reveal" style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.82rem', color: 'var(--muted)', fontFamily: 'DM Mono, monospace' }}>
-            8 personas total, switchable anytime
+          <div className="auris-persona-dots">
+            {personas.map((_, i) => (
+              <button
+                key={i}
+                className={`auris-persona-dot ${i === personaSlide ? 'active' : ''}`}
+                onClick={() => setPersonaSlide(i)}
+                aria-label={`Go to persona ${i + 1}`}
+              />
+            ))}
+          </div>
+          <p className="auris-reveal" style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.82rem', color: 'var(--muted)', fontFamily: 'DM Mono, monospace' }}>
+            {personaSlide + 1} / {totalPersonas} &middot; switchable anytime
           </p>
         </div>
       </section>
