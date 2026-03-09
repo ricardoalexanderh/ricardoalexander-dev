@@ -3,11 +3,27 @@ import React, { useState, useEffect, useRef, useCallback } from 'react'
 const AurisLanding: React.FC = () => {
   const [scrolled, setScrolled] = useState(false)
   const [showScrollTop, setShowScrollTop] = useState(false)
+  const [atBottom, setAtBottom] = useState(false)
   const [openFaq, setOpenFaq] = useState<number | null>(null)
   const [currentSlide, setCurrentSlide] = useState(0)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const slideTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const touchXRef = useRef(0)
+
+  const scrollToNextSection = useCallback(() => {
+    const ids = ['hero', 'how', 'outputs', 'voice-commands', 'providers', 'features', 'personas', 'privacy', 'pricing', 'faq']
+    const scrollY = window.scrollY
+    for (const id of ids) {
+      const el = document.getElementById(id)
+      if (el) {
+        const top = el.getBoundingClientRect().top + window.scrollY
+        if (top > scrollY + 80) {
+          el.scrollIntoView({ behavior: 'smooth' })
+          return
+        }
+      }
+    }
+  }, [])
 
   const totalSlides = 12
   const [personaSlide, setPersonaSlide] = useState(0)
@@ -33,6 +49,7 @@ const AurisLanding: React.FC = () => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 40)
       setShowScrollTop(window.scrollY > 600)
+      setAtBottom(window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 100)
     }
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
@@ -461,18 +478,25 @@ const AurisLanding: React.FC = () => {
 
         /* HERO SCROLL HINT */
         .auris-hero-scroll-hint {
-          position: absolute;
+          position: fixed;
           bottom: 2rem;
           left: 50%;
-          transform: translateX(-50%);
+          transform: translateX(-50%) translateY(12px);
           display: flex; align-items: center; justify-content: center;
           width: 44px; height: 44px;
           border: 1px solid var(--border);
           border-radius: 50%;
+          background: var(--surface);
           color: var(--muted);
           text-decoration: none;
-          transition: border-color 0.3s, color 0.3s;
-          animation: auris-fadeUp 0.6s 0.6s ease both;
+          cursor: pointer;
+          opacity: 0; pointer-events: none;
+          transition: opacity 0.3s, transform 0.3s, border-color 0.2s, color 0.2s;
+          z-index: 100;
+        }
+        .auris-hero-scroll-hint.visible {
+          opacity: 1; pointer-events: auto;
+          transform: translateX(-50%) translateY(0);
         }
         .auris-hero-scroll-hint:hover {
           border-color: var(--accent); color: var(--bright);
@@ -1210,11 +1234,6 @@ const AurisLanding: React.FC = () => {
             </div>
           </div>
         </div>
-        <a href="#how" className="auris-hero-scroll-hint" aria-label="Scroll to content">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="6 9 12 15 18 9" />
-          </svg>
-        </a>
       </section>
 
       {/* HOW IT WORKS */}
@@ -1441,6 +1460,17 @@ const AurisLanding: React.FC = () => {
           <p className="auris-footer-sub">An AI voice assistant for Claude Code for Web &mdash; keeping you in flow.</p>
         </div>
       </footer>
+
+      {/* Scroll to next section */}
+      <button
+        className={`auris-hero-scroll-hint ${!atBottom ? 'visible' : ''}`}
+        onClick={scrollToNextSection}
+        aria-label="Scroll to next section"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </button>
 
       {/* Scroll to top */}
       <button
