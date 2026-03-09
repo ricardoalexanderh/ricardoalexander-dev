@@ -323,12 +323,21 @@ const AurisLanding: React.FC = () => {
 
         /* HERO */
         .auris-hero {
-          min-height: 100vh;
+          min-height: auto;
           display: flex; flex-direction: column;
-          align-items: center; justify-content: center;
+          align-items: center; justify-content: flex-start;
           text-align: center;
-          padding: 8rem 2rem 5rem;
+          padding: 7rem 2rem 4rem;
           position: relative;
+        }
+
+        /* Desktop landscape — center hero and fill viewport */
+        @media (min-width: 641px) and (orientation: landscape) {
+          .auris-hero {
+            min-height: 100vh;
+            justify-content: center;
+            padding: 8rem 2rem 5rem;
+          }
         }
         .auris-badge {
           display: inline-flex; align-items: center; gap: 0.5rem;
@@ -403,7 +412,7 @@ const AurisLanding: React.FC = () => {
 
         /* DEMO SLIDESHOW */
         .auris-demo-container {
-          margin-top: 5rem;
+          margin-top: 3rem;
           animation: auris-fadeUp 0.8s 0.5s ease both;
           position: relative;
         }
