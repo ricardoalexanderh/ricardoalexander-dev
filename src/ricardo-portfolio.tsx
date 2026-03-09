@@ -215,18 +215,18 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
               onMouseLeave={() => setProductsOpen(false)}
             >
               <button
-                className="flex items-center gap-1 text-gray-300 hover:text-cyan-400 transition-colors font-outfit"
+                className="flex items-center gap-1 text-gray-300 hover:text-cyan-400 transition-colors font-outfit py-4 -my-4"
               >
                 Products
                 <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${productsOpen ? 'rotate-180' : ''}`} />
               </button>
               {productsOpen && (
-                <div className="absolute top-full right-0 pt-2">
+                <div className="absolute top-full right-0 mt-0 w-72">
                   <motion.div
                     initial={{ opacity: 0, y: -8, scale: 0.96 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     transition={{ duration: 0.18, ease: 'easeOut' }}
-                    className="w-72 bg-slate-800/95 backdrop-blur-lg rounded-xl border border-slate-700/50 shadow-2xl overflow-hidden"
+                    className="bg-slate-800/95 backdrop-blur-lg rounded-xl border border-slate-700/50 shadow-2xl overflow-hidden"
                   >
                     <button
                       onClick={() => {

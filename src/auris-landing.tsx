@@ -93,16 +93,16 @@ const AurisLanding: React.FC = () => {
       a: 'Auris ships with 50+ voices across 10 languages: American English, British English, Japanese, Mandarin, Korean, French, Hindi, Italian, Brazilian Portuguese, and Spanish. The voice picker is organized by language, with gender indicators per voice. Speech recognition is English-first in V1, with multilingual STT on the V2 roadmap.',
     },
     {
-      q: 'Does it only work with Claude Code?',
-      a: 'V1 is focused entirely on claude.ai \u2014 the web interface for Claude Code. Auris watches the DOM, classifies every output, and never modifies the page. Support for other AI coding tools (Cursor, Windsurf, GitHub Copilot) is planned for V2.',
+      q: 'Does it only work with Claude Code for Web?',
+      a: 'V1 is focused entirely on Claude Code for Web (claude.ai). Auris watches the DOM, classifies every output, and never modifies the page. Support for other AI coding tools (Cursor, Windsurf, GitHub Copilot) is planned for V2.',
     },
   ]
 
   const howItWorksCards = [
     {
       icon: '\uD83D\uDC41',
-      title: 'Auris watches Claude',
-      desc: 'A smart observer monitors claude.ai in real time, detecting every new output the moment Claude finishes streaming \u2014 classifying it into one of 10 types: errors, plans, permissions, completions, and more.',
+      title: 'Auris watches Claude Code',
+      desc: 'A smart observer monitors Claude Code for Web in real time, detecting every new output the moment it finishes streaming \u2014 classifying it into one of 10 types: errors, plans, permissions, completions, and more.',
     },
     {
       icon: '\uD83D\uDD0A',
@@ -168,7 +168,7 @@ const AurisLanding: React.FC = () => {
 
   const pricingFeatures = [
     'On-device voice \u2014 50+ voices, 10 languages',
-    'All 10 Claude output types, classified & spoken',
+    'All 10 Claude Code output types, classified & spoken',
     'AI-powered summaries with specialized prompts per type',
     '10 AI provider presets \u2014 Claude, OpenAI, Gemini, Ollama, LM Studio & more',
     '8 voice personas \u2014 Professional, Friendly, Concise, Pirate, and more',
@@ -765,10 +765,10 @@ const AurisLanding: React.FC = () => {
         <div className="auris-container">
           <div className="auris-badge">
             <span className="auris-badge-dot" />
-            Chrome Extension &middot; claude.ai &middot; On-device Voice
+            Chrome Extension &middot; Claude Code for Web &middot; On-device Voice
           </div>
           <h1>Your AI,<br /><span className="auris-gradient-text">out loud.</span></h1>
-          <p className="auris-tagline">An AI voice assistant for your AI coding assistant &mdash; keeping you in flow.</p>
+          <p className="auris-tagline">An AI voice assistant for Claude Code for Web &mdash; keeping you in flow.</p>
           <div className="auris-hero-actions">
             <a href="#pricing" className="auris-btn-primary">Get Auris &mdash; $29</a>
             <a href="#how" className="auris-btn-secondary">See how it works &rarr;</a>
@@ -844,8 +844,8 @@ const AurisLanding: React.FC = () => {
       <section id="how" style={{ padding: '7rem 0', position: 'relative', zIndex: 1 }}>
         <div className="auris-container">
           <p className="auris-section-label auris-reveal">How it works</p>
-          <h2 className="auris-section-title auris-reveal">Claude talks. You listen. You talk back.</h2>
-          <p className="auris-section-sub auris-reveal">Auris sits between you and Claude &mdash; reading every output aloud and understanding everything you say back.</p>
+          <h2 className="auris-section-title auris-reveal">Claude Code talks. You listen. You talk back.</h2>
+          <p className="auris-section-sub auris-reveal">Auris sits between you and Claude Code for Web &mdash; reading every output aloud and understanding everything you say back.</p>
           <div className="auris-flow-grid">
             {howItWorksCards.map((card, i) => (
               <div key={i} className="auris-flow-card auris-reveal">
@@ -864,7 +864,7 @@ const AurisLanding: React.FC = () => {
         <div className="auris-container">
           <p className="auris-section-label auris-reveal">What Auris reads aloud</p>
           <h2 className="auris-section-title auris-reveal">Every output. Classified. Spoken.</h2>
-          <p className="auris-section-sub auris-reveal">Auris doesn&apos;t just read text &mdash; it knows what type of output Claude produced and announces it with context.</p>
+          <p className="auris-section-sub auris-reveal">Auris doesn&apos;t just read text &mdash; it knows what type of output Claude Code produced and announces it with context.</p>
           <div className="auris-outputs-grid auris-reveal">
             {outputTypes.map((item, i) => (
               <div key={i} className="auris-output-pill">
@@ -975,7 +975,7 @@ const AurisLanding: React.FC = () => {
       <footer className="auris-footer">
         <div className="auris-container">
           <div className="auris-footer-logo">{'\u25C8'} Auris</div>
-          <p className="auris-footer-sub">An AI voice assistant for your AI coding assistant &mdash; keeping you in flow.</p>
+          <p className="auris-footer-sub">An AI voice assistant for Claude Code for Web &mdash; keeping you in flow.</p>
         </div>
       </footer>
     </div>
