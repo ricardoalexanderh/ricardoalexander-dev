@@ -654,7 +654,7 @@ const AurisLanding: React.FC = () => {
         }
         .auris-providers-row {
           display: flex; align-items: center; justify-content: center;
-          flex-wrap: wrap; gap: 0.75rem;
+          flex-wrap: nowrap; gap: 0.75rem; overflow-x: auto;
         }
         .auris-provider-pill {
           display: flex; align-items: center; gap: 0.5rem;
@@ -664,6 +664,7 @@ const AurisLanding: React.FC = () => {
           padding: 0.55rem 1.1rem;
           font-size: 0.85rem; font-weight: 500;
           color: var(--body); transition: all 0.2s;
+          flex-shrink: 0; white-space: nowrap;
         }
         .auris-provider-pill:hover { border-color: var(--accent); color: var(--bright); }
         .auris-provider-pip { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
