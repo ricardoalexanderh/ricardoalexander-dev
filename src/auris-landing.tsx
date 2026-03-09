@@ -11,7 +11,7 @@ const AurisLanding: React.FC = () => {
   const touchXRef = useRef(0)
 
   const scrollToNextSection = useCallback(() => {
-    const ids = ['how', 'outputs', 'voice-commands', 'providers', 'features', 'personas', 'privacy', 'pricing', 'faq']
+    const ids = ['demo-slideshow', 'how', 'outputs', 'voice-commands', 'providers', 'features', 'personas', 'privacy', 'pricing', 'faq']
     const scrollY = window.scrollY
     for (const id of ids) {
       const el = document.getElementById(id)
@@ -1209,7 +1209,7 @@ const AurisLanding: React.FC = () => {
           <p className="auris-price-hint"><strong>1-day free trial</strong> &middot; Full features &middot; $29 one-time &middot; BYOK</p>
 
           {/* DEMO SLIDESHOW */}
-          <div className="auris-demo-container">
+          <div id="demo-slideshow" className="auris-demo-container">
             <p className="auris-demo-label">Auris side panel &mdash; 10 output types + voice commands + status queries, all spoken aloud</p>
             <div
               className="auris-demo-window"
