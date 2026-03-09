@@ -389,7 +389,7 @@ const AurisLanding: React.FC = () => {
 
         /* ORIGIN NOTE */
         .auris-origin-note {
-          max-width: 480px; margin: 1.5rem auto 2rem;
+          max-width: 680px; margin: 1.5rem auto 2rem;
           text-align: center;
         }
         .auris-origin-note p {
@@ -1191,8 +1191,8 @@ const AurisLanding: React.FC = () => {
           <p className="auris-tagline">An AI voice assistant for <span style={{ color: '#D97757', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}><img src="/claude-ai-icon.svg" alt="Claude" width="18" height="18" style={{ verticalAlign: 'middle' }} />Claude Code</span> for Web &mdash; keeping you in flow.</p>
 
           <div className="auris-origin-note">
-            <p>I run Claude Code for Web on one screen<br />and do everything else on the other.</p>
-            <p>I kept forgetting it was there &mdash;<br />missing when it finished, missing when it asked me something.</p>
+            <p>I run Claude Code for Web on one screen and do everything else on the other.</p>
+            <p>I kept forgetting it was there &mdash; missing when it finished, missing when it asked me something.</p>
             <p className="auris-origin-punchline">Auris is the fix: it just talks to me.</p>
             <span className="auris-origin-attr">&mdash; Ricardo</span>
           </div>
