@@ -539,8 +539,11 @@ const AurisLanding: React.FC = () => {
         /* HOW IT WORKS */
         .auris-flow-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+          grid-template-columns: repeat(2, 1fr);
           gap: 1.5rem;
+        }
+        @media (max-width: 640px) {
+          .auris-flow-grid { grid-template-columns: 1fr; }
         }
         .auris-flow-card {
           background: var(--surface);
@@ -622,6 +625,58 @@ const AurisLanding: React.FC = () => {
         }
         .auris-provider-pill:hover { border-color: var(--accent); color: var(--bright); }
         .auris-provider-pip { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+        /* PERSONAS */
+        .auris-personas-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 1.25rem;
+        }
+        .auris-persona-card {
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: 12px;
+          padding: 1.5rem;
+          transition: border-color 0.3s, transform 0.2s;
+        }
+        .auris-persona-card:hover { border-color: var(--dim); transform: translateY(-2px); }
+        .auris-persona-name {
+          font-family: 'Syne', sans-serif; font-weight: 700;
+          color: var(--bright); font-size: 1rem; margin-bottom: 0.5rem;
+          display: flex; align-items: center; gap: 0.5rem;
+        }
+        .auris-persona-tag {
+          font-family: 'DM Mono', monospace; font-size: 0.65rem;
+          padding: 0.15rem 0.5rem; border-radius: 4px;
+          background: rgba(123,108,255,0.1); color: var(--accent2);
+          text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        .auris-persona-desc {
+          color: var(--muted); font-size: 0.85rem; margin-bottom: 1rem; line-height: 1.5;
+        }
+        .auris-persona-example {
+          background: var(--bg);
+          border: 1px solid var(--border);
+          border-radius: 8px;
+          padding: 0.85rem 1rem;
+          font-size: 0.82rem;
+          color: var(--subtle);
+          font-style: italic;
+          line-height: 1.55;
+          position: relative;
+        }
+        .auris-persona-example::before {
+          content: '\u201C';
+          position: absolute; top: 0.25rem; left: 0.6rem;
+          font-size: 1.5rem; color: var(--dim); font-style: normal;
+          font-family: serif; line-height: 1;
+        }
+        .auris-persona-example-inner { padding-left: 1rem; }
+        .auris-persona-example-label {
+          font-family: 'DM Mono', monospace; font-size: 0.65rem;
+          color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em;
+          margin-bottom: 0.4rem; font-style: normal;
+        }
 
         /* PRIVACY */
         .auris-privacy-grid {
@@ -767,7 +822,7 @@ const AurisLanding: React.FC = () => {
             <span className="auris-badge-dot" />
             Chrome Extension &middot; Claude Code for Web &middot; On-device Voice
           </div>
-          <h1>Your AI,<br /><span className="auris-gradient-text">out loud.</span></h1>
+          <h1>Your AI Coding Assistant,<br /><span className="auris-gradient-text">out loud.</span></h1>
           <p className="auris-tagline">An AI voice assistant for Claude Code for Web &mdash; keeping you in flow.</p>
           <div className="auris-hero-actions">
             <a href="#pricing" className="auris-btn-primary">Get Auris &mdash; $29</a>
@@ -906,6 +961,80 @@ const AurisLanding: React.FC = () => {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* PERSONAS */}
+      <section id="personas" style={{ padding: '6rem 0', position: 'relative', zIndex: 1 }}>
+        <div className="auris-container">
+          <p className="auris-section-label auris-reveal">Voice Personas</p>
+          <h2 className="auris-section-title auris-reveal">8 personas. Your assistant, your tone.</h2>
+          <p className="auris-section-sub auris-reveal">Auris doesn&apos;t just read &mdash; it speaks with personality. Pick the voice that matches your workflow.</p>
+          <div className="auris-personas-grid">
+            <div className="auris-persona-card auris-reveal">
+              <div className="auris-persona-name">{'\uD83D\uDC54'} Professional <span className="auris-persona-tag">Default</span></div>
+              <div className="auris-persona-desc">Clear, direct, no filler. Gets to the point fast.</div>
+              <div className="auris-persona-example">
+                <div className="auris-persona-example-inner">
+                  <div className="auris-persona-example-label">Error detected</div>
+                  Null pointer on line 42 of auth.ts. The user object isn&apos;t checked before accessing its token property. Recommend adding a null guard.
+                </div>
+              </div>
+            </div>
+            <div className="auris-persona-card auris-reveal">
+              <div className="auris-persona-name">{'\uD83D\uDE04'} Friendly</div>
+              <div className="auris-persona-desc">Warm and approachable. Like pair-programming with a patient colleague.</div>
+              <div className="auris-persona-example">
+                <div className="auris-persona-example-inner">
+                  <div className="auris-persona-example-label">Error detected</div>
+                  Hey, looks like there&apos;s a null pointer issue on line 42 of auth.ts. The user object might not exist when we try to grab the token. Easy fix though &mdash; just need a quick null check!
+                </div>
+              </div>
+            </div>
+            <div className="auris-persona-card auris-reveal">
+              <div className="auris-persona-name">{'\u26A1'} Concise</div>
+              <div className="auris-persona-desc">Minimal words, maximum signal. For when you just need the facts.</div>
+              <div className="auris-persona-example">
+                <div className="auris-persona-example-inner">
+                  <div className="auris-persona-example-label">Error detected</div>
+                  Null pointer, auth.ts line 42. Missing null check on user object.
+                </div>
+              </div>
+            </div>
+            <div className="auris-persona-card auris-reveal">
+              <div className="auris-persona-name">{'\uD83E\uDDD8'} Zen</div>
+              <div className="auris-persona-desc">Calm and measured. Keeps stress low during tough debugging sessions.</div>
+              <div className="auris-persona-example">
+                <div className="auris-persona-example-inner">
+                  <div className="auris-persona-example-label">Error detected</div>
+                  A small issue has surfaced on line 42 of auth.ts. The user object needs a gentle check before we access its token. Nothing to worry about &mdash; a simple guard will resolve this.
+                </div>
+              </div>
+            </div>
+            <div className="auris-persona-card auris-reveal">
+              <div className="auris-persona-name">{'\uD83C\uDFAD'} Sarcastic</div>
+              <div className="auris-persona-desc">Dry wit included. For devs who appreciate a roast with their bugs.</div>
+              <div className="auris-persona-example">
+                <div className="auris-persona-example-inner">
+                  <div className="auris-persona-example-label">Error detected</div>
+                  Oh wonderful, another null pointer. Line 42, auth.ts. Apparently we thought the user would always exist. Spoiler: they don&apos;t. Add a null check, please.
+                </div>
+              </div>
+            </div>
+            <div className="auris-persona-card auris-reveal">
+              <div className="auris-persona-name">{'\uD83C\uDFF4\u200D\u2620\uFE0F'} Pirate</div>
+              <div className="auris-persona-desc">Arrr! For the adventurous developer sailing through code.</div>
+              <div className="auris-persona-example">
+                <div className="auris-persona-example-inner">
+                  <div className="auris-persona-example-label">Error detected</div>
+                  Blimey! We&apos;ve hit a null pointer on line 42 of auth.ts, cap&apos;n! The user object be missin&apos; before we plunder its token. Best add a null guard before we sink the ship!
+                </div>
+              </div>
+            </div>
+          </div>
+          <p className="auris-reveal" style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.82rem', color: 'var(--muted)', fontFamily: 'DM Mono, monospace' }}>
+            + Encouraging &middot; Comedic &mdash; 8 personas total, switchable anytime
+          </p>
         </div>
       </section>
 
