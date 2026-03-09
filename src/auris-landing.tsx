@@ -786,7 +786,9 @@ const AurisLanding: React.FC = () => {
         .auris-footer-logo {
           font-family: 'Syne', sans-serif; font-weight: 800;
           color: var(--bright); font-size: 1.1rem; margin-bottom: 0.5rem;
+          display: flex; align-items: center; justify-content: center; gap: 0.5rem;
         }
+        .auris-footer-logo .ear-icon { color: var(--accent); font-size: 1.1rem; }
         .auris-footer-sub { font-size: 0.8rem; color: var(--muted); font-style: italic; }
 
         /* HAMBURGER */
@@ -1242,7 +1244,7 @@ const AurisLanding: React.FC = () => {
       {/* FOOTER */}
       <footer className="auris-footer">
         <div className="auris-container">
-          <div className="auris-footer-logo">{'\u25C8'} Auris</div>
+          <div className="auris-footer-logo"><span className="ear-icon">{'\u25C8'}</span> Auris</div>
           <p className="auris-footer-sub">An AI voice assistant for Claude Code for Web &mdash; keeping you in flow.</p>
         </div>
       </footer>
