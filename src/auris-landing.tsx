@@ -1047,14 +1047,13 @@ const AurisLanding: React.FC = () => {
       <section id="hero" className="auris-hero">
         <div className="auris-container">
           <div className="auris-badge">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 48 48" style={{ flexShrink: 0 }}>
-              <circle cx="24" cy="24" r="22" fill="#fff"/>
-              <path d="M24 2A22 22 0 0 0 5.3 34.1l10.5-18.2A11 11 0 0 1 24 13h18.7A22 22 0 0 0 24 2z" fill="#DB4437"/>
-              <path d="M42.7 13H24a11 11 0 0 1 8.2 18.2L21.7 49.4A22 22 0 0 0 42.7 13z" fill="#4285F4"/>
-              <path d="M32.2 31.2A11 11 0 0 1 15.8 15.9L5.3 34.1A22 22 0 0 0 21.7 49.4z" fill="#0F9D58"/>
-              <path d="M15.8 15.9A11 11 0 0 1 24 13h0a11 11 0 0 1 0 22h0a11 11 0 0 1-8.2-3.8L5.3 34.1" fill="#F4B400" opacity="0"/>
-              <circle cx="24" cy="24" r="8" fill="#4285F4"/>
-              <circle cx="24" cy="24" r="5.5" fill="#fff"/>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 192 192" style={{ flexShrink: 0 }}>
+              <path d="M160 32H32v128l32-32h96z" fill="#4285F4"/>
+              <path d="M32 32v128l32-32V32z" fill="#356AC3"/>
+              <path d="M160 32v96h-64l-32 32H32l128-128z" fill="#4285F4"/>
+              <path d="M96 80a24 24 0 1 0 0 48 24 24 0 0 0 0-48zm0 40a16 16 0 1 1 0-32 16 16 0 0 1 0 32z" fill="#fff"/>
+              <path d="M96 88a16 16 0 1 0 0 32 16 16 0 0 0 0-32z" fill="#fff" fillOpacity="0.4"/>
+              <circle cx="96" cy="104" r="8" fill="#fff"/>
             </svg>
             Chrome Extension
           </div>
@@ -1258,16 +1257,16 @@ const AurisLanding: React.FC = () => {
       <section id="pricing" style={{ padding: '7rem 0', position: 'relative', zIndex: 1 }}>
         <div className="auris-container">
           <p className="auris-section-label auris-reveal">Pricing</p>
-          <h2 className="auris-section-title auris-reveal">Install and get started.</h2>
-          <p className="auris-section-sub auris-reveal">Free to install. No server costs passed to you. BYOK.</p>
+          <h2 className="auris-section-title auris-reveal">Pay once. Yours forever.</h2>
+          <p className="auris-section-sub auris-reveal">No subscription. No usage fees. No server costs passed to you.</p>
           <div className="auris-reveal" style={{ maxWidth: 780, margin: '0 auto' }}>
             <div className="auris-pricing-card">
               <div className="auris-pricing-inner">
                 <div className="auris-pricing-left">
                   <div className="auris-plan-name">Auris</div>
-                  <div className="auris-plan-price"><span className="period">Free</span></div>
-                  <div className="auris-plan-note">Install from Chrome Web Store &middot; Purchase inside extension</div>
-                  <a href="https://chromewebstore.google.com" target="_blank" rel="noopener noreferrer" className="auris-plan-cta">Install Auris</a>
+                  <div className="auris-plan-price"><span className="currency">$</span>29<span className="period"> one-time</span></div>
+                  <div className="auris-plan-note">Lifetime access &middot; No subscription &middot; Yours forever</div>
+                  <a href="https://chromewebstore.google.com" target="_blank" rel="noopener noreferrer" className="auris-plan-cta">Get Auris</a>
                   <p className="auris-plan-guarantee">{'\uD83D\uDD12'} Secure in-app purchase</p>
                 </div>
                 <div className="auris-pricing-divider" />
