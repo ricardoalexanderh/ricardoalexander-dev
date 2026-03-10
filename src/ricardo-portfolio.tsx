@@ -4,6 +4,7 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { Float, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
 import { Linkedin, Mail, Github, ExternalLink, Code, Database, Cloud, Smartphone, Globe, Cpu, Sun, Moon, Menu, X, ChevronDown, Play, Zap } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
 // Types
 interface PortfolioProps {
@@ -162,14 +163,31 @@ const Scene3D: React.FC = () => {
 // Navigation Component
 const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }> = ({ theme, toggleTheme }) => {
   const [isOpen, setIsOpen] = useState(false)
+  const [productsOpen, setProductsOpen] = useState(false)
+  const [mobileProductsOpen, setMobileProductsOpen] = useState(false)
+  const productsRef = useRef<HTMLDivElement>(null)
+  const navigate = useNavigate()
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId)
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' })
+      const navHeight = 64
+      const top = element.getBoundingClientRect().top + window.scrollY - navHeight
+      window.scrollTo({ top, behavior: 'smooth' })
       setIsOpen(false)
     }
   }
+
+  // Close products dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (productsRef.current && !productsRef.current.contains(e.target as Node)) {
+        setProductsOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-900/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-700/50">
@@ -184,11 +202,51 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             <button onClick={() => scrollToSection('about')} className="text-gray-300 hover:text-cyan-400 transition-colors font-outfit">About</button>
+
+            {/* Products Dropdown */}
+            <div
+              className="relative"
+              ref={productsRef}
+              onMouseEnter={() => setProductsOpen(true)}
+              onMouseLeave={() => setProductsOpen(false)}
+            >
+              <button
+                className="flex items-center gap-1 text-gray-300 hover:text-cyan-400 transition-colors font-outfit py-5 -my-5"
+              >
+                Products
+                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${productsOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {productsOpen && (
+                <div className="absolute top-full left-0 mt-1 w-72">
+                  <motion.div
+                    initial={{ opacity: 0, y: -8, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ duration: 0.18, ease: 'easeOut' }}
+                    className="bg-slate-800/95 backdrop-blur-lg rounded-xl border border-slate-700/50 shadow-2xl overflow-hidden"
+                  >
+                    <button
+                      onClick={() => {
+                        navigate('/products/auris')
+                        setProductsOpen(false)
+                      }}
+                      className="flex items-center gap-4 w-full px-5 py-4 text-left text-gray-300 hover:text-cyan-400 hover:bg-slate-700/40 transition-all duration-200 font-outfit group"
+                    >
+                      <span className="text-2xl text-purple-400 group-hover:text-cyan-400 transition-colors duration-200">&#x25C8;</span>
+                      <div>
+                        <div className="font-semibold text-sm">Auris</div>
+                        <div className="text-xs text-gray-400 mt-0.5">Chrome Extension &mdash; AI voice assistant for <span style={{ color: '#D97757' }} className="font-medium">Claude Code</span> Web</div>
+                      </div>
+                    </button>
+                  </motion.div>
+                </div>
+              )}
+            </div>
+
             <button onClick={() => scrollToSection('skills')} className="text-gray-300 hover:text-cyan-400 transition-colors font-outfit">Skills</button>
             <button onClick={() => scrollToSection('projects')} className="text-gray-300 hover:text-cyan-400 transition-colors font-outfit">Projects</button>
             <button onClick={() => scrollToSection('clients')} className="text-gray-300 hover:text-cyan-400 transition-colors font-outfit">Clients</button>
             <button onClick={() => scrollToSection('contact')} className="text-gray-300 hover:text-cyan-400 transition-colors font-outfit">Contact</button>
-            
+
             {/* Social Links */}
             <a
               href="https://linkedin.com/in/ricardoalexanderh"
@@ -258,6 +316,40 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
             className="md:hidden bg-slate-800/95 backdrop-blur-lg rounded-lg mt-2 p-4 space-y-3"
           >
             <button onClick={() => scrollToSection('about')} className="block w-full text-left text-gray-300 hover:text-cyan-400 transition-colors font-outfit py-2">About</button>
+
+            {/* Products submenu */}
+            <div>
+              <button
+                onClick={() => setMobileProductsOpen(!mobileProductsOpen)}
+                className="flex items-center justify-between w-full text-left text-gray-300 hover:text-cyan-400 transition-colors font-outfit py-2"
+              >
+                Products
+                <ChevronDown className={`w-4 h-4 transition-transform ${mobileProductsOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {mobileProductsOpen && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <button
+                    onClick={() => {
+                      navigate('/products/auris')
+                      setIsOpen(false)
+                      setMobileProductsOpen(false)
+                    }}
+                    className="flex items-center gap-3 w-full pl-4 py-2 text-left text-gray-300 hover:text-cyan-400 transition-colors font-outfit"
+                  >
+                    <span className="text-purple-400">&#x25C8;</span>
+                    <div>
+                      <div className="font-medium text-sm">Auris</div>
+                      <div className="text-xs text-gray-400">Chrome Extension &mdash; AI voice assistant for <span style={{ color: '#D97757' }}>Claude Code</span> Web</div>
+                    </div>
+                  </button>
+                </motion.div>
+              )}
+            </div>
+
             <button onClick={() => scrollToSection('skills')} className="block w-full text-left text-gray-300 hover:text-cyan-400 transition-colors font-outfit py-2">Skills</button>
             <button onClick={() => scrollToSection('projects')} className="block w-full text-left text-gray-300 hover:text-cyan-400 transition-colors font-outfit py-2">Projects</button>
             <button onClick={() => scrollToSection('clients')} className="block w-full text-left text-gray-300 hover:text-cyan-400 transition-colors font-outfit py-2">Clients</button>
