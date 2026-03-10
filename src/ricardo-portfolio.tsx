@@ -195,8 +195,8 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center space-x-3">
-            <img src="/logo.png" alt="Xandr" className="w-10 h-10 rounded-full" />
-            <span className="font-space-grotesk font-bold text-xl text-white">Xandr</span>
+            <img src="/logo.png" alt="XANDR" className="w-10 h-10 rounded-full" />
+            <span className="font-space-grotesk font-bold text-xl text-white">XANDR</span>
           </div>
 
           {/* Desktop Navigation */}
