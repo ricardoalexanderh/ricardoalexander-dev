@@ -30,6 +30,10 @@ const AurisLanding: React.FC = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0)
+    document.title = 'Auris - AI-Powered Audio Intelligence | Ricardo Alexander'
+    return () => {
+      document.title = 'Ricardo Alexander - Software Architect & Technology Entrepreneur'
+    }
   }, [])
 
   const startAutoSlide = useCallback(() => {

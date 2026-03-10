@@ -252,6 +252,7 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
               href="https://linkedin.com/in/ricardoalexanderh"
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="LinkedIn profile"
               className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors group"
             >
               <Linkedin className="w-5 h-5 text-blue-400 group-hover:text-blue-300" />
@@ -260,14 +261,16 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
               href="https://github.com/ricardoalexanderh"
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="GitHub profile"
               className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors group"
             >
               <Github className="w-5 h-5 text-gray-300 group-hover:text-white" />
             </a>
-            
+
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
+              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
               className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors"
             >
               {theme === 'dark' ? <Sun className="w-5 h-5 text-yellow-400" /> : <Moon className="w-5 h-5 text-slate-400" />}
@@ -280,6 +283,7 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
               href="https://linkedin.com/in/ricardoalexanderh"
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="LinkedIn profile"
               className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors group"
             >
               <Linkedin className="w-5 h-5 text-blue-400 group-hover:text-blue-300" />
@@ -288,18 +292,21 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
               href="https://github.com/ricardoalexanderh"
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="GitHub profile"
               className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors group"
             >
               <Github className="w-5 h-5 text-gray-300 group-hover:text-white" />
             </a>
             <button
               onClick={toggleTheme}
+              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
               className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors"
             >
               {theme === 'dark' ? <Sun className="w-5 h-5 text-yellow-400" /> : <Moon className="w-5 h-5 text-slate-400" />}
             </button>
             <button
               onClick={() => setIsOpen(!isOpen)}
+              aria-label={isOpen ? 'Close menu' : 'Open menu'}
               className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors"
             >
               {isOpen ? <X className="w-5 h-5 text-white" /> : <Menu className="w-5 h-5 text-white" />}
@@ -982,6 +989,7 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
       {/* Navigation */}
       <Navigation theme={theme} toggleTheme={toggleTheme} />
 
+      <main>
       {/* Hero Section */}
       <section id="hero" className="relative h-screen flex items-center justify-center pt-16">
         {/* 3D Background */}
@@ -1459,6 +1467,8 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
           </div>
         </section>
       )}
+
+      </main>
 
       {/* Footer */}
       <footer className="py-8 px-4 text-center border-t border-gray-200 dark:border-slate-700">
