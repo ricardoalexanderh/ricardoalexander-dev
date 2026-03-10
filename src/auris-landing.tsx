@@ -1206,7 +1206,7 @@ const AurisLanding: React.FC = () => {
             <a href="https://chromewebstore.google.com" target="_blank" rel="noopener noreferrer" className="auris-btn-primary">Get Auris</a>
             <a href="#how" className="auris-btn-secondary">See how it works &rarr;</a>
           </div>
-          <p className="auris-price-hint"><strong>1-day free trial</strong> &middot; Full features &middot; $29 one-time &middot; BYOK</p>
+          <p className="auris-price-hint"><strong>1-day free trial</strong> &middot; Full features &middot; $39 one-time &middot; BYOK</p>
 
           {/* DEMO SLIDESHOW */}
           <div id="demo-slideshow" className="auris-demo-container">
@@ -1454,7 +1454,7 @@ const AurisLanding: React.FC = () => {
               <div className="auris-pricing-inner">
                 <div className="auris-pricing-left">
                   <div className="auris-plan-name">Auris</div>
-                  <div className="auris-plan-price"><span className="currency">$</span>29<span className="period"> one-time</span></div>
+                  <div className="auris-plan-price"><span className="currency">$</span>39<span className="period"> one-time</span></div>
                   <div className="auris-plan-note">1-day free trial &middot; Lifetime access &middot; No subscription</div>
                   <a href="https://chromewebstore.google.com" target="_blank" rel="noopener noreferrer" className="auris-plan-cta">Get Auris</a>
                   <p className="auris-plan-guarantee">{'\uD83D\uDD12'} Secure in-app purchase</p>
