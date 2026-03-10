@@ -212,7 +212,7 @@ const AurisLanding: React.FC = () => {
   const privacyItems = [
     { icon: '\uD83C\uDF99', title: 'Voice stays local', desc: 'All voice processing runs entirely inside your browser \u2014 on your device, on your terms. Zero audio data sent anywhere.' },
     { icon: '\uD83D\uDD11', title: 'You own the keys', desc: 'Bring your own API key or local model. Auris never proxies your requests or stores your credentials.' },
-    { icon: '\uD83D\uDCCA', title: 'Zero telemetry', desc: 'No analytics, no tracking, no account required. Your coding sessions are yours.' },
+    { icon: '\uD83D\uDCCA', title: 'Zero telemetry', desc: 'No analytics, no tracking, no account required. Your vibe coding sessions are yours.' },
     { icon: '\uD83C\uDF10', title: 'Works offline', desc: 'Voice processing needs no internet. Pair with Ollama or LM Studio for a fully air-gapped setup.' },
   ]
 
@@ -1192,7 +1192,7 @@ const AurisLanding: React.FC = () => {
             <img src="/chrome-web-store-icon.svg" alt="Chrome Web Store" width="16" height="16" style={{ flexShrink: 0 }} />
             Chrome Extension
           </div>
-          <h1>Your AI Coding Assistant,<br /><span className="auris-gradient-text">out loud.</span></h1>
+          <h1>Your AI Vibe Coding Assistant,<br /><span className="auris-gradient-text">out loud.</span></h1>
           <p className="auris-tagline">An AI voice assistant for <span style={{ color: '#D97757', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}><img src="/claude-ai-icon.svg" alt="Claude" width="18" height="18" style={{ verticalAlign: 'middle' }} />Claude Code</span> for Web &mdash; keeping you in flow.</p>
 
           <div className="auris-origin-note">
