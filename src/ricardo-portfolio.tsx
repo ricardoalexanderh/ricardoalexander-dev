@@ -1204,7 +1204,7 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
                 </h3>
               </div>
               <p className="text-gray-600 dark:text-gray-300 font-outfit mb-6">
-                Chrome Extension &mdash; AI voice assistant for <span style={{ color: '#D97757' }} className="font-medium">Claude Code</span> Web. Hands-free coding with intelligent voice commands.
+                Chrome Extension &mdash; AI voice assistant for <span style={{ color: '#D97757' }} className="font-medium">Claude Code</span> Web. Hands-free vibe coding with intelligent voice commands.
               </p>
               <div className="flex items-center text-cyan-400 font-outfit font-semibold group-hover:gap-3 gap-2 transition-all duration-200">
                 Learn more
