@@ -195,8 +195,8 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center space-x-3">
-            <img src="/logo.png" alt="Ricardo Alexander" className="w-10 h-10 rounded-full" />
-            <span className="font-space-grotesk font-bold text-xl text-white">Ricardo Alexander</span>
+            <img src="/logo.png" alt="XANDR" className="w-10 h-10 rounded-full" />
+            <span className="font-space-grotesk font-bold text-xl text-white">XANDR</span>
           </div>
 
           {/* Desktop Navigation */}
@@ -958,8 +958,9 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
   showContact = true
 }) => {
   const { theme, toggleTheme } = useTheme()
+  const navigate = useNavigate()
   const [isVideoOpen, setIsVideoOpen] = useState(false)
-  
+
   // YouTube video ID for professional overview
   const youtubeVideoId = "GHC_3oE1i6g"
 
@@ -1166,6 +1167,51 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
             </motion.div>
           </div>
         </motion.div>
+        </div>
+      </section>
+
+      {/* Products Section */}
+      <section id="products" className="relative py-20 px-4 md:px-8 bg-gray-50 dark:bg-slate-800/30">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            className="text-center mb-16"
+            {...fadeInUp}
+          >
+            <h2 className="text-4xl md:text-5xl font-space-grotesk font-bold mb-6">
+              <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+                Products
+              </span>
+            </h2>
+            <p className="text-lg text-gray-600 dark:text-gray-400 font-outfit max-w-2xl mx-auto">
+              Tools and products I've built to solve real problems
+            </p>
+          </motion.div>
+
+          <div className="flex justify-center">
+            <motion.div
+              className="max-w-md w-full p-8 rounded-2xl bg-white/70 dark:bg-slate-800/50 backdrop-blur-sm border border-gray-200 dark:border-slate-700 hover:border-cyan-400/50 transition-all duration-300 group cursor-pointer"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              whileHover={{ scale: 1.03, y: -5 }}
+              onClick={() => navigate('/products/auris')}
+            >
+              <div className="flex items-center gap-4 mb-4">
+                <span className="text-4xl text-purple-400 group-hover:text-cyan-400 transition-colors duration-200">&#x25C8;</span>
+                <h3 className="text-2xl font-space-grotesk font-bold text-gray-800 dark:text-white group-hover:text-cyan-400 transition-colors">
+                  Auris
+                </h3>
+              </div>
+              <p className="text-gray-600 dark:text-gray-300 font-outfit mb-6">
+                Chrome Extension &mdash; AI voice assistant for <span style={{ color: '#D97757' }} className="font-medium">Claude Code</span> Web. Hands-free coding with intelligent voice commands.
+              </p>
+              <div className="flex items-center text-cyan-400 font-outfit font-semibold group-hover:gap-3 gap-2 transition-all duration-200">
+                Learn more
+                <ExternalLink className="w-4 h-4" />
+              </div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
