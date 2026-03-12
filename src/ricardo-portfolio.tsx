@@ -243,7 +243,7 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
             </div>
 
             <button onClick={() => scrollToSection('skills')} className="text-gray-300 hover:text-cyan-400 transition-colors font-outfit">Skills</button>
-            <button onClick={() => scrollToSection('projects')} className="text-gray-300 hover:text-cyan-400 transition-colors font-outfit">Projects</button>
+            {/* <button onClick={() => scrollToSection('projects')} className="text-gray-300 hover:text-cyan-400 transition-colors font-outfit">Projects</button> */}
             <button onClick={() => scrollToSection('clients')} className="text-gray-300 hover:text-cyan-400 transition-colors font-outfit">Clients</button>
             <button onClick={() => scrollToSection('contact')} className="text-gray-300 hover:text-cyan-400 transition-colors font-outfit">Contact</button>
 
@@ -351,7 +351,7 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
             </div>
 
             <button onClick={() => scrollToSection('skills')} className="block w-full text-left text-gray-300 hover:text-cyan-400 transition-colors font-outfit py-2">Skills</button>
-            <button onClick={() => scrollToSection('projects')} className="block w-full text-left text-gray-300 hover:text-cyan-400 transition-colors font-outfit py-2">Projects</button>
+            {/* <button onClick={() => scrollToSection('projects')} className="block w-full text-left text-gray-300 hover:text-cyan-400 transition-colors font-outfit py-2">Projects</button> */}
             <button onClick={() => scrollToSection('clients')} className="block w-full text-left text-gray-300 hover:text-cyan-400 transition-colors font-outfit py-2">Clients</button>
             <button onClick={() => scrollToSection('contact')} className="block w-full text-left text-gray-300 hover:text-cyan-400 transition-colors font-outfit py-2">Contact</button>
           </motion.div>
@@ -1267,7 +1267,7 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
         </div>
       </section>
 
-      {/* Projects Section */}
+      {/* Projects Section - hidden for now
       <section id="projects" className="py-20 px-4 md:px-8">
         <div className="max-w-7xl mx-auto">
           <motion.div
@@ -1336,6 +1336,7 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
           </div>
         </div>
       </section>
+      */}
 
       {/* Client Testimonials */}
       <section id="clients" className="py-20 px-4 md:px-8 bg-gray-50 dark:bg-slate-800/30">
