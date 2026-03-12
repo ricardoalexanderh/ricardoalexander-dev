@@ -11,6 +11,7 @@ interface PortfolioProps {
   showContact?: boolean
 }
 
+/* Hidden for now
 interface Project {
   title: string
   description: string
@@ -19,6 +20,7 @@ interface Project {
   link?: string
   metrics?: string
 }
+*/
 
 interface Skill {
   category: string
@@ -878,6 +880,7 @@ const skills: Skill[] = [
   }
 ]
 
+/* Hidden for now
 const projects: Project[] = [
   {
     title: "Toyota Performance Optimization",
@@ -910,6 +913,7 @@ const projects: Project[] = [
     metrics: ""
   }
 ]
+*/
 
 const clients = [
   "Toyota Group",
