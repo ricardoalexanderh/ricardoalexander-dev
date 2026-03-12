@@ -4,7 +4,6 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { Float, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
 import { Linkedin, Mail, Github, ExternalLink, Code, Database, Cloud, Smartphone, Globe, Cpu, Sun, Moon, Menu, X, ChevronDown, Play, Zap } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
 
 // Types
 interface PortfolioProps {
@@ -163,10 +162,6 @@ const Scene3D: React.FC = () => {
 // Navigation Component
 const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }> = ({ theme, toggleTheme }) => {
   const [isOpen, setIsOpen] = useState(false)
-  const [productsOpen, setProductsOpen] = useState(false)
-  const [mobileProductsOpen, setMobileProductsOpen] = useState(false)
-  const productsRef = useRef<HTMLDivElement>(null)
-  const navigate = useNavigate()
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId)
@@ -177,17 +172,6 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
       setIsOpen(false)
     }
   }
-
-  // Close products dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (productsRef.current && !productsRef.current.contains(e.target as Node)) {
-        setProductsOpen(false)
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-900/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-700/50">
@@ -960,7 +944,6 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
   showContact = true
 }) => {
   const { theme, toggleTheme } = useTheme()
-  const navigate = useNavigate()
   const [isVideoOpen, setIsVideoOpen] = useState(false)
 
   // YouTube video ID for professional overview
