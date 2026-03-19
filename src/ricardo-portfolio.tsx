@@ -1,11 +1,16 @@
-import React, { useRef, useState, useEffect, Suspense } from 'react'
-import { motion, useInView } from 'motion/react'
+import React, { useRef, useState, useEffect, useCallback, Suspense } from 'react'
+import { motion, useMotionValue, useSpring, useInView } from 'motion/react'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { Float, OrbitControls } from '@react-three/drei'
+import { OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
-import { Linkedin, Mail, Github, ExternalLink, Code, Database, Cloud, Smartphone, Globe, Cpu, Sun, Moon, Menu, X, ChevronDown, Play, Zap } from 'lucide-react'
+import { LinkedinLogo, GithubLogo, Sun, Moon, List, X, Play, DownloadSimple, EnvelopeSimple, Code, Globe, DeviceMobile, Cube, Cloud, Database, Lightning, Cpu } from '@phosphor-icons/react'
 
-// Types
+// ─── Constants ───────────────────────────────────────────────────────────────
+
+const SPRING = { type: 'spring' as const, stiffness: 100, damping: 20 }
+
+// ─── Types ───────────────────────────────────────────────────────────────────
+
 interface PortfolioProps {
   showContact?: boolean
 }
@@ -19,19 +24,19 @@ interface Project {
   metrics?: string
 }
 
-interface Skill {
+interface SkillRow {
   category: string
   technologies: string[]
   icon: React.ReactNode
-  color: string
 }
 
-// Theme context
+// ─── Theme Hook ──────────────────────────────────────────────────────────────
+
 const useTheme = () => {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark')
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') as 'dark' | 'light' || 'dark'
+    const savedTheme = (localStorage.getItem('theme') as 'dark' | 'light') || 'dark'
     setTheme(savedTheme)
     document.documentElement.classList.toggle('dark', savedTheme === 'dark')
   }, [])
@@ -46,18 +51,321 @@ const useTheme = () => {
   return { theme, toggleTheme }
 }
 
-// Video Modal Component
-const VideoModal: React.FC<{ isOpen: boolean; onClose: () => void; videoId: string }> = ({ isOpen, onClose, videoId }) => {
+// ─── Utility Hooks ───────────────────────────────────────────────────────────
+
+const useTextScramble = (text: string, trigger: boolean) => {
+  const [display, setDisplay] = useState('')
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&*'
+
+  useEffect(() => {
+    if (!trigger) return
+
+    let frame = 0
+    const totalFrames = text.length * 2
+
+    const interval = setInterval(() => {
+      const resolved = Math.floor(frame / 2)
+      let result = ''
+
+      for (let i = 0; i < text.length; i++) {
+        if (text[i] === ' ') {
+          result += ' '
+        } else if (i < resolved) {
+          result += text[i]
+        } else {
+          result += chars[Math.floor(Math.random() * chars.length)]
+        }
+      }
+
+      setDisplay(result)
+      frame++
+
+      if (frame > totalFrames) {
+        setDisplay(text)
+        clearInterval(interval)
+      }
+    }, 30)
+
+    return () => clearInterval(interval)
+  }, [text, trigger])
+
+  return display
+}
+
+const useMagneticHover = (strength: number = 0.3) => {
+  const x = useMotionValue(0)
+  const y = useMotionValue(0)
+  const springX = useSpring(x, { stiffness: 200, damping: 20 })
+  const springY = useSpring(y, { stiffness: 200, damping: 20 })
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const centerX = rect.left + rect.width / 2
+    const centerY = rect.top + rect.height / 2
+    x.set((e.clientX - centerX) * strength)
+    y.set((e.clientY - centerY) * strength)
+  }, [x, y, strength])
+
+  const handleMouseLeave = useCallback(() => {
+    x.set(0)
+    y.set(0)
+  }, [x, y])
+
+  return { springX, springY, handleMouseMove, handleMouseLeave }
+}
+
+const useSpotlightCard = () => {
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    e.currentTarget.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`)
+    e.currentTarget.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`)
+  }, [])
+
+  return { handleMouseMove }
+}
+
+// ─── ScrollReveal Component ─────────────────────────────────────────────────
+
+const ScrollReveal: React.FC<{ children: React.ReactNode; className?: string; delay?: number }> = ({
+  children,
+  className = '',
+  delay = 0,
+}) => {
+  return (
+    <motion.div
+      className={className}
+      initial={{ opacity: 0, y: 64, filter: 'blur(8px)' }}
+      whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+      transition={{ ...SPRING, delay }}
+      viewport={{ once: true, margin: '-80px' }}
+    >
+      {children}
+    </motion.div>
+  )
+}
+
+// ─── 3D Scene ────────────────────────────────────────────────────────────────
+
+const SubtleOrb: React.FC = () => {
+  const meshRef = useRef<THREE.Mesh>(null)
+  const [hovered, setHovered] = useState(false)
+  const scaleTarget = useRef(1)
+
+  useFrame((state) => {
+    if (!meshRef.current) return
+    meshRef.current.rotation.y = state.clock.elapsedTime * 0.05
+    meshRef.current.rotation.x = state.clock.elapsedTime * 0.03
+    scaleTarget.current = hovered ? 1.08 : 1
+    const s = THREE.MathUtils.lerp(meshRef.current.scale.x, scaleTarget.current, 0.05)
+    meshRef.current.scale.setScalar(s)
+  })
+
+  return (
+    <mesh
+      ref={meshRef}
+      onPointerOver={() => setHovered(true)}
+      onPointerOut={() => setHovered(false)}
+    >
+      <sphereGeometry args={[1.5, 64, 64]} />
+      <meshStandardMaterial
+        color="#10b981"
+        emissive="#10b981"
+        emissiveIntensity={hovered ? 0.25 : 0.15}
+        transparent
+        opacity={0.12}
+        wireframe
+      />
+    </mesh>
+  )
+}
+
+const HeroScene: React.FC = () => (
+  <>
+    <ambientLight intensity={0.4} />
+    <directionalLight position={[5, 5, 5]} intensity={0.6} />
+    <SubtleOrb />
+    <OrbitControls enableZoom={false} enablePan={false} autoRotate autoRotateSpeed={0.5} />
+  </>
+)
+
+// ─── Code Rain Background ────────────────────────────────────────────────────
+
+type TokenType = 'keyword' | 'decorator' | 'function' | 'string' | 'comment' | 'plain' | 'indent'
+
+interface CodeToken {
+  type: TokenType
+  text: string
+}
+
+interface CodeLine {
+  tokens: CodeToken[]
+}
+
+const CODE_BLOCKS: CodeLine[][] = [
+  [
+    { tokens: [{ type: 'keyword', text: 'from' }, { type: 'plain', text: ' langgraph ' }, { type: 'keyword', text: 'import' }, { type: 'plain', text: ' StateGraph' }] },
+    { tokens: [{ type: 'keyword', text: 'from' }, { type: 'plain', text: ' langchain_core ' }, { type: 'keyword', text: 'import' }, { type: 'plain', text: ' messages' }] },
+    { tokens: [{ type: 'plain', text: '' }] },
+    { tokens: [{ type: 'keyword', text: 'class' }, { type: 'function', text: ' AgentState' }, { type: 'plain', text: '(TypedDict):' }] },
+    { tokens: [{ type: 'indent', text: '    ' }, { type: 'plain', text: 'messages: list[BaseMessage]' }] },
+    { tokens: [{ type: 'indent', text: '    ' }, { type: 'plain', text: 'next_step: ' }, { type: 'string', text: 'str' }] },
+  ],
+  [
+    { tokens: [{ type: 'decorator', text: '@tool' }] },
+    { tokens: [{ type: 'keyword', text: 'def' }, { type: 'function', text: ' retrieve_context' }, { type: 'plain', text: '(query: str):' }] },
+    { tokens: [{ type: 'indent', text: '    ' }, { type: 'string', text: '"""Retrieve relevant docs."""' }] },
+    { tokens: [{ type: 'indent', text: '    ' }, { type: 'plain', text: 'docs = vectorstore.' }, { type: 'function', text: 'similarity_search' }, { type: 'plain', text: '(query)' }] },
+    { tokens: [{ type: 'indent', text: '    ' }, { type: 'keyword', text: 'return' }, { type: 'plain', text: ' docs' }] },
+  ],
+  [
+    { tokens: [{ type: 'keyword', text: 'def' }, { type: 'function', text: ' agent_node' }, { type: 'plain', text: '(state: AgentState):' }] },
+    { tokens: [{ type: 'indent', text: '    ' }, { type: 'plain', text: 'llm = ' }, { type: 'function', text: 'ChatAnthropic' }, { type: 'plain', text: '()' }] },
+    { tokens: [{ type: 'indent', text: '    ' }, { type: 'plain', text: 'resp = llm.' }, { type: 'function', text: 'invoke' }, { type: 'plain', text: '(state[' }, { type: 'string', text: '"messages"' }, { type: 'plain', text: '])' }] },
+    { tokens: [{ type: 'indent', text: '    ' }, { type: 'keyword', text: 'return' }, { type: 'plain', text: ' {' }, { type: 'string', text: '"messages"' }, { type: 'plain', text: ': [resp]}' }] },
+  ],
+  [
+    { tokens: [{ type: 'comment', text: '# Build the graph' }] },
+    { tokens: [{ type: 'plain', text: 'graph = ' }, { type: 'function', text: 'StateGraph' }, { type: 'plain', text: '(AgentState)' }] },
+    { tokens: [{ type: 'plain', text: 'graph.' }, { type: 'function', text: 'add_node' }, { type: 'plain', text: '(' }, { type: 'string', text: '"agent"' }, { type: 'plain', text: ', agent_node)' }] },
+    { tokens: [{ type: 'plain', text: 'graph.' }, { type: 'function', text: 'add_node' }, { type: 'plain', text: '(' }, { type: 'string', text: '"tools"' }, { type: 'plain', text: ', tool_executor)' }] },
+    { tokens: [{ type: 'plain', text: 'graph.' }, { type: 'function', text: 'add_edge' }, { type: 'plain', text: '(' }, { type: 'string', text: '"agent"' }, { type: 'plain', text: ', ' }, { type: 'string', text: '"tools"' }, { type: 'plain', text: ')' }] },
+    { tokens: [{ type: 'plain', text: 'graph.' }, { type: 'function', text: 'set_entry_point' }, { type: 'plain', text: '(' }, { type: 'string', text: '"agent"' }, { type: 'plain', text: ')' }] },
+  ],
+  [
+    { tokens: [{ type: 'keyword', text: 'def' }, { type: 'function', text: ' should_continue' }, { type: 'plain', text: '(state):' }] },
+    { tokens: [{ type: 'indent', text: '    ' }, { type: 'keyword', text: 'if' }, { type: 'plain', text: ' state[' }, { type: 'string', text: '"next_step"' }, { type: 'plain', text: '] == ' }, { type: 'string', text: '"end"' }, { type: 'plain', text: ':' }] },
+    { tokens: [{ type: 'indent', text: '        ' }, { type: 'keyword', text: 'return' }, { type: 'plain', text: ' END' }] },
+    { tokens: [{ type: 'indent', text: '    ' }, { type: 'keyword', text: 'return' }, { type: 'plain', text: ' ' }, { type: 'string', text: '"tools"' }] },
+  ],
+  [
+    { tokens: [{ type: 'keyword', text: 'async def' }, { type: 'function', text: ' run_agent' }, { type: 'plain', text: '(query: str):' }] },
+    { tokens: [{ type: 'indent', text: '    ' }, { type: 'plain', text: 'checkpoint = ' }, { type: 'function', text: 'MemorySaver' }, { type: 'plain', text: '()' }] },
+    { tokens: [{ type: 'indent', text: '    ' }, { type: 'plain', text: 'app = graph.' }, { type: 'function', text: 'compile' }, { type: 'plain', text: '(checkpointer=checkpoint)' }] },
+    { tokens: [{ type: 'indent', text: '    ' }, { type: 'plain', text: 'result = ' }, { type: 'keyword', text: 'await' }, { type: 'plain', text: ' app.' }, { type: 'function', text: 'ainvoke' }, { type: 'plain', text: '(state)' }] },
+    { tokens: [{ type: 'indent', text: '    ' }, { type: 'keyword', text: 'return' }, { type: 'plain', text: ' result' }] },
+  ],
+]
+
+const TOKEN_STYLES: Record<TokenType, string> = {
+  keyword: 'text-purple-400',
+  decorator: 'text-yellow-400',
+  function: 'text-blue-400',
+  string: 'text-emerald-400',
+  comment: 'text-zinc-500 italic',
+  plain: 'text-zinc-400',
+  indent: '',
+}
+
+const CodeRain: React.FC = () => {
+  const allBlocks = [...CODE_BLOCKS, ...CODE_BLOCKS]
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none z-0 opacity-[0.12] dark:opacity-[0.10]">
+      <div className="flex justify-around h-full">
+        {Array.from({ length: 6 }).map((_, col) => (
+          <div
+            key={col}
+            className="flex flex-col gap-6 text-[10px] font-jetbrains whitespace-pre animate-scroll-code"
+            style={{ animationDuration: `${25 + col * 4}s`, animationDelay: `${-col * 3}s` }}
+          >
+            {allBlocks.map((block, bi) => (
+              <div key={bi} className="flex flex-col gap-0.5 mb-4">
+                {block.map((line, li) => (
+                  <div key={li}>
+                    {line.tokens.map((token, ti) => (
+                      <span key={ti} className={TOKEN_STYLES[token.type]}>{token.text}</span>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ─── Hero Typing Animation ───────────────────────────────────────────────────
+
+const heroSubtitleLines = [
+  'Technology Entrepreneur & Software Architect',
+  "Building Tomorrow's Systems Today",
+  'Full-stack · Web · Mobile · Web3 · AI/LLM',
+  'Co-Founder & Managing Partner at SparkWorks',
+]
+
+const HeroTypingAnimation: React.FC = () => {
+  const [displayText, setDisplayText] = useState('')
+  const [currentLineIndex, setCurrentLineIndex] = useState(0)
+  const [currentCharIndex, setCurrentCharIndex] = useState(0)
+
+  useEffect(() => {
+    const typeText = () => {
+      if (currentLineIndex < heroSubtitleLines.length) {
+        const currentLine = heroSubtitleLines[currentLineIndex]
+
+        if (currentCharIndex < currentLine.length) {
+          setDisplayText(prev => {
+            const lines = prev.split('\n')
+            lines[currentLineIndex] = (lines[currentLineIndex] || '') + currentLine[currentCharIndex]
+            return lines.join('\n')
+          })
+          setCurrentCharIndex(prev => prev + 1)
+        } else {
+          setTimeout(() => {
+            setCurrentLineIndex(prev => prev + 1)
+            setCurrentCharIndex(0)
+            setDisplayText(prev => prev + (currentLineIndex < heroSubtitleLines.length - 1 ? '\n' : ''))
+          }, 150)
+        }
+      } else {
+        setTimeout(() => {
+          setDisplayText('')
+          setCurrentLineIndex(0)
+          setCurrentCharIndex(0)
+        }, 3000)
+      }
+    }
+
+    const timer = setTimeout(typeText, Math.random() * 25 + 40)
+    return () => clearTimeout(timer)
+  }, [currentLineIndex, currentCharIndex])
+
+  return (
+    <div className="text-lg md:text-xl text-zinc-600 dark:text-zinc-400 mb-10 max-w-lg font-outfit min-h-[120px]">
+      <div className="whitespace-pre-line">
+        {displayText.split('\n').map((line, index) => (
+          <div key={index} className="mb-1">
+            {index === 0 && <span className="text-emerald-500 font-semibold">{line}</span>}
+            {index === 1 && <span className="text-zinc-600 dark:text-zinc-300">{line}</span>}
+            {index === 2 && <span className="text-sm text-emerald-500/70 font-jetbrains">{line}</span>}
+            {index === 3 && <span className="text-lg text-zinc-500 dark:text-zinc-400 font-outfit">{line}</span>}
+            {index === currentLineIndex && currentCharIndex <= (heroSubtitleLines[currentLineIndex]?.length ?? 0) && (
+              <span className="text-emerald-400 animate-pulse">|</span>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ─── Video Modal ─────────────────────────────────────────────────────────────
+
+const VideoModal: React.FC<{ isOpen: boolean; onClose: () => void; videoId: string }> = ({
+  isOpen,
+  onClose,
+  videoId,
+}) => {
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
     }
-    
     if (isOpen) {
       document.addEventListener('keydown', handleEscape)
       document.body.style.overflow = 'hidden'
     }
-    
     return () => {
       document.removeEventListener('keydown', handleEscape)
       document.body.style.overflow = 'unset'
@@ -75,22 +383,19 @@ const VideoModal: React.FC<{ isOpen: boolean; onClose: () => void; videoId: stri
       onClick={onClose}
     >
       <motion.div
-        className="relative w-full max-w-4xl bg-slate-900 rounded-lg overflow-hidden shadow-2xl"
+        className="relative w-full max-w-4xl bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl"
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Close button */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 z-10 p-2 bg-black/50 hover:bg-black/70 text-white rounded-full transition-colors"
         >
-          <X className="w-5 h-5" />
+          <X size={20} weight="bold" />
         </button>
-        
-        {/* Video container with responsive aspect ratio */}
-        <div className="relative w-full pb-[56.25%] h-0"> {/* 16:9 aspect ratio */}
+        <div className="relative w-full pb-[56.25%] h-0">
           <iframe
             className="absolute top-0 left-0 w-full h-full border-0"
             src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`}
@@ -104,817 +409,298 @@ const VideoModal: React.FC<{ isOpen: boolean; onClose: () => void; videoId: stri
   )
 }
 
-// 3D Components
-const FloatingGeometry: React.FC<{ position: [number, number, number] }> = ({ position }) => {
-  const meshRef = useRef<THREE.Mesh>(null)
-  const [hovered, setHovered] = useState(false)
+// ─── Navigation ──────────────────────────────────────────────────────────────
 
-  useFrame((state) => {
-    if (meshRef.current) {
-      meshRef.current.rotation.x = state.clock.elapsedTime * 0.2
-      meshRef.current.rotation.y = state.clock.elapsedTime * 0.3
-      meshRef.current.position.y = position[1] + Math.sin(state.clock.elapsedTime) * 0.1
-    }
-  })
-
-  return (
-    <Float speed={1.5} rotationIntensity={1} floatIntensity={0.5}>
-      <mesh
-        ref={meshRef}
-        position={position}
-        onPointerOver={() => setHovered(true)}
-        onPointerOut={() => setHovered(false)}
-        scale={hovered ? 1.2 : 1}
-      >
-        <octahedronGeometry args={[0.5]} />
-        <meshStandardMaterial
-          color={hovered ? '#00D4FF' : '#4ECDC4'}
-          wireframe
-          transparent
-          opacity={0.6}
-        />
-      </mesh>
-    </Float>
-  )
-}
-
-const Scene3D: React.FC = () => {
-  return (
-    <>
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[10, 10, 5]} intensity={1} />
-      <FloatingGeometry position={[-2, 0, 0]} />
-      <FloatingGeometry position={[2, 1, -1]} />
-      <FloatingGeometry position={[0, -1, -2]} />
-      <FloatingGeometry position={[-1, 2, -1]} />
-      <FloatingGeometry position={[3, -0.5, 0]} />
-      <FloatingGeometry position={[-3, -1, 1]} />
-      <FloatingGeometry position={[1, 2.5, -2]} />
-      <FloatingGeometry position={[-2.5, -2, -1]} />
-      <FloatingGeometry position={[4, 1, -3]} />
-      <FloatingGeometry position={[-4, 0.5, 0]} />
-      <FloatingGeometry position={[0, -2.5, 1]} />
-      <FloatingGeometry position={[2.5, -1.5, -2]} />
-    </>
-  )
-}
-
-// Navigation Component
-const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }> = ({ theme, toggleTheme }) => {
+const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }> = ({
+  theme,
+  toggleTheme,
+}) => {
   const [isOpen, setIsOpen] = useState(false)
+  const [productsOpen, setProductsOpen] = useState(false)
+  const productsRef = useRef<HTMLDivElement>(null)
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId)
     if (element) {
-      const navHeight = 64
-      const top = element.getBoundingClientRect().top + window.scrollY - navHeight
+      const top = element.getBoundingClientRect().top + window.scrollY - 80
       window.scrollTo({ top, behavior: 'smooth' })
       setIsOpen(false)
     }
   }
 
+  const navLinks = ['About', 'Skills', 'Products', 'Projects', 'Clients', 'Contact']
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-900/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-700/50">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+    <nav className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-4xl">
+      <div className="rounded-full bg-zinc-900/80 dark:bg-zinc-900/80 bg-white/80 backdrop-blur-xl border border-white/[0.06] dark:border-white/[0.06] border-zinc-200/60 px-6 py-3">
+        <div className="flex items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center space-x-3">
-            <img src="/logo.png" alt="XANDR" className="w-10 h-10 rounded-full" />
-            <span className="font-space-grotesk font-bold text-xl text-white">XANDR</span>
+          <div className="flex items-center space-x-2.5">
+            <img src="/logo.png" alt="XANDR" className="w-8 h-8 rounded-full" />
+            <span className="font-space-grotesk font-bold text-lg text-zinc-900 dark:text-zinc-100">
+              XANDR
+            </span>
           </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            <button onClick={() => scrollToSection('about')} className="text-gray-300 hover:text-cyan-400 transition-colors font-outfit">About</button>
-
-            {/* Products Dropdown - hidden for now
-            <div
-              className="relative"
-              ref={productsRef}
-              onMouseEnter={() => setProductsOpen(true)}
-              onMouseLeave={() => setProductsOpen(false)}
-            >
-              <button
-                className="flex items-center gap-1 text-gray-300 hover:text-cyan-400 transition-colors font-outfit py-5 -my-5"
-              >
-                Products
-                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${productsOpen ? 'rotate-180' : ''}`} />
-              </button>
-              {productsOpen && (
-                <div className="absolute top-full left-0 mt-1 w-72">
-                  <motion.div
-                    initial={{ opacity: 0, y: -8, scale: 0.96 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    transition={{ duration: 0.18, ease: 'easeOut' }}
-                    className="bg-slate-800/95 backdrop-blur-lg rounded-xl border border-slate-700/50 shadow-2xl overflow-hidden"
+          {/* Desktop Links */}
+          <div className="hidden md:flex items-center space-x-6">
+            {navLinks.map((link) =>
+              link === 'Products' ? (
+                <div
+                  key={link}
+                  ref={productsRef}
+                  className="relative"
+                  onMouseEnter={() => setProductsOpen(true)}
+                  onMouseLeave={() => setProductsOpen(false)}
+                >
+                  <button
+                    className="flex items-center gap-1 text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors font-outfit py-4 -my-4"
                   >
-                    <button
-                      onClick={() => {
-                        navigate('/products/auris')
-                        setProductsOpen(false)
-                      }}
-                      className="flex items-center gap-4 w-full px-5 py-4 text-left text-gray-300 hover:text-cyan-400 hover:bg-slate-700/40 transition-all duration-200 font-outfit group"
+                    Products
+                    <svg className={`w-3 h-3 transition-transform duration-200 ${productsOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                  </button>
+                  {productsOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -6, scale: 0.97 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute top-full left-0 mt-1 w-72 rounded-xl bg-zinc-900/95 dark:bg-zinc-900/95 bg-white/95 backdrop-blur-xl border border-white/[0.06] dark:border-white/[0.06] border-zinc-200/60 shadow-2xl overflow-hidden"
                     >
-                      <span className="text-2xl text-purple-400 group-hover:text-cyan-400 transition-colors duration-200">&#x25C8;</span>
-                      <div>
-                        <div className="font-semibold text-sm">Auris</div>
-                        <div className="text-xs text-gray-400 mt-0.5">AI voice assistant for <span style={{ color: '#D97757' }} className="font-medium">Claude Code</span> &mdash; Web, VS Code, Terminal &amp; Desktop</div>
-                      </div>
-                    </button>
-                  </motion.div>
+                      <a
+                        href="/products/auris"
+                        className="flex items-center gap-4 w-full px-5 py-4 text-left text-zinc-600 dark:text-zinc-400 hover:text-emerald-500 dark:hover:text-emerald-400 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/50 transition-all font-outfit group"
+                      >
+                        <span className="text-2xl group-hover:scale-110 transition-transform" style={{ color: '#7b6cff' }}>&#x25C8;</span>
+                        <div>
+                          <div className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">Auris</div>
+                          <div className="text-xs text-zinc-500 dark:text-zinc-500 mt-0.5">AI voice assistant for <span className="text-emerald-500 font-medium">Claude Code</span></div>
+                        </div>
+                      </a>
+                    </motion.div>
+                  )}
                 </div>
-              )}
-            </div>
-            */}
-
-            <button onClick={() => scrollToSection('skills')} className="text-gray-300 hover:text-cyan-400 transition-colors font-outfit">Skills</button>
-            <button onClick={() => scrollToSection('projects')} className="text-gray-300 hover:text-cyan-400 transition-colors font-outfit">Projects</button>
-            <button onClick={() => scrollToSection('clients')} className="text-gray-300 hover:text-cyan-400 transition-colors font-outfit">Clients</button>
-            <button onClick={() => scrollToSection('contact')} className="text-gray-300 hover:text-cyan-400 transition-colors font-outfit">Contact</button>
-
-            {/* Social Links */}
-            <a
-              href="https://linkedin.com/in/ricardoalexanderh"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors group"
-            >
-              <Linkedin className="w-5 h-5 text-blue-400 group-hover:text-blue-300" />
-            </a>
-            <a
-              href="https://github.com/ricardoalexanderh"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors group"
-            >
-              <Github className="w-5 h-5 text-gray-300 group-hover:text-white" />
-            </a>
-            
-            {/* Theme Toggle */}
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors"
-            >
-              {theme === 'dark' ? <Sun className="w-5 h-5 text-yellow-400" /> : <Moon className="w-5 h-5 text-slate-400" />}
-            </button>
+              ) : (
+                <button
+                  key={link}
+                  onClick={() => scrollToSection(link.toLowerCase())}
+                  className="text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors font-outfit"
+                >
+                  {link}
+                </button>
+              )
+            )}
           </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden flex items-center space-x-2">
+          {/* Right side */}
+          <div className="flex items-center space-x-1">
             <a
               href="https://linkedin.com/in/ricardoalexanderh"
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors group"
+              className="hidden md:flex p-2 rounded-full hover:bg-zinc-800/50 dark:hover:bg-zinc-800/50 hover:bg-zinc-100 transition-colors"
             >
-              <Linkedin className="w-5 h-5 text-blue-400 group-hover:text-blue-300" />
+              <LinkedinLogo size={18} className="text-zinc-600 dark:text-zinc-400" weight="bold" />
             </a>
             <a
               href="https://github.com/ricardoalexanderh"
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors group"
+              className="hidden md:flex p-2 rounded-full hover:bg-zinc-800/50 dark:hover:bg-zinc-800/50 hover:bg-zinc-100 transition-colors"
             >
-              <Github className="w-5 h-5 text-gray-300 group-hover:text-white" />
+              <GithubLogo size={18} className="text-zinc-600 dark:text-zinc-400" weight="bold" />
             </a>
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors"
+              className="p-2 rounded-full hover:bg-zinc-800/50 dark:hover:bg-zinc-800/50 hover:bg-zinc-100 transition-colors"
             >
-              {theme === 'dark' ? <Sun className="w-5 h-5 text-yellow-400" /> : <Moon className="w-5 h-5 text-slate-400" />}
+              {theme === 'dark' ? (
+                <Sun size={18} className="text-zinc-400" weight="bold" />
+              ) : (
+                <Moon size={18} className="text-zinc-600" weight="bold" />
+              )}
             </button>
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors"
+              className="md:hidden p-2 rounded-full hover:bg-zinc-800/50 dark:hover:bg-zinc-800/50 hover:bg-zinc-100 transition-colors"
             >
-              {isOpen ? <X className="w-5 h-5 text-white" /> : <Menu className="w-5 h-5 text-white" />}
+              {isOpen ? (
+                <X size={18} className="text-zinc-900 dark:text-zinc-100" weight="bold" />
+              ) : (
+                <List size={18} className="text-zinc-900 dark:text-zinc-100" weight="bold" />
+              )}
             </button>
           </div>
         </div>
-
-        {/* Mobile Navigation */}
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="md:hidden bg-slate-800/95 backdrop-blur-lg rounded-lg mt-2 p-4 space-y-3"
-          >
-            <button onClick={() => scrollToSection('about')} className="block w-full text-left text-gray-300 hover:text-cyan-400 transition-colors font-outfit py-2">About</button>
-
-            {/* Products submenu - hidden for now
-            <div>
-              <button
-                onClick={() => setMobileProductsOpen(!mobileProductsOpen)}
-                className="flex items-center justify-between w-full text-left text-gray-300 hover:text-cyan-400 transition-colors font-outfit py-2"
-              >
-                Products
-                <ChevronDown className={`w-4 h-4 transition-transform ${mobileProductsOpen ? 'rotate-180' : ''}`} />
-              </button>
-              {mobileProductsOpen && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <button
-                    onClick={() => {
-                      navigate('/products/auris')
-                      setIsOpen(false)
-                      setMobileProductsOpen(false)
-                    }}
-                    className="flex items-center gap-3 w-full pl-4 py-2 text-left text-gray-300 hover:text-cyan-400 transition-colors font-outfit"
-                  >
-                    <span className="text-purple-400">&#x25C8;</span>
-                    <div>
-                      <div className="font-medium text-sm">Auris</div>
-                      <div className="text-xs text-gray-400">AI voice assistant for <span style={{ color: '#D97757' }}>Claude Code</span> &mdash; Web, VS Code, Terminal &amp; Desktop</div>
-                    </div>
-                  </button>
-                </motion.div>
-              )}
-            </div>
-            */}
-
-            <button onClick={() => scrollToSection('skills')} className="block w-full text-left text-gray-300 hover:text-cyan-400 transition-colors font-outfit py-2">Skills</button>
-            <button onClick={() => scrollToSection('projects')} className="block w-full text-left text-gray-300 hover:text-cyan-400 transition-colors font-outfit py-2">Projects</button>
-            <button onClick={() => scrollToSection('clients')} className="block w-full text-left text-gray-300 hover:text-cyan-400 transition-colors font-outfit py-2">Clients</button>
-            <button onClick={() => scrollToSection('contact')} className="block w-full text-left text-gray-300 hover:text-cyan-400 transition-colors font-outfit py-2">Contact</button>
-          </motion.div>
-        )}
       </div>
+
+      {/* Mobile dropdown */}
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2 }}
+          className="mt-2 rounded-2xl bg-zinc-900/95 dark:bg-zinc-900/95 bg-white/95 backdrop-blur-xl border border-white/[0.06] dark:border-white/[0.06] border-zinc-200/60 p-4 space-y-1"
+        >
+          {navLinks.map((link) =>
+            link === 'Products' ? (
+              <div key={link}>
+                <button
+                  onClick={() => setProductsOpen(!productsOpen)}
+                  className="flex items-center justify-between w-full px-4 py-2.5 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/10 dark:hover:bg-zinc-800/50 transition-colors font-outfit"
+                >
+                  Products
+                  <svg className={`w-3 h-3 transition-transform duration-200 ${productsOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                </button>
+                {productsOpen && (
+                  <a
+                    href="/products/auris"
+                    className="flex items-center gap-3 w-full px-8 py-2.5 text-left text-zinc-500 dark:text-zinc-500 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors font-outfit"
+                  >
+                    <span className="text-lg" style={{ color: '#7b6cff' }}>&#x25C8;</span>
+                    <span className="text-sm">Auris</span>
+                  </a>
+                )}
+              </div>
+            ) : (
+              <button
+                key={link}
+                onClick={() => scrollToSection(link.toLowerCase())}
+                className="block w-full text-left px-4 py-2.5 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/10 dark:hover:bg-zinc-800/50 transition-colors font-outfit"
+              >
+                {link}
+              </button>
+          ))}
+          <div className="flex items-center space-x-2 px-4 pt-2 border-t border-zinc-800/50 dark:border-zinc-800/50 border-zinc-200/50 mt-2">
+            <a
+              href="https://linkedin.com/in/ricardoalexanderh"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 rounded-full hover:bg-zinc-800/50 transition-colors"
+            >
+              <LinkedinLogo size={18} className="text-zinc-400" weight="bold" />
+            </a>
+            <a
+              href="https://github.com/ricardoalexanderh"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 rounded-full hover:bg-zinc-800/50 transition-colors"
+            >
+              <GithubLogo size={18} className="text-zinc-400" weight="bold" />
+            </a>
+          </div>
+        </motion.div>
+      )}
     </nav>
   )
 }
 
-// Hero subtitle lines for typing animation
-const heroSubtitleLines = [
-  "Tech Enthusiast & Software Architect",
-  "Building Tomorrow's Systems Today", 
-  "Full-stack ● Web ● Mobile ● Web3 ● AI/LLM",
-  "Co-Founder & Managing Partner at SparkWorks"
-]
+// ─── Data ────────────────────────────────────────────────────────────────────
 
-// Hero subtitle typing animation component
-const HeroTypingAnimation: React.FC = () => {
-  const [displayText, setDisplayText] = useState('')
-  const [currentLineIndex, setCurrentLineIndex] = useState(0)
-  const [currentCharIndex, setCurrentCharIndex] = useState(0)
-
-  useEffect(() => {
-    const typeText = () => {
-      if (currentLineIndex < heroSubtitleLines.length) {
-        const currentLine = heroSubtitleLines[currentLineIndex]
-        
-        if (currentCharIndex < currentLine.length) {
-          setDisplayText(prev => {
-            const lines = prev.split('\n')
-            lines[currentLineIndex] = (lines[currentLineIndex] || '') + currentLine[currentCharIndex]
-            return lines.join('\n')
-          })
-          setCurrentCharIndex(prev => prev + 1)
-        } else {
-          // Line completed, move to next line after delay
-          setTimeout(() => {
-            setCurrentLineIndex(prev => prev + 1)
-            setCurrentCharIndex(0)
-            setDisplayText(prev => prev + (currentLineIndex < heroSubtitleLines.length - 1 ? '\n' : ''))
-          }, 150)
-        }
-      } else {
-        // Animation completed, restart after delay
-        setTimeout(() => {
-          setDisplayText('')
-          setCurrentLineIndex(0)
-          setCurrentCharIndex(0)
-        }, 3000)
-      }
-    }
-
-    const timer = setTimeout(typeText, Math.random() * 25 + 40)
-    return () => clearTimeout(timer)
-  }, [currentLineIndex, currentCharIndex])
-
-  return (
-    <div className="text-xl md:text-2xl text-gray-700 dark:text-gray-300 mb-6 max-w-4xl mx-auto font-outfit min-h-[120px]">
-      <div className="whitespace-pre-line">
-        {displayText.split('\n').map((line, index) => (
-          <div key={index} className="mb-1">
-            {index === 0 && <span className="text-orange-500 font-semibold">{line}</span>}
-            {index === 1 && <span className="text-purple-500 dark:text-purple-400">{line}</span>}
-            {index === 2 && <span className="text-sm text-cyan-500 dark:text-cyan-400 font-jetbrains">{line}</span>}
-            {index === 3 && <span className="text-lg text-gray-600 dark:text-gray-400 font-outfit">{line}</span>}
-            {index === currentLineIndex && currentCharIndex <= heroSubtitleLines[currentLineIndex]?.length && (
-              <span className="text-cyan-400 animate-pulse">|</span>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-// Solidity code snippets for technical expertise animation
-const solidityCodeSnippets = [
-  "// SPDX-License-Identifier: MIT",
-  "pragma solidity ^0.8.19;",
-  "",
-  "import \"@openzeppelin/contracts/token/ERC20/ERC20.sol\";",
-  "import \"@openzeppelin/contracts/access/Ownable.sol\";",
-  "import \"@openzeppelin/contracts/security/ReentrancyGuard.sol\";",
-  "",
-  "contract DeFiYieldVault is ERC20, Ownable, ReentrancyGuard {",
-  "    using SafeMath for uint256;",
-  "",
-  "    struct Stake {",
-  "        uint256 amount;",
-  "        uint256 timestamp;",
-  "        uint256 rewardDebt;",
-  "    }",
-  "",
-  "    mapping(address => Stake) public stakes;",
-  "    uint256 public totalStaked;",
-  "    uint256 public rewardRate = 100; // 1% per day",
-  "    uint256 public constant PRECISION = 1e18;",
-  "",
-  "    event Staked(address indexed user, uint256 amount);",
-  "    event Withdrawn(address indexed user, uint256 amount);",
-  "    event RewardClaimed(address indexed user, uint256 reward);",
-  "",
-  "    modifier validAmount(uint256 _amount) {",
-  "        require(_amount > 0, \"Amount must be greater than 0\");",
-  "        _;",
-  "    }",
-  "",
-  "    constructor() ERC20(\"YieldToken\", \"YIELD\") {}",
-  "",
-  "    function stake(uint256 _amount) external payable validAmount(_amount) nonReentrant {",
-  "        require(msg.value == _amount, \"ETH amount mismatch\");",
-  "        ",
-  "        Stake storage userStake = stakes[msg.sender];",
-  "        ",
-  "        if (userStake.amount > 0) {",
-  "            uint256 pendingReward = calculateReward(msg.sender);",
-  "            if (pendingReward > 0) {",
-  "                _mint(msg.sender, pendingReward);",
-  "                emit RewardClaimed(msg.sender, pendingReward);",
-  "            }",
-  "        }",
-  "",
-  "        userStake.amount = userStake.amount.add(_amount);",
-  "        userStake.timestamp = block.timestamp;",
-  "        userStake.rewardDebt = userStake.amount.mul(getRewardPerToken());",
-  "        ",
-  "        totalStaked = totalStaked.add(_amount);",
-  "        emit Staked(msg.sender, _amount);",
-  "    }",
-  "",
-  "    function withdraw(uint256 _amount) external validAmount(_amount) nonReentrant {",
-  "        Stake storage userStake = stakes[msg.sender];",
-  "        require(userStake.amount >= _amount, \"Insufficient staked amount\");",
-  "        ",
-  "        uint256 pendingReward = calculateReward(msg.sender);",
-  "        if (pendingReward > 0) {",
-  "            _mint(msg.sender, pendingReward);",
-  "            emit RewardClaimed(msg.sender, pendingReward);",
-  "        }",
-  "",
-  "        userStake.amount = userStake.amount.sub(_amount);",
-  "        userStake.rewardDebt = userStake.amount.mul(getRewardPerToken());",
-  "        totalStaked = totalStaked.sub(_amount);",
-  "",
-  "        payable(msg.sender).transfer(_amount);",
-  "        emit Withdrawn(msg.sender, _amount);",
-  "    }",
-  "",
-  "    function calculateReward(address _user) public view returns (uint256) {",
-  "        Stake memory userStake = stakes[_user];",
-  "        if (userStake.amount == 0) return 0;",
-  "",
-  "        uint256 timeElapsed = block.timestamp.sub(userStake.timestamp);",
-  "        uint256 reward = userStake.amount",
-  "            .mul(rewardRate)",
-  "            .mul(timeElapsed)",
-  "            .div(86400) // seconds in a day",
-  "            .div(10000); // basis points",
-  "",
-  "        return reward;",
-  "    }",
-  "",
-  "    function getRewardPerToken() public view returns (uint256) {",
-  "        if (totalStaked == 0) return 0;",
-  "        return rewardRate.mul(PRECISION).div(totalStaked);",
-  "    }",
-  "",
-  "    function emergencyWithdraw() external onlyOwner {",
-  "        payable(owner()).transfer(address(this).balance);",
-  "    }",
-  "}",
-]
-
-// Solidity Math Animation Component for Technical Expertise
-const SolidityMathAnimation: React.FC = () => {
-  const [code, setCode] = useState('')
-  const [currentLine, setCurrentLine] = useState(0)
-  
-  useEffect(() => {
-    let lineIndex = 0
-    let charIndex = 0
-    let currentCodeLine = ''
-    
-    const typeWriter = () => {
-      if (lineIndex < solidityCodeSnippets.length) {
-        const currentSnippet = solidityCodeSnippets[lineIndex]
-        
-        if (charIndex < currentSnippet.length) {
-          currentCodeLine += currentSnippet[charIndex]
-          setCode(prev => {
-            const lines = prev.split('\n')
-            lines[lineIndex] = currentCodeLine
-            return lines.join('\n')
-          })
-          charIndex++
-          setTimeout(typeWriter, Math.random() * 40 + 20) // Faster typing for Solidity
-        } else {
-          // Line completed, move to next line
-          setCode(prev => prev + (lineIndex < solidityCodeSnippets.length - 1 ? '\n' : ''))
-          lineIndex++
-          charIndex = 0
-          currentCodeLine = ''
-          setCurrentLine(lineIndex)
-          setTimeout(typeWriter, Math.random() * 150 + 50) // Shorter pause between lines
-        }
-      } else {
-        // Animation completed, restart after delay
-        setTimeout(() => {
-          setCode('')
-          setCurrentLine(0)
-          lineIndex = 0
-          charIndex = 0
-          currentCodeLine = ''
-          typeWriter()
-        }, 4000)
-      }
-    }
-
-    const timer = setTimeout(typeWriter, 500) // Initial delay
-    return () => clearTimeout(timer)
-  }, [])
-
-  return (
-    <div className="absolute inset-0 overflow-hidden opacity-8 dark:opacity-15 pointer-events-none">
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-blue-500/5" />
-      <pre className="absolute top-0 left-0 w-full h-full text-xs leading-relaxed font-mono text-purple-600 dark:text-purple-400 p-6 overflow-hidden">
-        <div className="animate-pulse text-blue-500 mb-2">
-          // Smart Contract Development - Solidity DeFi Vault
-        </div>
-        <div className="relative">
-          {code.split('\n').map((line, index) => (
-            <div 
-              key={index} 
-              className={`${
-                index === currentLine ? 'text-yellow-500 animate-pulse' : ''
-              } ${
-                line.includes('//') || line.includes('SPDX') ? 'text-gray-500' : 
-                line.includes('contract') || line.includes('function') || line.includes('modifier') ? 'text-blue-500' :
-                line.includes('mapping') || line.includes('struct') || line.includes('uint256') || line.includes('address') ? 'text-green-500' :
-                line.includes('require') || line.includes('emit') || line.includes('if') || line.includes('return') ? 'text-orange-500' :
-                line.includes('public') || line.includes('external') || line.includes('private') || line.includes('view') ? 'text-cyan-500' :
-                line.includes('import') || line.includes('pragma') ? 'text-pink-500' :
-                'text-purple-500'
-              }`}
-            >
-              {line}
-              {index === currentLine && (
-                <span className="animate-blink text-purple-400">|</span>
-              )}
-            </div>
-          ))}
-        </div>
-        
-        {/* Floating blockchain symbols */}
-        <div className="absolute top-4 right-4 space-y-2 text-right">
-          <div className="animate-bounce delay-0 text-purple-500">⬣</div>
-          <div className="animate-bounce delay-200 text-blue-500">◈</div>
-          <div className="animate-bounce delay-400 text-green-500">⟐</div>
-          <div className="animate-bounce delay-600 text-cyan-500">◊</div>
-        </div>
-        
-        {/* Smart contract metrics */}
-        <div className="absolute bottom-4 right-4 text-right text-gray-600 dark:text-gray-500 space-y-1">
-          <div className="animate-pulse delay-100">Gas: ~50,000</div>
-          <div className="animate-pulse delay-300">APY: 12.5%</div>
-          <div className="animate-pulse delay-500">TVL: $2.3M</div>
-        </div>
-      </pre>
-      
-      <style>{`
-        @keyframes blink {
-          0%, 50% { opacity: 1; }
-          51%, 100% { opacity: 0; }
-        }
-        
-        .animate-blink {
-          animation: blink 1s infinite;
-        }
-      `}</style>
-    </div>
-  )
-}
-
-// Crypto code snippets for animation
-const cryptoCodeSnippets = [
-  "// Calculate SHA-256 hash for blockchain",
-  "const hash = await crypto.subtle.digest('SHA-256', data);",
-  "const hashArray = Array.from(new Uint8Array(hash));",
-  "const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');",
-  "",
-  "// Generate Ethereum address from public key",
-  "const publicKey = secp256k1.publicKeyCreate(privateKey);",
-  "const address = '0x' + keccak256(publicKey.slice(1)).slice(-20).toString('hex');",
-  "",
-  "// Elliptic Curve Digital Signature Algorithm (ECDSA)",
-  "interface ECDSASignature {",
-  "  r: bigint;",
-  "  s: bigint;",
-  "  recovery?: number;",
-  "}",
-  "",
-  "// Merkle Tree calculation for block verification",
-  "function calculateMerkleRoot(transactions: string[]): string {",
-  "  if (transactions.length === 0) return '';",
-  "  if (transactions.length === 1) return transactions[0];",
-  "",
-  "  const level: string[] = [];",
-  "  for (let i = 0; i < transactions.length; i += 2) {",
-  "    const left = transactions[i];",
-  "    const right = transactions[i + 1] || left;",
-  "    const combined = left + right;",
-  "    level.push(sha256(combined));",
-  "  }",
-  "  return calculateMerkleRoot(level);",
-  "}",
-  "",
-  "// Smart contract gas estimation",
-  "const gasPrice = await web3.eth.getGasPrice();",
-  "const gasEstimate = await contract.methods.transfer(to, amount).estimateGas();",
-  "const transactionCost = gasPrice * gasEstimate;",
-  "",
-  "// DeFi yield calculation with compound interest",
-  "const calculateAPY = (principal: number, rate: number, periods: number): number => {",
-  "  return principal * Math.pow(1 + rate / periods, periods) - principal;",
-  "};",
-  "",
-  "// Zero-knowledge proof verification",
-  "const zkProof = {",
-  "  pi_a: [BigInt('0x...'), BigInt('0x...')],",
-  "  pi_b: [[BigInt('0x...'), BigInt('0x...')], [BigInt('0x...'), BigInt('0x...')]],",
-  "  pi_c: [BigInt('0x...'), BigInt('0x...')],",
-  "  protocol: 'groth16',",
-  "  curve: 'bn128'",
-  "};",
-  "",
-  "// Layer 2 state channel implementation",
-  "class PaymentChannel {",
-  "  private nonce: number = 0;",
-  "  private balance: Map<string, bigint> = new Map();",
-  "",
-  "  updateState(from: string, to: string, amount: bigint): void {",
-  "    this.nonce++;",
-  "    const fromBalance = this.balance.get(from) || 0n;",
-  "    const toBalance = this.balance.get(to) || 0n;",
-  "    this.balance.set(from, fromBalance - amount);",
-  "    this.balance.set(to, toBalance + amount);",
-  "  }",
-  "}",
-]
-
-// Crypto Math Animation Component
-const CryptoMathAnimation: React.FC = () => {
-  const [code, setCode] = useState('')
-  const [currentLine, setCurrentLine] = useState(0)
-
-  useEffect(() => {
-    let lineIndex = 0
-    let charIndex = 0
-    let currentCodeLine = ''
-    
-    const typeWriter = () => {
-      if (lineIndex < cryptoCodeSnippets.length) {
-        const currentSnippet = cryptoCodeSnippets[lineIndex]
-        
-        if (charIndex < currentSnippet.length) {
-          currentCodeLine += currentSnippet[charIndex]
-          setCode(prev => {
-            const lines = prev.split('\n')
-            lines[lineIndex] = currentCodeLine
-            return lines.join('\n')
-          })
-          charIndex++
-          setTimeout(typeWriter, Math.random() * 50 + 30) // Variable typing speed
-        } else {
-          // Line completed, move to next line
-          setCode(prev => prev + (lineIndex < cryptoCodeSnippets.length - 1 ? '\n' : ''))
-          lineIndex++
-          charIndex = 0
-          currentCodeLine = ''
-          setCurrentLine(lineIndex)
-          setTimeout(typeWriter, Math.random() * 200 + 100) // Pause between lines
-        }
-      } else {
-        // Animation completed, restart after delay
-        setTimeout(() => {
-          setCode('')
-          setCurrentLine(0)
-          lineIndex = 0
-          charIndex = 0
-          currentCodeLine = ''
-          typeWriter()
-        }, 5000)
-      }
-    }
-
-    const timer = setTimeout(typeWriter, 1000) // Initial delay
-    return () => clearTimeout(timer)
-  }, [])
-
-  return (
-    <div className="absolute inset-0 overflow-hidden opacity-10 dark:opacity-20 pointer-events-none">
-      <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-purple-500/5" />
-      <pre className="absolute top-0 left-0 w-full h-full text-xs leading-relaxed font-mono text-cyan-600 dark:text-cyan-400 p-8 overflow-hidden">
-        <div className="animate-pulse text-green-500 mb-2">
-          // Blockchain & Crypto
-        </div>
-        <div className="relative">
-          {code.split('\n').map((line, index) => (
-            <div 
-              key={index} 
-              className={`${
-                index === currentLine ? 'text-yellow-500 animate-pulse' : ''
-              } ${
-                line.includes('//') ? 'text-gray-500' : 
-                line.includes('const') || line.includes('function') || line.includes('class') ? 'text-purple-500' :
-                line.includes('interface') || line.includes('type') ? 'text-blue-500' :
-                line.includes('await') || line.includes('async') ? 'text-orange-500' :
-                'text-cyan-500'
-              }`}
-            >
-              {line}
-              {index === currentLine && (
-                <span className="animate-blink text-cyan-400">|</span>
-              )}
-            </div>
-          ))}
-        </div>
-        
-        {/* Floating crypto symbols */}
-        <div className="absolute top-4 right-4 space-y-2 text-right">
-          <div className="animate-bounce delay-0 text-yellow-500">₿</div>
-          <div className="animate-bounce delay-200 text-purple-500">Ξ</div>
-          <div className="animate-bounce delay-400 text-green-500">◊</div>
-          <div className="animate-bounce delay-600 text-blue-500">₳</div>
-        </div>
-        
-        {/* Mathematical formulas */}
-        <div className="absolute bottom-4 right-4 text-right text-gray-600 dark:text-gray-500 space-y-1">
-          <div className="animate-pulse delay-100">Hash = SHA256(block + nonce)</div>
-          <div className="animate-pulse delay-300">APY = (1 + r/n)ⁿ - 1</div>
-          <div className="animate-pulse delay-500">Gas = gasPrice × gasLimit</div>
-        </div>
-      </pre>
-      
-      <style>{`
-        @keyframes blink {
-          0%, 50% { opacity: 1; }
-          51%, 100% { opacity: 0; }
-        }
-        
-        .animate-blink {
-          animation: blink 1s infinite;
-        }
-      `}</style>
-    </div>
-  )
-}
-
-// Animation variants
-const fadeInUp = {
-  initial: { opacity: 0, y: 50 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.6 }
-}
-
-const staggerContainer = {
-  animate: {
-    transition: {
-      staggerChildren: 0.1
-    }
-  }
-}
-
-// Data
-const skills: Skill[] = [
+const skills: SkillRow[] = [
   {
-    category: "Languages & Frameworks",
-    technologies: ["C#/.NET", "Java/Spring Boot", "Python", "Node.js/NestJS", "TypeScript"],
-    icon: <Code className="w-6 h-6" />,
-    color: "text-cyan-400"
+    category: 'Languages & Frameworks',
+    technologies: ['C#/.NET', 'Java/Spring Boot', 'Python', 'Node.js/NestJS', 'TypeScript'],
+    icon: <Code size={20} weight="bold" />,
   },
   {
-    category: "Frontend",
-    technologies: ["React", "Angular", "Next.js", "Vue.js", "TypeScript"],
-    icon: <Globe className="w-6 h-6" />,
-    color: "text-teal-400"
+    category: 'Frontend',
+    technologies: ['React', 'Angular', 'Next.js', 'Vue.js', 'TypeScript'],
+    icon: <Globe size={20} weight="bold" />,
   },
   {
-    category: "Mobile Development",
-    technologies: ["React Native", "Flutter", "iOS", "Android"],
-    icon: <Smartphone className="w-6 h-6" />,
-    color: "text-green-400"
+    category: 'Mobile Development',
+    technologies: ['React Native', 'Flutter', 'iOS', 'Android'],
+    icon: <DeviceMobile size={20} weight="bold" />,
   },
   {
-    category: "Web3 & Blockchain",
-    technologies: ["Solidity", "Foundry", "Hardhat", "Ethers.js", "Web3.js"],
-    icon: <Cpu className="w-6 h-6" />,
-    color: "text-purple-400"
+    category: 'Web3 & Blockchain',
+    technologies: ['Solidity', 'Foundry', 'Hardhat', 'Ethers.js', 'Web3.js'],
+    icon: <Cube size={20} weight="bold" />,
   },
   {
-    category: "Cloud & DevOps",
-    technologies: ["AWS", "Azure", "GCP", "Docker", "Kubernetes", "Jenkins"],
-    icon: <Cloud className="w-6 h-6" />,
-    color: "text-orange-400"
+    category: 'Cloud & DevOps',
+    technologies: ['AWS', 'Azure', 'GCP', 'Docker', 'Kubernetes', 'Jenkins'],
+    icon: <Cloud size={20} weight="bold" />,
   },
   {
-    category: "Databases",
-    technologies: ["SQL Server", "PostgreSQL", "Oracle", "MongoDB", "Redis", "Neo4J"],
-    icon: <Database className="w-6 h-6" />,
-    color: "text-pink-400"
+    category: 'Databases',
+    technologies: ['SQL Server', 'PostgreSQL', 'Oracle', 'MongoDB', 'Redis', 'Neo4J'],
+    icon: <Database size={20} weight="bold" />,
   },
   {
-    category: "Middleware & Integration",
-    technologies: ["Apache Airflow", "Kafka", "RabbitMQ", "Apache NiFi", "CQRS", "Event-Driven Architecture"],
-    icon: <Zap className="w-6 h-6" />,
-    color: "text-yellow-400"
+    category: 'Middleware & Integration',
+    technologies: ['Apache Airflow', 'Kafka', 'RabbitMQ', 'Apache NiFi', 'CQRS', 'Event-Driven Architecture'],
+    icon: <Lightning size={20} weight="bold" />,
   },
   {
-    category: "Emerging Tech",
-    technologies: ["AI/LLM", "Context Engineering", "MCP Servers", "Golang", "Rust"],
-    icon: <Cpu className="w-6 h-6" />,
-    color: "text-indigo-400"
-  }
+    category: 'Emerging Tech',
+    technologies: ['AI/LLM', 'Agentic AI', 'Context Engineering', 'MCP Servers', 'Golang', 'Rust'],
+    icon: <Cpu size={20} weight="bold" />,
+  },
 ]
 
 const projects: Project[] = [
   {
-    title: "Toyota Performance Optimization",
-    description: "Re-engineered costing system for Toyota Astra Motor, transforming a system that took 3+ hours and frequently failed into one that processes in 10-15 minutes with 99.9% reliability.",
-    impact: "90% Performance Improvement",
-    technologies: ["SQL Server", "Microservices", ".NET", "Performance Tuning"],
-    metrics: "1-2M daily transactions"
+    title: 'Toyota Performance Optimization',
+    description:
+      'Re-engineered costing system for Toyota Astra Motor, transforming a system that took 3+ hours and frequently failed into one that processes in 10-15 minutes with 99.9% reliability.',
+    impact: '90% Performance Improvement',
+    technologies: ['SQL Server', 'Microservices', '.NET', 'Performance Tuning'],
+    metrics: '1-2M daily transactions',
   },
   {
-    title: "SparkWorks",
-    description: "Co-founded and built enterprise platform serving Fortune 500 companies including Bank Mandiri, Astra Group, and Panasonic. Led technical strategy for 100+ projects.",
-    impact: "Fortune 500 Partnerships",
-    technologies: ["React", "Angular", "Mobile", "Node.js", ".NET", "Microservices", "Java"],
-    metrics: "20+ enterprise clients"
+    title: 'SparkWorks',
+    description:
+      'Co-founded and built enterprise platform serving Fortune 500 companies including Bank Mandiri, Astra Group, and Panasonic. Led technical strategy for 100+ projects.',
+    impact: 'Fortune 500 Partnerships',
+    technologies: ['React', 'Angular', 'Mobile', 'Node.js', '.NET', 'Microservices', 'Java'],
+    metrics: '20+ enterprise clients',
   },
   {
-    title: "Semakin Pintar Educational Platform",
-    description: "Created gamified educational website for children's mathematics learning with interactive games and tools. Publicly available educational resource.",
-    impact: "Educational Innovation",
-    technologies: ["React", "Node.js", "Gamification", "Educational Design"],
-    link: "https://www.semakinpintar.com"
+    title: 'Semakin Pintar Educational Platform',
+    description:
+      'Created gamified educational website for children\'s mathematics learning with interactive games and tools. Publicly available educational resource.',
+    impact: 'Educational Innovation',
+    technologies: ['React', 'Node.js', 'Gamification', 'Educational Design'],
+    link: 'https://www.semakinpintar.com',
   },
   {
-    title: "Web3 & Blockchain Development",
-    description: "Learned blockchain platforms and Web3 applications using Solidity smart contracts with focus on security and decentralized architecture.",
-    //impact: "Blockchain Innovation",
-    impact: "Web3 Learning Path",
-    technologies: ["Solidity", "Foundry", "Hardhat", "Ethers.js", "Smart Contracts"],
-    //metrics: "Multiple blockchain implementations"
-    metrics: ""
-  }
+    title: 'Agentic AI & Intelligent Systems',
+    description:
+      'Architecting multi-agent workflows with LangGraph and Claude Agent SDK, building RAG pipelines, MCP server integrations, and AI-powered enterprise automation with context engineering for reliable decision-making.',
+    impact: 'Next-Gen AI Architecture',
+    technologies: ['LangGraph', 'Claude Agent SDK', 'MCP Servers', 'RAG', 'Context Engineering', 'Python'],
+    metrics: 'Multi-agent orchestration',
+  },
+  {
+    title: 'Web3 & Blockchain Development',
+    description:
+      'Learned blockchain platforms and Web3 applications using Solidity smart contracts with focus on security and decentralized architecture.',
+    impact: 'Web3 Learning Path',
+    technologies: ['Solidity', 'Foundry', 'Hardhat', 'Ethers.js', 'Smart Contracts'],
+    metrics: '',
+  },
 ]
 
 const clients = [
-  "Toyota Group",
-  "Bank Mandiri", 
-  "Astra Group",
-  "Panasonic",
-  "UOB Bank",
-  "BCA Finance",
-  "Boston Consulting Group",
-  "Accenture",
-  "AstraPay",
-  "BUMA"
+  'Toyota Group',
+  'Bank Mandiri',
+  'Astra Group',
+  'Panasonic',
+  'UOB Bank',
+  'BCA Finance',
+  'Boston Consulting Group',
+  'Accenture',
+  'AstraPay',
+  'BUMA',
 ]
 
-// Components
-const AnimatedCounter: React.FC<{ end: number; duration?: number; suffix?: string }> = ({ 
-  end, 
-  duration = 2, 
-  suffix = "" 
+// ─── AnimatedCounter ─────────────────────────────────────────────────────────
+
+const AnimatedCounter: React.FC<{ end: number; duration?: number; suffix?: string }> = ({
+  end,
+  duration = 2,
+  suffix = '',
 }) => {
   const [count, setCount] = useState(0)
   const ref = useRef<HTMLSpanElement>(null)
@@ -926,12 +712,8 @@ const AnimatedCounter: React.FC<{ end: number; duration?: number; suffix?: strin
       const animate = (currentTime: number) => {
         if (!startTime) startTime = currentTime
         const progress = Math.min((currentTime - startTime) / (duration * 1000), 1)
-        
         setCount(Math.floor(progress * end))
-        
-        if (progress < 1) {
-          requestAnimationFrame(animate)
-        }
+        if (progress < 1) requestAnimationFrame(animate)
       }
       requestAnimationFrame(animate)
     }
@@ -940,517 +722,501 @@ const AnimatedCounter: React.FC<{ end: number; duration?: number; suffix?: strin
   return <span ref={ref}>{count}{suffix}</span>
 }
 
-const RicardoPortfolio: React.FC<PortfolioProps> = ({
-  showContact = true
-}) => {
-  const { theme, toggleTheme } = useTheme()
-  const [isVideoOpen, setIsVideoOpen] = useState(false)
+// ─── SectionLabel ────────────────────────────────────────────────────────────
 
-  // YouTube video ID for professional overview
-  const youtubeVideoId = "GHC_3oE1i6g"
+const SectionLabel: React.FC<{ children: string }> = ({ children }) => (
+  <div className="font-jetbrains text-xs tracking-[0.2em] uppercase text-zinc-500 dark:text-zinc-500 text-zinc-400 mb-6">
+    {children}
+  </div>
+)
+
+// ─── DoubleBezel Card ────────────────────────────────────────────────────────
+
+const DoubleBezelCard: React.FC<{
+  children: React.ReactNode
+  className?: string
+  spotlight?: boolean
+}> = ({ children, className = '', spotlight = false }) => {
+  const { handleMouseMove } = useSpotlightCard()
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-white overflow-x-hidden transition-colors duration-300">
-      <style>{`
-        @keyframes gradient-shift {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-        }
-      `}</style>
-      {/* Video Modal */}
-      <VideoModal 
-        isOpen={isVideoOpen} 
-        onClose={() => setIsVideoOpen(false)} 
-        videoId={youtubeVideoId} 
-      />
-      
-      {/* Navigation */}
+    <div
+      className={`rounded-2xl p-[1px] border border-white/[0.06] dark:border-white/[0.06] border-zinc-200/60 h-full ${spotlight ? 'spotlight-card' : ''}`}
+      onMouseMove={spotlight ? handleMouseMove : undefined}
+    >
+      <div
+        className={`bg-zinc-50 dark:bg-zinc-950 rounded-[15px] p-8 h-full flex flex-col ${className}`}
+      >
+        {children}
+      </div>
+    </div>
+  )
+}
+
+// ─── Main Component ──────────────────────────────────────────────────────────
+
+const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
+  const { theme, toggleTheme } = useTheme()
+  const [isVideoOpen, setIsVideoOpen] = useState(false)
+  const [heroReady, setHeroReady] = useState(false)
+
+  const heroName = useTextScramble('Ricardo Alexander', heroReady)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setHeroReady(true), 300)
+    return () => clearTimeout(timer)
+  }, [])
+
+  const magnetic = useMagneticHover(0.3)
+
+  const youtubeVideoId = 'GHC_3oE1i6g'
+
+  return (
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 overflow-x-hidden transition-colors duration-300">
+      <VideoModal isOpen={isVideoOpen} onClose={() => setIsVideoOpen(false)} videoId={youtubeVideoId} />
       <Navigation theme={theme} toggleTheme={toggleTheme} />
 
-      {/* Hero Section */}
-      <section id="hero" className="relative h-screen flex items-center justify-center pt-16">
-        {/* 3D Background */}
-        <div className="absolute inset-0 z-0">
-          <Canvas camera={{ position: [0, 0, 5], fov: 60 }}>
+      {/* ─── Hero ─────────────────────────────────────────────────────── */}
+      <section id="hero" className="relative min-h-[100dvh] grid grid-cols-1 lg:grid-cols-2 items-center px-6 md:px-12 lg:px-20 pt-24">
+        {/* Code Rain background */}
+        <CodeRain />
+
+        {/* Mobile 3D background */}
+        <div className="absolute inset-0 z-0 lg:hidden opacity-40">
+          <Canvas dpr={[1, 1.5]} camera={{ position: [0, 0, 5], fov: 45 }}>
             <Suspense fallback={null}>
-              <Scene3D />
-              <OrbitControls enableZoom={false} enablePan={false} />
+              <HeroScene />
             </Suspense>
           </Canvas>
         </div>
 
-        {/* Hero Content */}
-        <motion.div 
-          className="relative z-10 text-center px-4"
-          initial={{ opacity: 0, y: 50 }}
+        {/* Left content */}
+        <motion.div
+          className="relative z-10"
+          initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, ease: "easeOut" }}
+          transition={SPRING}
         >
-          <motion.h1 
-            className="text-5xl md:text-7xl font-space-grotesk font-bold mb-4"
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2, duration: 0.8 }}
-          >
-            <span className="bg-gradient-to-r from-cyan-400 via-purple-500 to-teal-400 bg-clip-text text-transparent animate-pulse bg-[length:200%_100%]" style={{animation: 'gradient-shift 3s ease-in-out infinite'}}>
-              Ricardo Alexander
-            </span>
-          </motion.h1>
-          
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.6 }}
-          >
-            <HeroTypingAnimation />
-          </motion.div>
-
-          <motion.div
-            className="flex justify-center"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1, duration: 0.6 }}
-          >
-            <button
-              onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })}
-              className="animate-bounce"
-            >
-              <ChevronDown className="w-8 h-8 text-cyan-400" />
-            </button>
-          </motion.div>
-        </motion.div>
-      </section>
-
-      {/* About Section */}
-      <section id="about" className="relative py-20 px-4 md:px-8">
-        <div className="max-w-7xl mx-auto">
-        {/* Crypto Math Animation Background */}
-        <CryptoMathAnimation />
-        <motion.div
-          className="text-center mb-16"
-          {...fadeInUp}
-        >
-          <h2 className="text-4xl md:text-5xl font-space-grotesk font-bold mb-6">
-            <span className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
-              About Me
-            </span>
-          </h2>
-        </motion.div>
-
-        <div className="grid md:grid-cols-3 gap-8 mb-16">
-          <motion.div
-            className="text-center p-6 rounded-lg bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border border-gray-200 dark:border-slate-700"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-          >
-            <div className="text-4xl font-bold text-cyan-500 mb-2 font-space-grotesk">
-              <AnimatedCounter end={20} suffix="+" />
+          <div className="flex flex-wrap gap-2 mb-6">
+            <div className="inline-block px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/10">
+              <span className="text-xs font-jetbrains text-emerald-500 tracking-wider uppercase">
+                Software Architect
+              </span>
             </div>
-            <p className="text-gray-700 dark:text-gray-300 font-outfit">Years Experience</p>
-          </motion.div>
-
-          <motion.div
-            className="text-center p-6 rounded-lg bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border border-gray-200 dark:border-slate-700"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            viewport={{ once: true }}
-          >
-            <div className="text-4xl font-bold text-teal-500 mb-2 font-space-grotesk">
-              <AnimatedCounter end={100} suffix="+" />
+            <div className="inline-block px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/10">
+              <span className="text-xs font-jetbrains text-emerald-500 tracking-wider uppercase">
+                Tech Entrepreneur
+              </span>
             </div>
-            <p className="text-gray-700 dark:text-gray-300 font-outfit">Projects Delivered</p>
-          </motion.div>
+          </div>
 
-          <motion.div
-            className="text-center p-6 rounded-lg bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border border-gray-200 dark:border-slate-700"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            viewport={{ once: true }}
-          >
-            <div className="text-4xl font-bold text-orange-500 mb-2 font-space-grotesk">
-              <AnimatedCounter end={99} suffix=".9%" />
-            </div>
-            <p className="text-gray-700 dark:text-gray-300 font-outfit">System Uptime</p>
-          </motion.div>
-        </div>
+          <h1 className="text-6xl sm:text-7xl lg:text-8xl font-space-grotesk font-bold leading-[0.9] mb-6 text-zinc-900 dark:text-zinc-100">
+            {heroName || '\u00A0'}
+          </h1>
 
-        <motion.div
-          className="max-w-4xl mx-auto text-center"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-        >
-          <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed mb-6 font-outfit">
-            Passionate Software Architect and Technology Entrepreneur with 20+ years of experience 
-            transforming complex business challenges into scalable, high-performance solutions. 
-            As Co-Founder & Managing Partner of SparkWorks, I've partnered with Fortune 500 companies 
-            like Toyota, Bank Mandiri, and Astra Group to drive digital transformation.
-          </p>
-          <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed mb-8 font-outfit">
-            My expertise spans enterprise architecture, AI/LLM integration, blockchain development, 
-            and leading cross-functional teams. I believe in bridging cutting-edge technology 
-            with practical business value, ensuring every solution delivers measurable impact.
-          </p>
+          <HeroTypingAnimation />
 
-          {/* Video Overview & PDF Portfolio */}
-          <div className="mt-8 grid md:grid-cols-2 gap-6">
-            <motion.div
-              className="p-6 rounded-lg bg-gradient-to-br from-cyan-500/10 to-purple-500/10 border border-cyan-500/30"
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              viewport={{ once: true }}
+          <div className="flex flex-wrap gap-4">
+            <motion.a
+              href="#contact"
+              className="inline-flex items-center px-7 py-3.5 rounded-full bg-emerald-500 text-white font-outfit font-semibold text-sm hover:bg-emerald-400 transition-colors"
+              style={{ x: magnetic.springX, y: magnetic.springY }}
+              onMouseMove={magnetic.handleMouseMove}
+              onMouseLeave={magnetic.handleMouseLeave}
             >
-              <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-4 font-space-grotesk">
-                🎥 Professional Overview
-              </h3>
-              <p className="text-gray-700 dark:text-gray-300 mb-4 font-outfit">
-                Watch an AI-generated overview of my professional journey and expertise
-              </p>
-              <motion.button
-                onClick={() => setIsVideoOpen(true)}
-                className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white rounded-lg transition-all duration-300 font-outfit font-semibold"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Play className="w-5 h-5 mr-2" />
-                Watch Video Overview
-              </motion.button>
-            </motion.div>
-
-            <motion.div
-              className="p-6 rounded-lg bg-gradient-to-br from-orange-500/10 to-red-500/10 border border-orange-500/30"
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              viewport={{ once: true }}
-            >
-              <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-4 font-space-grotesk">
-                📄 Complete Portfolio
-              </h3>
-              <p className="text-gray-700 dark:text-gray-300 mb-4 font-outfit">
-                Download my comprehensive portfolio with detailed project experiences and client work
-              </p>
-              <motion.a
-                href="/Ricardo Alexander - Portfolio 2025.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-lg transition-all duration-300 font-outfit font-semibold"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
-                Download PDF Portfolio
-              </motion.a>
-            </motion.div>
+              Get in touch
+            </motion.a>
           </div>
         </motion.div>
+
+        {/* Right: 3D canvas + gradient (desktop) */}
+        <div className="hidden lg:block relative h-full min-h-[500px]">
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-[500px] h-[500px] rounded-full bg-emerald-500/10 blur-[120px]" />
+          </div>
+          <div className="absolute inset-0">
+            <Canvas dpr={[1, 2]} camera={{ position: [0, 0, 5], fov: 45 }}>
+              <Suspense fallback={null}>
+                <HeroScene />
+              </Suspense>
+            </Canvas>
+          </div>
         </div>
       </section>
 
-      {/* Products Section - hidden for now
-      <section id="products" className="relative py-20 px-4 md:px-8 bg-gray-50 dark:bg-slate-800/30">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            className="text-center mb-16"
-            {...fadeInUp}
-          >
-            <h2 className="text-4xl md:text-5xl font-space-grotesk font-bold mb-6">
-              <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-                Products
-              </span>
-            </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-400 font-outfit max-w-2xl mx-auto">
-              Tools and products I've built to solve real problems
+      {/* ─── About ────────────────────────────────────────────────────── */}
+      <section id="about" className="py-24 md:py-32 px-6 md:px-12 lg:px-20">
+        <div className="max-w-6xl mx-auto">
+          <ScrollReveal>
+            <SectionLabel>01 / About</SectionLabel>
+          </ScrollReveal>
+
+          <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-12 lg:gap-20 mb-16">
+            <ScrollReveal>
+              <p className="text-2xl md:text-3xl font-light leading-relaxed text-zinc-700 dark:text-zinc-300 font-outfit">
+                Passionate Software Architect and Technology Entrepreneur with 20+ years of experience
+                transforming complex business challenges into scalable, high-performance solutions.
+                As Co-Founder & Managing Partner of SparkWorks, I've partnered with Fortune 500 companies
+                like Toyota, Bank Mandiri, and Astra Group to drive digital transformation.
+              </p>
+              <p className="text-lg md:text-xl font-light leading-relaxed text-zinc-600 dark:text-zinc-400 font-outfit mt-6">
+                My expertise spans enterprise architecture, AI/LLM integration, blockchain development,
+                and leading cross-functional teams. I believe in bridging cutting-edge technology with
+                practical business value, ensuring every solution delivers measurable impact.
+              </p>
+            </ScrollReveal>
+
+            <ScrollReveal delay={0.1}>
+              <div className="space-y-0">
+                <div className="border-t border-zinc-200 dark:border-zinc-800 py-6">
+                  <div className="text-3xl font-space-grotesk font-bold text-zinc-900 dark:text-zinc-100">
+                    <AnimatedCounter end={20} suffix="+" />
+                  </div>
+                  <div className="text-sm text-zinc-500 dark:text-zinc-500 font-outfit mt-1">Years Experience</div>
+                </div>
+                <div className="border-t border-zinc-200 dark:border-zinc-800 py-6">
+                  <div className="text-3xl font-space-grotesk font-bold text-zinc-900 dark:text-zinc-100">
+                    <AnimatedCounter end={100} suffix="+" />
+                  </div>
+                  <div className="text-sm text-zinc-500 dark:text-zinc-500 font-outfit mt-1">Projects Delivered</div>
+                </div>
+                <div className="border-t border-zinc-200 dark:border-zinc-800 py-6">
+                  <div className="text-3xl font-space-grotesk font-bold text-zinc-900 dark:text-zinc-100">
+                    <AnimatedCounter end={99} suffix=".9%" />
+                  </div>
+                  <div className="text-sm text-zinc-500 dark:text-zinc-500 font-outfit mt-1">System Uptime</div>
+                </div>
+              </div>
+            </ScrollReveal>
+          </div>
+
+          {/* Video + PDF in Double-Bezel cards */}
+          <div className="grid md:grid-cols-2 gap-6">
+            <ScrollReveal delay={0.15}>
+              <DoubleBezelCard spotlight>
+                <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-3 font-space-grotesk">
+                  Professional Overview
+                </h3>
+                <p className="text-zinc-600 dark:text-zinc-400 mb-6 font-outfit text-sm leading-relaxed">
+                  Watch an AI-generated overview of my professional journey and expertise.
+                </p>
+                <button
+                  onClick={() => setIsVideoOpen(true)}
+                  className="mt-auto inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-emerald-500 text-white font-outfit font-medium text-sm hover:bg-emerald-400 transition-colors"
+                >
+                  <Play size={16} weight="fill" />
+                  Watch Video
+                </button>
+              </DoubleBezelCard>
+            </ScrollReveal>
+
+            <ScrollReveal delay={0.2}>
+              <DoubleBezelCard spotlight>
+                <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-3 font-space-grotesk">
+                  Complete Portfolio
+                </h3>
+                <p className="text-zinc-600 dark:text-zinc-400 mb-6 font-outfit text-sm leading-relaxed">
+                  Download my comprehensive portfolio with detailed project experiences and client work.
+                </p>
+                <a
+                  href="/Ricardo Alexander - Portfolio 2025.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-auto inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 font-outfit font-medium text-sm hover:border-zinc-500 dark:hover:border-zinc-500 transition-colors"
+                >
+                  <DownloadSimple size={16} weight="bold" />
+                  Download PDF
+                </a>
+              </DoubleBezelCard>
+            </ScrollReveal>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Skills ───────────────────────────────────────────────────── */}
+      <section id="skills" className="py-24 md:py-32 px-6 md:px-12 lg:px-20">
+        <div className="max-w-6xl mx-auto">
+          <ScrollReveal>
+            <SectionLabel>02 / Expertise</SectionLabel>
+          </ScrollReveal>
+
+          <div className="space-y-0">
+            {skills.map((skill, i) => (
+              <ScrollReveal key={skill.category} delay={i * 0.05}>
+                <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-4 md:gap-8 border-t border-zinc-200 dark:border-zinc-800 py-6 md:py-8 items-start">
+                  <div className="flex items-center gap-3">
+                    <span className="text-zinc-500 dark:text-zinc-500">{skill.icon}</span>
+                    <span className="font-space-grotesk font-semibold text-zinc-900 dark:text-zinc-100 text-sm">
+                      {skill.category}
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {skill.technologies.map((tech) => (
+                      <span
+                        key={tech}
+                        className="px-3 py-1.5 text-xs font-jetbrains rounded-full border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:border-emerald-500/40 transition-colors"
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Products ────────────────────────────────────────────────── */}
+      <section id="products" className="py-24 md:py-32 px-6 md:px-12 lg:px-20">
+        <div className="max-w-6xl mx-auto">
+          <ScrollReveal>
+            <SectionLabel>03 / Products</SectionLabel>
+          </ScrollReveal>
+
+          <ScrollReveal delay={0.1}>
+            <p className="text-lg text-zinc-600 dark:text-zinc-400 font-outfit max-w-2xl mb-12">
+              Tools and products I&apos;ve built to solve real problems.
             </p>
-          </motion.div>
+          </ScrollReveal>
 
           <div className="flex justify-center">
-            <motion.div
-              className="max-w-md w-full p-8 rounded-2xl bg-white/70 dark:bg-slate-800/50 backdrop-blur-sm border border-gray-200 dark:border-slate-700 hover:border-cyan-400/50 transition-all duration-300 group cursor-pointer"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-              whileHover={{ scale: 1.03, y: -5 }}
-              onClick={() => navigate('/products/auris')}
-            >
-              <div className="flex items-center gap-4 mb-4">
-                <span className="text-4xl text-purple-400 group-hover:text-cyan-400 transition-colors duration-200">&#x25C8;</span>
-                <h3 className="text-2xl font-space-grotesk font-bold text-gray-800 dark:text-white group-hover:text-cyan-400 transition-colors">
-                  Auris
-                </h3>
-              </div>
-              <p className="text-gray-600 dark:text-gray-300 font-outfit mb-6">
-                AI voice assistant for <span style={{ color: '#D97757' }} className="font-medium">Claude Code</span> &mdash; Web, VS Code, Terminal &amp; Desktop. Hands-free vibe coding with intelligent voice commands.
-              </p>
-              <div className="flex items-center text-cyan-400 font-outfit font-semibold group-hover:gap-3 gap-2 transition-all duration-200">
-                Learn more
-                <ExternalLink className="w-4 h-4" />
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-      */}
-
-      {/* Skills Section */}
-      <section id="skills" className="relative py-20 px-4 md:px-8 bg-gray-50 dark:bg-slate-800/30">
-        {/* Solidity Animation Background */}
-        <SolidityMathAnimation />
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            className="text-center mb-16"
-            {...fadeInUp}
-          >
-            <h2 className="text-4xl md:text-5xl font-space-grotesk font-bold mb-6">
-              <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-                Technical Expertise
-              </span>
-            </h2>
-          </motion.div>
-
-          <motion.div
-            className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
-            variants={staggerContainer}
-            initial="initial"
-            whileInView="animate"
-            viewport={{ once: true }}
-          >
-            {skills.map((skill) => (
-              <motion.div
-                key={skill.category}
-                className="p-6 rounded-lg bg-white/70 dark:bg-slate-800/50 backdrop-blur-sm border border-gray-200 dark:border-slate-700 hover:border-cyan-400/50 transition-all duration-300 group"
-                variants={fadeInUp}
-                whileHover={{ scale: 1.02, y: -2 }}
-              >
-                <div className="flex items-center mb-4">
-                  <div className={`${skill.color} mr-3 group-hover:scale-110 transition-transform`}>
-                    {skill.icon}
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-800 dark:text-white font-space-grotesk">{skill.category}</h3>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {skill.technologies.map((tech) => (
-                    <span
-                      key={tech}
-                      className="px-3 py-1 text-sm bg-gray-100 dark:bg-slate-700/50 text-gray-800 dark:text-gray-300 rounded-full border border-gray-200 dark:border-slate-600 hover:border-cyan-400/50 transition-colors font-jetbrains"
-                    >
-                      {tech}
-                    </span>
-                  ))}
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Projects Section */}
-      <section id="projects" className="py-20 px-4 md:px-8">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            className="text-center mb-16"
-            {...fadeInUp}
-          >
-            <h2 className="text-4xl md:text-5xl font-space-grotesk font-bold mb-6">
-              <span className="bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">
-                Featured Projects
-              </span>
-            </h2>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 gap-8">
-            {projects.map((project) => (
-              <motion.div
-                key={project.title}
-                className="p-6 rounded-lg bg-white/70 dark:bg-slate-800/50 backdrop-blur-sm border border-gray-200 dark:border-slate-700 hover:border-orange-400/50 transition-all duration-300 group"
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                viewport={{ once: true }}
-                whileHover={{ scale: 1.02 }}
-              >
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4 gap-3">
-                  <h3 className="text-xl font-bold text-gray-800 dark:text-white group-hover:text-orange-500 transition-colors font-space-grotesk">
-                    {project.title}
+            <ScrollReveal delay={0.15}>
+              <DoubleBezelCard spotlight>
+                <div className="flex items-center gap-4 mb-4">
+                  <span className="text-3xl" style={{ color: '#7b6cff' }}>&#x25C8;</span>
+                  <h3 className="text-2xl font-space-grotesk font-bold text-zinc-900 dark:text-zinc-100">
+                    Auris
                   </h3>
-                  {project.link && (
-                    <a
-                      href={project.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-cyan-500 hover:text-cyan-400 transition-colors shrink-0"
-                    >
-                      <ExternalLink className="w-5 h-5" />
-                    </a>
-                  )}
                 </div>
-
-                <p className="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed font-outfit">{project.description}</p>
-
-                <div className="mb-4 flex flex-wrap gap-2">
-                  <span className="inline-block px-3 py-1 bg-gradient-to-r from-orange-500/20 to-red-500/20 text-orange-500 dark:text-orange-400 rounded-full text-sm font-semibold border border-orange-500/30">
-                    {project.impact}
-                  </span>
-                  {project.metrics && (
-                    <span className="inline-block px-3 py-1 bg-gray-100 dark:bg-slate-700/50 text-cyan-700 dark:text-cyan-400 rounded-full text-sm font-jetbrains">
-                      {project.metrics}
-                    </span>
-                  )}
-                </div>
-
-                <div className="flex flex-wrap gap-2">
-                  {project.technologies.map((tech) => (
-                    <span
-                      key={tech}
-                      className="px-2 py-1 text-xs bg-gray-100 dark:bg-slate-700/50 text-gray-700 dark:text-gray-400 rounded border border-gray-200 dark:border-slate-600 font-jetbrains"
-                    >
-                      {tech}
+                <p className="text-zinc-600 dark:text-zinc-400 font-outfit mb-6 leading-relaxed">
+                  AI voice assistant for <span className="text-emerald-500 font-medium">Claude Code</span> &mdash; Web, VS Code, Terminal &amp; Desktop.
+                  Hands-free vibe coding with intelligent voice commands.
+                </p>
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {['Voice AI', 'Claude Code', 'VS Code', 'Desktop', 'Multi-platform'].map(tag => (
+                    <span key={tag} className="px-2.5 py-1 text-xs font-jetbrains rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700">
+                      {tag}
                     </span>
                   ))}
                 </div>
-              </motion.div>
-            ))}
+                <a
+                  href="/products/auris"
+                  className="inline-flex items-center gap-2 text-sm text-emerald-500 font-outfit font-semibold hover:text-emerald-400 transition-colors"
+                >
+                  $49 &middot; Learn more &rarr;
+                </a>
+              </DoubleBezelCard>
+            </ScrollReveal>
           </div>
         </div>
       </section>
 
-      {/* Client Testimonials */}
-      <section id="clients" className="py-20 px-4 md:px-8 bg-gray-50 dark:bg-slate-800/30">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            className="text-center mb-16"
-            {...fadeInUp}
+      {/* ─── Projects ─────────────────────────────────────────────────── */}
+      <section id="projects" className="py-24 md:py-32 px-6 md:px-12 lg:px-20">
+        <div className="max-w-6xl mx-auto">
+          <ScrollReveal>
+            <SectionLabel>04 / Work</SectionLabel>
+          </ScrollReveal>
+
+          <div className="space-y-24 md:space-y-32">
+            {projects.map((project, i) => {
+              const isEven = i % 2 === 0
+              return (
+                <ScrollReveal key={project.title} delay={0.1}>
+                  <div
+                    className={`grid grid-cols-1 md:grid-cols-[3fr_2fr] gap-8 ${
+                      !isEven ? 'md:[direction:rtl]' : ''
+                    }`}
+                  >
+                    <div className={!isEven ? 'md:[direction:ltr]' : ''}>
+                      <DoubleBezelCard spotlight>
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4 gap-3">
+                          <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 font-space-grotesk">
+                            {project.title}
+                          </h3>
+                          {project.link && (
+                            <a
+                              href={project.link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-emerald-500 hover:text-emerald-400 transition-colors shrink-0 text-sm font-outfit"
+                            >
+                              Visit site &rarr;
+                            </a>
+                          )}
+                        </div>
+
+                        <p className="text-zinc-600 dark:text-zinc-400 mb-5 leading-relaxed font-outfit text-sm">
+                          {project.description}
+                        </p>
+
+                        <div className="mb-5 flex flex-wrap gap-2">
+                          <span className="inline-block px-3 py-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full text-xs font-semibold border border-emerald-500/20">
+                            {project.impact}
+                          </span>
+                          {project.metrics && (
+                            <span className="inline-block px-3 py-1 bg-zinc-100 dark:bg-zinc-800/50 text-zinc-600 dark:text-zinc-400 rounded-full text-xs font-jetbrains">
+                              {project.metrics}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="flex flex-wrap gap-1.5">
+                          {project.technologies.map((tech) => (
+                            <span
+                              key={tech}
+                              className="px-2 py-1 text-[10px] bg-zinc-100 dark:bg-zinc-800/50 text-zinc-500 dark:text-zinc-500 rounded font-jetbrains"
+                            >
+                              {tech}
+                            </span>
+                          ))}
+                        </div>
+                      </DoubleBezelCard>
+                    </div>
+
+                    <div className={`hidden md:block ${!isEven ? 'md:[direction:ltr]' : ''}`} />
+                  </div>
+                </ScrollReveal>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Clients ──────────────────────────────────────────────────── */}
+      <section id="clients" className="py-24 md:py-32 px-6 md:px-12 lg:px-20 overflow-hidden">
+        <div className="max-w-6xl mx-auto">
+          <ScrollReveal>
+            <SectionLabel>05 / Clients</SectionLabel>
+          </ScrollReveal>
+        </div>
+
+        {/* Marquee row 1 */}
+        <div className="relative mb-4">
+          <div
+            className="flex whitespace-nowrap animate-marquee hover:[animation-play-state:paused]"
+            style={{ width: 'max-content' }}
           >
-            <h2 className="text-4xl md:text-5xl font-space-grotesk font-bold mb-6">
-              <span className="bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent">
-                Trusted by Industry Leaders
+            {[...clients, ...clients].map((client, i) => (
+              <span
+                key={`r1-${i}`}
+                className="inline-block px-8 md:px-12 text-2xl md:text-4xl font-bold text-zinc-300 dark:text-zinc-700 hover:text-zinc-800 dark:hover:text-zinc-100 transition-colors duration-300 font-space-grotesk select-none cursor-default"
+              >
+                {client}
               </span>
-            </h2>
-          </motion.div>
-
-          <motion.div
-            className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-16"
-            variants={staggerContainer}
-            initial="initial"
-            whileInView="animate"
-            viewport={{ once: true }}
-          >
-            {clients.map((client) => (
-              <motion.div
-                key={client}
-                className="text-center p-4 rounded-lg bg-white/70 dark:bg-slate-800/50 backdrop-blur-sm border border-gray-200 dark:border-slate-700 hover:border-green-400/50 transition-all duration-300 group"
-                variants={fadeInUp}
-                whileHover={{ scale: 1.05 }}
-              >
-                <p className="text-gray-700 dark:text-gray-300 font-medium text-sm font-outfit group-hover:text-green-500 transition-colors">
-                  {client}
-                </p>
-              </motion.div>
             ))}
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            <motion.div
-              className="text-center p-6 rounded-lg bg-gradient-to-br from-green-500/10 to-blue-500/10 border border-green-500/30"
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-            >
-              <div className="text-3xl font-bold text-green-500 mb-2 font-space-grotesk">300%</div>
-              <p className="text-gray-700 dark:text-gray-300 font-outfit">Performance Improvements</p>
-            </motion.div>
-
-            <motion.div
-              className="text-center p-6 rounded-lg bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-blue-500/30"
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              viewport={{ once: true }}
-            >
-              <div className="text-3xl font-bold text-blue-500 mb-2 font-space-grotesk">$200K+</div>
-              <p className="text-gray-700 dark:text-gray-300 font-outfit">Annual Cost Savings</p>
-            </motion.div>
-
-            <motion.div
-              className="text-center p-6 rounded-lg bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/30"
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              viewport={{ once: true }}
-            >
-              <div className="text-3xl font-bold text-purple-500 mb-2 font-space-grotesk">99.9%</div>
-              <p className="text-gray-700 dark:text-gray-300 font-outfit">System Uptime</p>
-            </motion.div>
           </div>
+          {/* Fade edges */}
+          <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-zinc-50 dark:from-zinc-950 to-transparent pointer-events-none" />
+          <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-zinc-50 dark:from-zinc-950 to-transparent pointer-events-none" />
+        </div>
+
+        {/* Marquee row 2 (reversed) */}
+        <div className="relative mb-16">
+          <div
+            className="flex whitespace-nowrap animate-marquee [animation-direction:reverse] hover:[animation-play-state:paused]"
+            style={{ width: 'max-content' }}
+          >
+            {[...clients.slice().reverse(), ...clients.slice().reverse()].map((client, i) => (
+              <span
+                key={`r2-${i}`}
+                className="inline-block px-8 md:px-12 text-2xl md:text-4xl font-bold text-zinc-300 dark:text-zinc-700 hover:text-zinc-800 dark:hover:text-zinc-100 transition-colors duration-300 font-space-grotesk select-none cursor-default"
+              >
+                {client}
+              </span>
+            ))}
+          </div>
+          <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-zinc-50 dark:from-zinc-950 to-transparent pointer-events-none" />
+          <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-zinc-50 dark:from-zinc-950 to-transparent pointer-events-none" />
+        </div>
+
+        {/* Metrics */}
+        <div className="max-w-6xl mx-auto">
+          <ScrollReveal>
+            <div className="grid grid-cols-1 md:grid-cols-3">
+              <div className="border-t border-zinc-200 dark:border-zinc-800 py-6 md:pr-8">
+                <div className="text-2xl font-space-grotesk font-bold text-zinc-900 dark:text-zinc-100">300%</div>
+                <div className="text-sm text-zinc-500 font-outfit mt-1">Performance Improvements</div>
+              </div>
+              <div className="border-t border-zinc-200 dark:border-zinc-800 py-6 md:px-8">
+                <div className="text-2xl font-space-grotesk font-bold text-zinc-900 dark:text-zinc-100">$200K+</div>
+                <div className="text-sm text-zinc-500 font-outfit mt-1">Annual Cost Savings</div>
+              </div>
+              <div className="border-t border-zinc-200 dark:border-zinc-800 py-6 md:pl-8">
+                <div className="text-2xl font-space-grotesk font-bold text-zinc-900 dark:text-zinc-100">99.9%</div>
+                <div className="text-sm text-zinc-500 font-outfit mt-1">System Uptime</div>
+              </div>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
 
-      {/* Contact Section */}
+      {/* ─── Contact ──────────────────────────────────────────────────── */}
       {showContact && (
-        <section id="contact" className="py-20 px-4 md:px-8">
-          <div className="max-w-4xl mx-auto text-center">
-            <motion.div
-              className="mb-16"
-              {...fadeInUp}
-            >
-              <h2 className="text-4xl md:text-5xl font-space-grotesk font-bold mb-6">
-                <span className="bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">
-                  Let's Build Something Amazing
-                </span>
+        <section id="contact" className="py-24 md:py-32 px-6 md:px-12 lg:px-20">
+          <div className="max-w-6xl mx-auto">
+            <ScrollReveal>
+              <SectionLabel>06 / Contact</SectionLabel>
+            </ScrollReveal>
+
+            <ScrollReveal delay={0.1}>
+              <h2 className="text-5xl md:text-7xl font-bold font-space-grotesk text-zinc-900 dark:text-zinc-100 mb-10">
+                Let's talk.
               </h2>
-              <p className="text-xl text-gray-700 dark:text-gray-300 mb-8 font-outfit">
-                Ready to transform your challenges into scalable solutions?
-              </p>
-            </motion.div>
+            </ScrollReveal>
 
-            <motion.div
-              className="flex flex-col sm:flex-row gap-6 justify-center items-center"
-              variants={staggerContainer}
-              initial="initial"
-              whileInView="animate"
-              viewport={{ once: true }}
-            >
-              <motion.a
-                href="mailto:ricardoalexanderh@gmail.com"
-                className="flex items-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors group font-outfit"
-                variants={fadeInUp}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Mail className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
-                Email
-              </motion.a>
-
-              <motion.a
-                href="mailto:ricardo.alexanderh@sparkworks.co.id"
-                className="flex items-center px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors group font-outfit"
-                variants={fadeInUp}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Mail className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
-                Company Email
-              </motion.a>
-            </motion.div>
+            <ScrollReveal delay={0.2}>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <motion.a
+                  href="mailto:ricardoalexanderh@gmail.com"
+                  className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-emerald-500 text-white font-outfit font-semibold text-sm hover:bg-emerald-400 transition-colors"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  <EnvelopeSimple size={18} weight="bold" />
+                  Email
+                </motion.a>
+                <motion.a
+                  href="mailto:ricardo.alexanderh@sparkworks.co.id"
+                  className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 font-outfit font-semibold text-sm hover:border-zinc-500 dark:hover:border-zinc-500 transition-colors"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  <EnvelopeSimple size={18} weight="bold" />
+                  Company Email
+                </motion.a>
+              </div>
+            </ScrollReveal>
           </div>
         </section>
       )}
 
-      {/* Footer */}
-      <footer className="py-8 px-4 text-center border-t border-gray-200 dark:border-slate-700">
-        <p className="text-gray-500 dark:text-gray-400 font-outfit">
-          © 2025 Ricardo Alexander. Built with passion for innovation.
-        </p>
+      {/* ─── Footer ───────────────────────────────────────────────────── */}
+      <footer className="border-t border-zinc-200 dark:border-zinc-800 py-12 px-6 md:px-12 lg:px-20">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+          <span className="text-sm text-zinc-500 font-outfit">
+            &copy; 2026 Ricardo Alexander
+          </span>
+          <div className="flex items-center space-x-3">
+            <a
+              href="https://linkedin.com/in/ricardoalexanderh"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800/50 transition-colors"
+            >
+              <LinkedinLogo size={18} className="text-zinc-500" weight="bold" />
+            </a>
+            <a
+              href="https://github.com/ricardoalexanderh"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800/50 transition-colors"
+            >
+              <GithubLogo size={18} className="text-zinc-500" weight="bold" />
+            </a>
+          </div>
+        </div>
       </footer>
     </div>
   )
