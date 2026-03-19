@@ -218,7 +218,7 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
                       <span className="text-2xl text-purple-400 group-hover:text-cyan-400 transition-colors duration-200">&#x25C8;</span>
                       <div>
                         <div className="font-semibold text-sm">Auris</div>
-                        <div className="text-xs text-gray-400 mt-0.5">Chrome Extension &mdash; AI voice assistant for <span style={{ color: '#D97757' }} className="font-medium">Claude Code</span> Web</div>
+                        <div className="text-xs text-gray-400 mt-0.5">AI voice assistant for <span style={{ color: '#D97757' }} className="font-medium">Claude Code</span> &mdash; Web, VS Code, Terminal &amp; Desktop</div>
                       </div>
                     </button>
                   </motion.div>
@@ -328,7 +328,7 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
                     <span className="text-purple-400">&#x25C8;</span>
                     <div>
                       <div className="font-medium text-sm">Auris</div>
-                      <div className="text-xs text-gray-400">Chrome Extension &mdash; AI voice assistant for <span style={{ color: '#D97757' }}>Claude Code</span> Web</div>
+                      <div className="text-xs text-gray-400">AI voice assistant for <span style={{ color: '#D97757' }}>Claude Code</span> &mdash; Web, VS Code, Terminal &amp; Desktop</div>
                     </div>
                   </button>
                 </motion.div>
@@ -1189,7 +1189,7 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({
                 </h3>
               </div>
               <p className="text-gray-600 dark:text-gray-300 font-outfit mb-6">
-                Chrome Extension &mdash; AI voice assistant for <span style={{ color: '#D97757' }} className="font-medium">Claude Code</span> Web. Hands-free vibe coding with intelligent voice commands.
+                AI voice assistant for <span style={{ color: '#D97757' }} className="font-medium">Claude Code</span> &mdash; Web, VS Code, Terminal &amp; Desktop. Hands-free vibe coding with intelligent voice commands.
               </p>
               <div className="flex items-center text-cyan-400 font-outfit font-semibold group-hover:gap-3 gap-2 transition-all duration-200">
                 Learn more
