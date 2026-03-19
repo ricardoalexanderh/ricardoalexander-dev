@@ -416,6 +416,8 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
   toggleTheme,
 }) => {
   const [isOpen, setIsOpen] = useState(false)
+  const [productsOpen, setProductsOpen] = useState(false)
+  const productsRef = useRef<HTMLDivElement>(null)
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId)
@@ -426,7 +428,7 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
     }
   }
 
-  const navLinks = ['About', 'Skills', 'Projects', 'Clients', 'Contact']
+  const navLinks = ['About', 'Skills', 'Products', 'Projects', 'Clients', 'Contact']
 
   return (
     <nav className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-4xl">
@@ -442,15 +444,51 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
 
           {/* Desktop Links */}
           <div className="hidden md:flex items-center space-x-6">
-            {navLinks.map((link) => (
-              <button
-                key={link}
-                onClick={() => scrollToSection(link.toLowerCase())}
-                className="text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors font-outfit"
-              >
-                {link}
-              </button>
-            ))}
+            {navLinks.map((link) =>
+              link === 'Products' ? (
+                <div
+                  key={link}
+                  ref={productsRef}
+                  className="relative"
+                  onMouseEnter={() => setProductsOpen(true)}
+                  onMouseLeave={() => setProductsOpen(false)}
+                >
+                  <button
+                    className="flex items-center gap-1 text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors font-outfit py-4 -my-4"
+                  >
+                    Products
+                    <svg className={`w-3 h-3 transition-transform duration-200 ${productsOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                  </button>
+                  {productsOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -6, scale: 0.97 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute top-full left-0 mt-1 w-72 rounded-xl bg-zinc-900/95 dark:bg-zinc-900/95 bg-white/95 backdrop-blur-xl border border-white/[0.06] dark:border-white/[0.06] border-zinc-200/60 shadow-2xl overflow-hidden"
+                    >
+                      <a
+                        href="/products/auris"
+                        className="flex items-center gap-4 w-full px-5 py-4 text-left text-zinc-600 dark:text-zinc-400 hover:text-emerald-500 dark:hover:text-emerald-400 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/50 transition-all font-outfit group"
+                      >
+                        <span className="text-2xl group-hover:scale-110 transition-transform" style={{ color: '#7b6cff' }}>&#x25C8;</span>
+                        <div>
+                          <div className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">Auris</div>
+                          <div className="text-xs text-zinc-500 dark:text-zinc-500 mt-0.5">AI voice assistant for <span className="text-emerald-500 font-medium">Claude Code</span></div>
+                        </div>
+                      </a>
+                    </motion.div>
+                  )}
+                </div>
+              ) : (
+                <button
+                  key={link}
+                  onClick={() => scrollToSection(link.toLowerCase())}
+                  className="text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors font-outfit"
+                >
+                  {link}
+                </button>
+              )
+            )}
           </div>
 
           {/* Right side */}
@@ -503,14 +541,34 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
           transition={{ duration: 0.2 }}
           className="mt-2 rounded-2xl bg-zinc-900/95 dark:bg-zinc-900/95 bg-white/95 backdrop-blur-xl border border-white/[0.06] dark:border-white/[0.06] border-zinc-200/60 p-4 space-y-1"
         >
-          {navLinks.map((link) => (
-            <button
-              key={link}
-              onClick={() => scrollToSection(link.toLowerCase())}
-              className="block w-full text-left px-4 py-2.5 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/10 dark:hover:bg-zinc-800/50 transition-colors font-outfit"
-            >
-              {link}
-            </button>
+          {navLinks.map((link) =>
+            link === 'Products' ? (
+              <div key={link}>
+                <button
+                  onClick={() => setProductsOpen(!productsOpen)}
+                  className="flex items-center justify-between w-full px-4 py-2.5 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/10 dark:hover:bg-zinc-800/50 transition-colors font-outfit"
+                >
+                  Products
+                  <svg className={`w-3 h-3 transition-transform duration-200 ${productsOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                </button>
+                {productsOpen && (
+                  <a
+                    href="/products/auris"
+                    className="flex items-center gap-3 w-full px-8 py-2.5 text-left text-zinc-500 dark:text-zinc-500 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors font-outfit"
+                  >
+                    <span className="text-lg" style={{ color: '#7b6cff' }}>&#x25C8;</span>
+                    <span className="text-sm">Auris</span>
+                  </a>
+                )}
+              </div>
+            ) : (
+              <button
+                key={link}
+                onClick={() => scrollToSection(link.toLowerCase())}
+                className="block w-full text-left px-4 py-2.5 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/10 dark:hover:bg-zinc-800/50 transition-colors font-outfit"
+              >
+                {link}
+              </button>
           ))}
           <div className="flex items-center space-x-2 px-4 pt-2 border-t border-zinc-800/50 dark:border-zinc-800/50 border-zinc-200/50 mt-2">
             <a
@@ -909,11 +967,56 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
         </div>
       </section>
 
+      {/* ─── Products ────────────────────────────────────────────────── */}
+      <section id="products" className="py-24 md:py-32 px-6 md:px-12 lg:px-20">
+        <div className="max-w-6xl mx-auto">
+          <ScrollReveal>
+            <SectionLabel>03 / Products</SectionLabel>
+          </ScrollReveal>
+
+          <ScrollReveal delay={0.1}>
+            <p className="text-lg text-zinc-600 dark:text-zinc-400 font-outfit max-w-2xl mb-12">
+              Tools and products I&apos;ve built to solve real problems.
+            </p>
+          </ScrollReveal>
+
+          <div className="flex justify-center">
+            <ScrollReveal delay={0.15}>
+              <DoubleBezelCard spotlight>
+                <div className="flex items-center gap-4 mb-4">
+                  <span className="text-3xl" style={{ color: '#7b6cff' }}>&#x25C8;</span>
+                  <h3 className="text-2xl font-space-grotesk font-bold text-zinc-900 dark:text-zinc-100">
+                    Auris
+                  </h3>
+                </div>
+                <p className="text-zinc-600 dark:text-zinc-400 font-outfit mb-6 leading-relaxed">
+                  AI voice assistant for <span className="text-emerald-500 font-medium">Claude Code</span> &mdash; Web, VS Code, Terminal &amp; Desktop.
+                  Hands-free vibe coding with intelligent voice commands.
+                </p>
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {['Voice AI', 'Claude Code', 'VS Code', 'Desktop', 'Multi-platform'].map(tag => (
+                    <span key={tag} className="px-2.5 py-1 text-xs font-jetbrains rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                <a
+                  href="/products/auris"
+                  className="inline-flex items-center gap-2 text-sm text-emerald-500 font-outfit font-semibold hover:text-emerald-400 transition-colors"
+                >
+                  $49 &middot; Learn more &rarr;
+                </a>
+              </DoubleBezelCard>
+            </ScrollReveal>
+          </div>
+        </div>
+      </section>
+
       {/* ─── Projects ─────────────────────────────────────────────────── */}
       <section id="projects" className="py-24 md:py-32 px-6 md:px-12 lg:px-20">
         <div className="max-w-6xl mx-auto">
           <ScrollReveal>
-            <SectionLabel>03 / Work</SectionLabel>
+            <SectionLabel>04 / Work</SectionLabel>
           </ScrollReveal>
 
           <div className="space-y-24 md:space-y-32">
@@ -985,7 +1088,7 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
       <section id="clients" className="py-24 md:py-32 px-6 md:px-12 lg:px-20 overflow-hidden">
         <div className="max-w-6xl mx-auto">
           <ScrollReveal>
-            <SectionLabel>04 / Clients</SectionLabel>
+            <SectionLabel>05 / Clients</SectionLabel>
           </ScrollReveal>
         </div>
 
@@ -1054,7 +1157,7 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
         <section id="contact" className="py-24 md:py-32 px-6 md:px-12 lg:px-20">
           <div className="max-w-6xl mx-auto">
             <ScrollReveal>
-              <SectionLabel>05 / Contact</SectionLabel>
+              <SectionLabel>06 / Contact</SectionLabel>
             </ScrollReveal>
 
             <ScrollReveal delay={0.1}>
