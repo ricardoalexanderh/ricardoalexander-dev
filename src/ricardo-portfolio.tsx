@@ -782,7 +782,7 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
         <CodeRain />
 
         {/* Mobile 3D background */}
-        <div className="absolute inset-0 z-0 lg:hidden opacity-40">
+        <div className="absolute inset-0 z-[1] lg:hidden opacity-40">
           <Canvas dpr={[1, 1.5]} camera={{ position: [0, 0, 5], fov: 45 }}>
             <Suspense fallback={null}>
               <HeroScene />
@@ -792,12 +792,12 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
 
         {/* Left content */}
         <motion.div
-          className="relative z-10"
+          className="relative z-10 pointer-events-none"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={SPRING}
         >
-          <div className="flex flex-wrap gap-2 mb-6">
+          <div className="flex flex-wrap gap-2 mb-6 pointer-events-auto">
             <div className="inline-block px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/10">
               <span className="text-xs font-jetbrains text-emerald-500 tracking-wider uppercase">
                 Software Architect
@@ -816,7 +816,7 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
 
           <HeroTypingAnimation />
 
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-wrap gap-4 pointer-events-auto">
             <motion.a
               href="#contact"
               className="inline-flex items-center px-7 py-3.5 rounded-full bg-emerald-500 text-white font-outfit font-semibold text-sm hover:bg-emerald-400 transition-colors"
