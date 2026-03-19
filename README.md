@@ -1,6 +1,6 @@
 # Ricardo Alexander - Portfolio
 
-A modern, interactive single-page portfolio website showcasing software architecture expertise and 20+ years of enterprise development experience.
+A modern, interactive portfolio site with multiple routes, showcasing software architecture expertise and 20+ years of enterprise development experience.
 
 ## Tech Stack
 
@@ -10,8 +10,25 @@ A modern, interactive single-page portfolio website showcasing software architec
 - **3D Graphics**: Three.js with React Three Fiber and React Three Drei
 - **Animations**: Motion (Framer Motion)
 - **Smooth Scrolling**: Lenis
-- **Icons**: Lucide React, React Icons
+- **Icons**: Phosphor Icons, Lucide React, React Icons
 - **Routing**: React Router
+
+## Pages
+
+| Route | Component | Description |
+|-------|-----------|-------------|
+| `/` | `ricardo-portfolio.tsx` | Main portfolio with 3D orb, project showcase, skills, and contact |
+| `/products/auris` | `auris-landing.tsx` | Product landing page for the Auris Chrome extension |
+
+## Features
+
+- Dark/light theme with localStorage persistence
+- Interactive 3D animated orb (Three.js / React Three Fiber)
+- Scroll-triggered animations and text scramble effects (Motion)
+- YouTube video modal for professional overview
+- Downloadable resume (PDF)
+- Responsive layout with mobile navigation
+- Auris product page with auto-playing slideshow, FAQ accordion, and scroll-reveal animations
 
 ## Getting Started
 
@@ -33,12 +50,20 @@ npm run dev
 
 ```
 src/
-  main.tsx                 # Application entry point
-  ricardo-portfolio.tsx    # Main portfolio component
-  auris-landing.tsx        # Auris landing page component
+  main.tsx                 # App entry with React Router setup
+  ricardo-portfolio.tsx    # Main portfolio page
+  auris-landing.tsx        # Auris product landing page
   index.css                # Global styles and Tailwind imports
-  assets/                  # Static assets
-public/                    # Public assets (fonts, images)
+  vite-env.d.ts            # Vite type declarations
+  assets/                  # Bundled static assets
+public/                    # Static assets (fonts, icons, favicons, resume PDF)
+index.html                 # HTML entry point (includes Google Fonts)
+vite.config.ts             # Vite configuration
+tailwind.config.js         # Tailwind CSS configuration
+postcss.config.js          # PostCSS configuration
+eslint.config.js           # ESLint configuration
+vercel.json                # Vercel deployment rewrites
+tsconfig.json              # TypeScript config (root)
 ```
 
 ## Deployment
