@@ -473,7 +473,7 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
                         <span className="text-2xl group-hover:scale-110 transition-transform" style={{ color: '#7b6cff' }}>&#x25C8;</span>
                         <div>
                           <div className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">Auris</div>
-                          <div className="text-xs text-zinc-500 dark:text-zinc-500 mt-0.5">AI voice assistant for <span className="text-emerald-500 font-medium">Claude Code</span></div>
+                          <div className="text-xs text-zinc-500 dark:text-zinc-500 mt-0.5">AI voice assistant for <span style={{ color: '#D97757', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}><img src="/claude-ai-icon.svg" alt="Claude" width="14" height="14" />Claude Code</span></div>
                         </div>
                       </a>
                     </motion.div>
@@ -990,7 +990,7 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
                   </h3>
                 </div>
                 <p className="text-zinc-600 dark:text-zinc-400 font-outfit mb-6 leading-relaxed">
-                  AI voice assistant for <span className="text-emerald-500 font-medium">Claude Code</span> &mdash; Web, VS Code, Terminal &amp; Desktop.
+                  AI voice assistant for <span style={{ color: '#D97757', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}><img src="/claude-ai-icon.svg" alt="Claude" width="18" height="18" />Claude Code</span> &mdash; Web, VS Code, Terminal &amp; Desktop.
                   Hands-free vibe coding with intelligent voice commands.
                 </p>
                 <div className="flex flex-wrap gap-2 mb-6">
