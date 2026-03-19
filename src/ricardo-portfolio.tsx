@@ -783,7 +783,7 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
 
         {/* Mobile 3D background */}
         <div className="absolute inset-0 z-[1] lg:hidden opacity-40 flex items-center justify-center pointer-events-none">
-          <div className="w-[260px] h-[260px] pointer-events-auto">
+          <div className="w-[340px] h-[340px] pointer-events-auto">
             <Canvas dpr={[1, 1.5]} camera={{ position: [0, 0, 5], fov: 45 }}>
               <Suspense fallback={null}>
                 <HeroScene />
