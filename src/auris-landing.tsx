@@ -133,7 +133,7 @@ const AurisLanding: React.FC = () => {
     },
     {
       q: 'Does it only work with Claude Code for Web?',
-      a: 'V1 is focused entirely on Claude Code for Web (claude.ai). Auris watches the DOM, classifies every output, and never modifies the page. Support for other web AI coding tools is planned for V2.',
+      a: 'V1 launches with Claude Code for Web (claude.ai) — Auris watches the DOM, classifies every output, and never modifies the page. Coming next: Claude for VS Code (as a plugin), Terminal (Windows & Mac), and Desktop App (Windows & Mac). All future platforms are included with your one-time purchase at no additional cost.',
     },
     {
       q: 'Can I send commands to Claude by voice?',
@@ -230,6 +230,7 @@ const AurisLanding: React.FC = () => {
     'Session history with auto-clear & export (MD / JSON)',
     'Settings import / export',
     'Web Speech API fallback if local models fail',
+    'Coming soon: VS Code, Terminal & Desktop App — included free',
     'Zero telemetry \u00B7 Non-intrusive page access \u00B7 All future updates',
   ]
 
@@ -1193,7 +1194,7 @@ const AurisLanding: React.FC = () => {
             Chrome Extension
           </div>
           <h1>Your AI Vibe Coding Assistant,<br /><span className="auris-gradient-text">out loud.</span></h1>
-          <p className="auris-tagline">An AI voice assistant for <span style={{ color: '#D97757', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}><img src="/claude-ai-icon.svg" alt="Claude" width="18" height="18" style={{ verticalAlign: 'middle' }} />Claude Code</span> for Web &mdash; keeping you in flow.</p>
+          <p className="auris-tagline">An AI voice assistant for <span style={{ color: '#D97757', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}><img src="/claude-ai-icon.svg" alt="Claude" width="18" height="18" style={{ verticalAlign: 'middle' }} />Claude Code</span> &mdash; starting with Web, expanding to VS Code, Terminal &amp; Desktop.</p>
 
           <div className="auris-origin-note">
             <p>I run Claude Code for Web on one screen and do everything else on the other.</p>
@@ -1206,7 +1207,7 @@ const AurisLanding: React.FC = () => {
             <a href="https://chromewebstore.google.com" target="_blank" rel="noopener noreferrer" className="auris-btn-primary">Get Auris</a>
             <a href="#how" className="auris-btn-secondary">See how it works &rarr;</a>
           </div>
-          <p className="auris-price-hint"><strong>1-day free trial</strong> &middot; Full features &middot; $39 one-time &middot; BYOK</p>
+          <p className="auris-price-hint"><strong>1-day free trial</strong> &middot; Full features &middot; $49 one-time &middot; BYOK</p>
 
           {/* DEMO SLIDESHOW */}
           <div id="demo-slideshow" className="auris-demo-container">
@@ -1454,7 +1455,7 @@ const AurisLanding: React.FC = () => {
               <div className="auris-pricing-inner">
                 <div className="auris-pricing-left">
                   <div className="auris-plan-name">Auris</div>
-                  <div className="auris-plan-price"><span className="currency">$</span>39<span className="period"> one-time</span></div>
+                  <div className="auris-plan-price"><span className="currency">$</span>49<span className="period"> one-time</span></div>
                   <div className="auris-plan-note">1-day free trial &middot; Lifetime access &middot; No subscription</div>
                   <a href="https://chromewebstore.google.com" target="_blank" rel="noopener noreferrer" className="auris-plan-cta">Get Auris</a>
                   <p className="auris-plan-guarantee">{'\uD83D\uDD12'} Secure in-app purchase</p>
