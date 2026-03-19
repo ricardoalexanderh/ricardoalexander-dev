@@ -146,36 +146,49 @@ const ScrollReveal: React.FC<{ children: React.ReactNode; className?: string; de
 
 // ─── 3D Scene ────────────────────────────────────────────────────────────────
 
-const SubtleOrb: React.FC = () => {
-  const meshRef = useRef<THREE.Mesh>(null)
+const StellatedStar: React.FC = () => {
+  const groupRef = useRef<THREE.Group>(null)
   const [hovered, setHovered] = useState(false)
   const scaleTarget = useRef(1)
 
   useFrame((state) => {
-    if (!meshRef.current) return
-    meshRef.current.rotation.y = state.clock.elapsedTime * 0.05
-    meshRef.current.rotation.x = state.clock.elapsedTime * 0.03
+    if (!groupRef.current) return
+    groupRef.current.rotation.y = state.clock.elapsedTime * 0.08
+    groupRef.current.rotation.x = state.clock.elapsedTime * 0.05
     scaleTarget.current = hovered ? 1.08 : 1
-    const s = THREE.MathUtils.lerp(meshRef.current.scale.x, scaleTarget.current, 0.05)
-    meshRef.current.scale.setScalar(s)
+    const s = THREE.MathUtils.lerp(groupRef.current.scale.x, scaleTarget.current, 0.05)
+    groupRef.current.scale.setScalar(s)
   })
 
   return (
-    <mesh
-      ref={meshRef}
+    <group
+      ref={groupRef}
       onPointerOver={() => setHovered(true)}
       onPointerOut={() => setHovered(false)}
     >
-      <sphereGeometry args={[1.5, 64, 64]} />
-      <meshStandardMaterial
-        color="#10b981"
-        emissive="#10b981"
-        emissiveIntensity={hovered ? 0.25 : 0.15}
-        transparent
-        opacity={0.12}
-        wireframe
-      />
-    </mesh>
+      <mesh>
+        <tetrahedronGeometry args={[1.6, 0]} />
+        <meshStandardMaterial
+          color="#10b981"
+          emissive="#10b981"
+          emissiveIntensity={hovered ? 0.8 : 0.5}
+          transparent
+          opacity={0.45}
+          wireframe
+        />
+      </mesh>
+      <mesh>
+        <sphereGeometry args={[1.6, 20, 20]} />
+        <meshStandardMaterial
+          color="#10b981"
+          emissive="#10b981"
+          emissiveIntensity={hovered ? 0.5 : 0.3}
+          transparent
+          opacity={0.25}
+          wireframe
+        />
+      </mesh>
+    </group>
   )
 }
 
@@ -183,7 +196,7 @@ const HeroScene: React.FC = () => (
   <>
     <ambientLight intensity={0.4} />
     <directionalLight position={[5, 5, 5]} intensity={0.6} />
-    <SubtleOrb />
+    <StellatedStar />
     <OrbitControls enableZoom={false} enablePan={false} autoRotate autoRotateSpeed={0.5} />
   </>
 )
@@ -783,7 +796,7 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
 
         {/* Mobile 3D background */}
         <div className="absolute inset-0 z-[1] lg:hidden opacity-40 flex items-center justify-center pointer-events-none">
-          <div className="w-[75vw] h-[75vw] max-w-[420px] max-h-[420px] pointer-events-auto">
+          <div className="w-[85vw] h-[85vw] max-w-[480px] max-h-[480px] pointer-events-auto">
             <Canvas dpr={[1, 1.5]} camera={{ position: [0, 0, 5], fov: 45 }}>
               <Suspense fallback={null}>
                 <HeroScene />
