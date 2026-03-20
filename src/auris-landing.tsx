@@ -30,6 +30,48 @@ const AurisLanding: React.FC = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0)
+    document.title = 'Auris - AI-Powered Audio Intelligence | Ricardo Alexander'
+
+    const metaDesc = document.querySelector('meta[name="description"]')
+    const ogTitle = document.querySelector('meta[property="og:title"]')
+    const ogDesc = document.querySelector('meta[property="og:description"]')
+    const ogUrl = document.querySelector('meta[property="og:url"]')
+    const twitterTitle = document.querySelector('meta[name="twitter:title"]')
+    const twitterDesc = document.querySelector('meta[name="twitter:description"]')
+    const canonical = document.querySelector('link[rel="canonical"]')
+
+    const aurisDesc = 'Auris is an AI-powered audio intelligence voice assistant for Claude Code for Web — keeping you in flow with hands-free vibe coding.'
+    const aurisTitle = 'Auris - AI-Powered Audio Intelligence | Ricardo Alexander'
+    const aurisUrl = 'https://ricardoalexander.dev/products/auris'
+
+    const originals = {
+      desc: metaDesc?.getAttribute('content'),
+      ogTitle: ogTitle?.getAttribute('content'),
+      ogDesc: ogDesc?.getAttribute('content'),
+      ogUrl: ogUrl?.getAttribute('content'),
+      twitterTitle: twitterTitle?.getAttribute('content'),
+      twitterDesc: twitterDesc?.getAttribute('content'),
+      canonical: canonical?.getAttribute('href'),
+    }
+
+    metaDesc?.setAttribute('content', aurisDesc)
+    ogTitle?.setAttribute('content', aurisTitle)
+    ogDesc?.setAttribute('content', aurisDesc)
+    ogUrl?.setAttribute('content', aurisUrl)
+    twitterTitle?.setAttribute('content', aurisTitle)
+    twitterDesc?.setAttribute('content', aurisDesc)
+    canonical?.setAttribute('href', aurisUrl)
+
+    return () => {
+      document.title = 'Ricardo Alexander - Software Architect & Technology Entrepreneur'
+      if (originals.desc) metaDesc?.setAttribute('content', originals.desc)
+      if (originals.ogTitle) ogTitle?.setAttribute('content', originals.ogTitle)
+      if (originals.ogDesc) ogDesc?.setAttribute('content', originals.ogDesc)
+      if (originals.ogUrl) ogUrl?.setAttribute('content', originals.ogUrl)
+      if (originals.twitterTitle) twitterTitle?.setAttribute('content', originals.twitterTitle)
+      if (originals.twitterDesc) twitterDesc?.setAttribute('content', originals.twitterDesc)
+      if (originals.canonical) canonical?.setAttribute('href', originals.canonical)
+    }
   }, [])
 
   const startAutoSlide = useCallback(() => {

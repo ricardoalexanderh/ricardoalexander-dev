@@ -404,6 +404,7 @@ const VideoModal: React.FC<{ isOpen: boolean; onClose: () => void; videoId: stri
       >
         <button
           onClick={onClose}
+          aria-label="Close video"
           className="absolute top-4 right-4 z-10 p-2 bg-black/50 hover:bg-black/70 text-white rounded-full transition-colors"
         >
           <X size={20} weight="bold" />
@@ -449,7 +450,7 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center space-x-2.5">
-            <img src="/logo.png" alt="XANDR" className="w-8 h-8 rounded-full" />
+            <img src="/logo.png" alt="XANDR" className="w-8 h-8 rounded-full" width="32" height="32" />
             <span className="font-space-grotesk font-bold text-lg text-zinc-900 dark:text-zinc-100">
               XANDR
             </span>
@@ -510,6 +511,7 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
               href="https://linkedin.com/in/ricardoalexanderh"
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="LinkedIn profile"
               className="hidden md:flex p-2 rounded-full hover:bg-zinc-800/50 dark:hover:bg-zinc-800/50 hover:bg-zinc-100 transition-colors"
             >
               <LinkedinLogo size={18} className="text-zinc-600 dark:text-zinc-400" weight="bold" />
@@ -518,12 +520,14 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
               href="https://github.com/ricardoalexanderh"
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="GitHub profile"
               className="hidden md:flex p-2 rounded-full hover:bg-zinc-800/50 dark:hover:bg-zinc-800/50 hover:bg-zinc-100 transition-colors"
             >
               <GithubLogo size={18} className="text-zinc-600 dark:text-zinc-400" weight="bold" />
             </a>
             <button
               onClick={toggleTheme}
+              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
               className="p-2 rounded-full hover:bg-zinc-800/50 dark:hover:bg-zinc-800/50 hover:bg-zinc-100 transition-colors"
             >
               {theme === 'dark' ? (
@@ -534,6 +538,7 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
             </button>
             <button
               onClick={() => setIsOpen(!isOpen)}
+              aria-label={isOpen ? 'Close menu' : 'Open menu'}
               className="md:hidden p-2 rounded-full hover:bg-zinc-800/50 dark:hover:bg-zinc-800/50 hover:bg-zinc-100 transition-colors"
             >
               {isOpen ? (
@@ -588,6 +593,7 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
               href="https://linkedin.com/in/ricardoalexanderh"
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="LinkedIn profile"
               className="p-2 rounded-full hover:bg-zinc-800/50 transition-colors"
             >
               <LinkedinLogo size={18} className="text-zinc-400" weight="bold" />
@@ -596,6 +602,7 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
               href="https://github.com/ricardoalexanderh"
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="GitHub profile"
               className="p-2 rounded-full hover:bg-zinc-800/50 transition-colors"
             >
               <GithubLogo size={18} className="text-zinc-400" weight="bold" />
@@ -789,6 +796,7 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
       <VideoModal isOpen={isVideoOpen} onClose={() => setIsVideoOpen(false)} videoId={youtubeVideoId} />
       <Navigation theme={theme} toggleTheme={toggleTheme} />
 
+      <main>
       {/* ─── Hero ─────────────────────────────────────────────────────── */}
       <section id="hero" className="relative min-h-[100dvh] grid grid-cols-1 lg:grid-cols-2 items-center px-6 md:px-12 lg:px-20 pt-24">
         {/* Code Rain background */}
@@ -1207,6 +1215,8 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
         </section>
       )}
 
+      </main>
+
       {/* ─── Footer ───────────────────────────────────────────────────── */}
       <footer className="border-t border-zinc-200 dark:border-zinc-800 py-12 px-6 md:px-12 lg:px-20">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
@@ -1218,6 +1228,7 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
               href="https://linkedin.com/in/ricardoalexanderh"
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="LinkedIn profile"
               className="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800/50 transition-colors"
             >
               <LinkedinLogo size={18} className="text-zinc-500" weight="bold" />
@@ -1226,6 +1237,7 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
               href="https://github.com/ricardoalexanderh"
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="GitHub profile"
               className="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800/50 transition-colors"
             >
               <GithubLogo size={18} className="text-zinc-500" weight="bold" />
