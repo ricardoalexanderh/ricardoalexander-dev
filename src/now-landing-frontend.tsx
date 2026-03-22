@@ -141,7 +141,7 @@ const NowLandingFrontend: React.FC = () => {
   const [sysInfoCpu, setSysInfoCpu] = useState(42)
   const [sysInfoRam, setSysInfoRam] = useState(67)
   const carouselRef = useRef<HTMLDivElement>(null)
-  const touchXRef = useRef(0)
+
   const progressTriggered = useRef(false)
   const [demoNotes, setDemoNotes] = useState<string[]>(['Review PR #42', 'Ship login fix'])
   const [demoNoteInput, setDemoNoteInput] = useState('')
@@ -1303,10 +1303,11 @@ const NowLandingFrontend: React.FC = () => {
           text-transform: uppercase;
         }
         .now-builder-chars {
-          display: flex; gap: 0.5rem; flex-wrap: wrap;
+          display: flex; gap: 0.5rem; flex-wrap: nowrap;
         }
         .now-builder-char-btn {
           width: 42px; height: 42px;
+          flex-shrink: 0;
           background: var(--bg);
           border: 2px solid var(--border);
           border-radius: 4px;
@@ -1954,11 +1955,6 @@ const NowLandingFrontend: React.FC = () => {
             <div
               className="now-carousel"
               ref={carouselRef}
-              onTouchStart={(e) => { touchXRef.current = e.touches[0].clientX }}
-              onTouchEnd={(e) => {
-                const diff = touchXRef.current - e.changedTouches[0].clientX
-                if (Math.abs(diff) > 40) scrollCarousel(diff > 0 ? 1 : -1)
-              }}
             >
               {characters.map((c, i) => (
                 <div
