@@ -185,7 +185,7 @@ const NowLandingFrontend: React.FC = () => {
     { q: 'Can I customize the widget?', a: 'Yes. You can pick your companion, adjust transparency, choose from 3 sizes (S, M, L), dock to any corner, switch between dark and light theme, and configure pomodoro presets and custom trackers.' },
     { q: 'Does it work with multiple monitors?', a: 'Yes! You can pin Now to any monitor. It stays always-on-top with a transparent background, so it sits right on your desktop.' },
     { q: 'What about privacy?', a: 'Now is 100% local. No telemetry, no analytics, no data collection. Everything runs on your machine. Your habits, notes, and data never leave your device.' },
-    { q: 'Will more companions be released?', a: 'Yes! More companions are coming. New companions will be available as separate purchases.' },
+    { q: 'Will more companions be released?', a: 'Yes! More original companions are coming, and we\'re exploring collaborations with licensed and iconic characters. New companions will be available as separate purchases.' },
     { q: 'How does the Pomodoro timer work?', a: 'Standard 25-minute focus / 5-minute break cycles with configurable presets. Your companion reacts to each phase — a message when focus starts, another when it\'s break time, and celebration when all sessions are done.' },
   ]
 

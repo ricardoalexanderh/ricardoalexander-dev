@@ -493,7 +493,7 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
                         href="/products/now"
                         className="flex items-center gap-4 w-full px-5 py-4 text-left text-zinc-600 dark:text-zinc-400 hover:text-emerald-500 dark:hover:text-emerald-400 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/50 transition-all font-outfit group"
                       >
-                        <span className="group-hover:scale-110 transition-transform" style={{ display: 'inline-grid', gridTemplateColumns: 'repeat(3, 5px)', gap: '2px' }}>{[1,0,1,0,1,0,1,0,1].map((on, idx) => <span key={idx} style={{ width: 5, height: 5, borderRadius: 1, background: on ? '#7BEAD2' : 'rgba(123,234,210,0.15)' }} />)}</span>
+                        <span className="group-hover:scale-110 transition-transform" style={{ display: 'inline-grid', gridTemplateColumns: 'repeat(3, 5px)', gap: '2px' }}>{[1,0,1,0,1,0,1,0,1].map((on, idx) => <span key={idx} style={{ width: 5, height: 5, borderRadius: 1, background: on ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.08)' }} />)}</span>
                         <div>
                           <div className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">Now</div>
                           <div className="text-xs text-zinc-500 dark:text-zinc-500 mt-0.5">Pixel companion for your desktop</div>
@@ -587,7 +587,7 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
                       href="/products/now"
                       className="flex items-center gap-3 w-full px-8 py-2.5 text-left text-zinc-500 dark:text-zinc-500 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors font-outfit"
                     >
-                      <span style={{ display: 'inline-grid', gridTemplateColumns: 'repeat(3, 4px)', gap: '1.5px' }}>{[1,0,1,0,1,0,1,0,1].map((on, idx) => <span key={idx} style={{ width: 4, height: 4, borderRadius: 1, background: on ? '#7BEAD2' : 'rgba(123,234,210,0.15)' }} />)}</span>
+                      <span style={{ display: 'inline-grid', gridTemplateColumns: 'repeat(3, 4px)', gap: '1.5px' }}>{[1,0,1,0,1,0,1,0,1].map((on, idx) => <span key={idx} style={{ width: 4, height: 4, borderRadius: 1, background: on ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.08)' }} />)}</span>
                       <span className="text-sm">Now</span>
                     </a>
                   </>
@@ -1023,7 +1023,7 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
                     Auris
                   </h3>
                 </div>
-                <p className="text-zinc-600 dark:text-zinc-400 font-outfit mb-6 leading-relaxed">
+                <p className="text-zinc-600 dark:text-zinc-400 font-outfit mb-6 leading-relaxed flex-1">
                   AI voice assistant for <span style={{ color: '#D97757', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}><img src="/claude-ai-icon.svg" alt="Claude" width="18" height="18" />Claude Code</span> &mdash; Web, VS Code, Terminal &amp; Desktop.
                   Hands-free vibe coding with intelligent voice commands.
                 </p>
@@ -1036,7 +1036,7 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
                 </div>
                 <a
                   href="/products/auris"
-                  className="inline-flex items-center gap-2 text-sm text-emerald-500 font-outfit font-semibold hover:text-emerald-400 transition-colors"
+                  className="inline-flex items-center gap-2 text-sm text-emerald-500 font-outfit font-semibold hover:text-emerald-400 transition-colors mt-auto"
                 >
                   $49 &middot; Learn more &rarr;
                 </a>
@@ -1045,12 +1045,12 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
             <ScrollReveal delay={0.2}>
               <DoubleBezelCard spotlight>
                 <div className="flex items-center gap-4 mb-4">
-                  <span style={{ display: 'inline-grid', gridTemplateColumns: 'repeat(3, 6px)', gap: '2px' }}>{[1,0,1,0,1,0,1,0,1].map((on, idx) => <span key={idx} style={{ width: 6, height: 6, borderRadius: 1, background: on ? '#7BEAD2' : 'rgba(123,234,210,0.15)' }} />)}</span>
+                  <span style={{ display: 'inline-grid', gridTemplateColumns: 'repeat(3, 6px)', gap: '2px' }}>{[1,0,1,0,1,0,1,0,1].map((on, idx) => <span key={idx} className={on ? 'bg-zinc-400 dark:bg-white/30' : 'bg-zinc-200 dark:bg-white/[0.08]'} style={{ width: 6, height: 6, borderRadius: 1 }} />)}</span>
                   <h3 className="text-2xl font-space-grotesk font-bold text-zinc-900 dark:text-zinc-100">
                     Now
                   </h3>
                 </div>
-                <p className="text-zinc-600 dark:text-zinc-400 font-outfit mb-6 leading-relaxed">
+                <p className="text-zinc-600 dark:text-zinc-400 font-outfit mb-6 leading-relaxed flex-1">
                   A tiny pixel companion that sits on your screen &mdash; always present, never demanding. Clock, progress bars, pomodoro, notes, and ambient sounds. 6 companions, each with personality.
                 </p>
                 <div className="flex flex-wrap gap-2 mb-6">
@@ -1062,9 +1062,9 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
                 </div>
                 <a
                   href="/products/now"
-                  className="inline-flex items-center gap-2 text-sm text-emerald-500 font-outfit font-semibold hover:text-emerald-400 transition-colors"
+                  className="inline-flex items-center gap-2 text-sm text-emerald-500 font-outfit font-semibold hover:text-emerald-400 transition-colors mt-auto"
                 >
-                  Learn more &rarr;
+                  $4.99 &middot; Learn more &rarr;
                 </a>
               </DoubleBezelCard>
             </ScrollReveal>
