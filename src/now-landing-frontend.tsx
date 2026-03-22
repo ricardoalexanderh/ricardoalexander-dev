@@ -309,8 +309,10 @@ const NowLandingFrontend: React.FC = () => {
 
   const scrollCarousel = useCallback((direction: number) => {
     if (carouselRef.current) {
-      const cardWidth = carouselRef.current.offsetWidth * 0.72
-      carouselRef.current.scrollBy({ left: direction * cardWidth, behavior: 'smooth' })
+      const card = carouselRef.current.querySelector('.now-char-card') as HTMLElement
+      const gap = parseFloat(getComputedStyle(carouselRef.current).gap) || 0
+      const scrollDist = card ? card.offsetWidth + gap : carouselRef.current.offsetWidth * 0.72
+      carouselRef.current.scrollBy({ left: direction * scrollDist, behavior: 'smooth' })
     }
   }, [])
 
