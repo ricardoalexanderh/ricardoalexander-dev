@@ -1169,7 +1169,7 @@ const AurisLanding: React.FC = () => {
           <a href="#personas">Personas</a>
           <a href="#pricing">Pricing</a>
           <a href="#faq">FAQ</a>
-          <a href="https://chromewebstore.google.com" target="_blank" rel="noopener noreferrer" className="auris-nav-cta">Get Auris</a>
+          <span className="auris-nav-cta" style={{ opacity: 0.5, pointerEvents: 'none', cursor: 'not-allowed' }}>Coming Soon</span>
         </div>
         <button className={`auris-hamburger ${mobileMenuOpen ? 'open' : ''}`} onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
           <span /><span /><span />
@@ -1183,7 +1183,7 @@ const AurisLanding: React.FC = () => {
         <a href="#personas" onClick={() => setMobileMenuOpen(false)}>Personas</a>
         <a href="#pricing" onClick={() => setMobileMenuOpen(false)}>Pricing</a>
         <a href="#faq" onClick={() => setMobileMenuOpen(false)}>FAQ</a>
-        <a href="https://chromewebstore.google.com" target="_blank" rel="noopener noreferrer" className="auris-nav-cta" onClick={() => setMobileMenuOpen(false)}>Get Auris</a>
+        <span className="auris-nav-cta" style={{ opacity: 0.5, pointerEvents: 'none', cursor: 'not-allowed' }}>Coming Soon</span>
       </div>
 
       {/* HERO */}
@@ -1204,7 +1204,7 @@ const AurisLanding: React.FC = () => {
           </div>
 
           <div className="auris-hero-actions">
-            <a href="https://chromewebstore.google.com" target="_blank" rel="noopener noreferrer" className="auris-btn-primary">Get Auris</a>
+            <span className="auris-btn-primary" style={{ opacity: 0.5, pointerEvents: 'none', cursor: 'not-allowed' }}>Coming Soon</span>
             <a href="#how" className="auris-btn-secondary">See how it works &rarr;</a>
           </div>
           <p className="auris-price-hint"><strong>1-day free trial</strong> &middot; Full features &middot; $49 one-time &middot; BYOK</p>
@@ -1457,7 +1457,7 @@ const AurisLanding: React.FC = () => {
                   <div className="auris-plan-name">Auris</div>
                   <div className="auris-plan-price"><span className="currency">$</span>49<span className="period"> one-time</span></div>
                   <div className="auris-plan-note">1-day free trial &middot; Lifetime access &middot; No subscription</div>
-                  <a href="https://chromewebstore.google.com" target="_blank" rel="noopener noreferrer" className="auris-plan-cta">Get Auris</a>
+                  <span className="auris-plan-cta" style={{ opacity: 0.5, pointerEvents: 'none', cursor: 'not-allowed' }}>Coming Soon</span>
                   <p className="auris-plan-guarantee">{'\uD83D\uDD12'} Secure in-app purchase</p>
                 </div>
                 <div className="auris-pricing-divider" />

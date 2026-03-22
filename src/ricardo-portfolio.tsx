@@ -1038,7 +1038,7 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
                   href="/products/auris"
                   className="inline-flex items-center gap-2 text-sm text-emerald-500 font-outfit font-semibold hover:text-emerald-400 transition-colors mt-auto"
                 >
-                  $49 &middot; Learn more &rarr;
+                  Coming Soon &middot; Learn more &rarr;
                 </a>
               </DoubleBezelCard>
             </ScrollReveal>
@@ -1064,7 +1064,7 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
                   href="/products/now"
                   className="inline-flex items-center gap-2 text-sm text-emerald-500 font-outfit font-semibold hover:text-emerald-400 transition-colors mt-auto"
                 >
-                  $4.99 &middot; Learn more &rarr;
+                  Coming Soon &middot; Learn more &rarr;
                 </a>
               </DoubleBezelCard>
             </ScrollReveal>

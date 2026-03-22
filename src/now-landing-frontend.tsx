@@ -1738,7 +1738,7 @@ const NowLandingFrontend: React.FC = () => {
           <a href="#how">How it works</a>
           <a href="#pricing">Pricing</a>
           <a href="#faq">FAQ</a>
-          <a href="#" className="now-nav-cta">Get Now</a>
+          <span className="now-nav-cta" style={{ opacity: 0.5, pointerEvents: 'none', cursor: 'not-allowed' }}>Coming Soon</span>
         </div>
         <button className={`now-hamburger ${mobileMenuOpen ? 'open' : ''}`} onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
           <span /><span /><span />
@@ -1752,7 +1752,7 @@ const NowLandingFrontend: React.FC = () => {
         <a href="#how" onClick={() => setMobileMenuOpen(false)}>How it works</a>
         <a href="#pricing" onClick={() => setMobileMenuOpen(false)}>Pricing</a>
         <a href="#faq" onClick={() => setMobileMenuOpen(false)}>FAQ</a>
-        <a href="#" className="now-nav-cta" onClick={() => setMobileMenuOpen(false)}>Get Now</a>
+        <span className="now-nav-cta" style={{ opacity: 0.5, pointerEvents: 'none', cursor: 'not-allowed' }}>Coming Soon</span>
       </div>
 
       {/* HERO */}
@@ -1895,7 +1895,7 @@ const NowLandingFrontend: React.FC = () => {
           </div>
 
           <div className="now-hero-actions">
-            <a href="#" className="now-btn-primary">Get Now &mdash; $4.99</a>
+            <span className="now-btn-primary" style={{ opacity: 0.5, pointerEvents: 'none', cursor: 'not-allowed' }}>Coming Soon</span>
             <a href="#how" className="now-btn-secondary">How it works &rarr;</a>
           </div>
           <p className="now-price-hint"><strong>$4.99</strong> &middot; All 6 companions &middot; Windows, macOS, Linux</p>
@@ -2362,7 +2362,7 @@ const NowLandingFrontend: React.FC = () => {
                   <div className="now-plan-name">Now</div>
                   <div className="now-plan-price" style={{ color: 'var(--accent)', transition: 'color 0.6s ease' }}>$4.99</div>
                   <div className="now-plan-note">One-time purchase &middot; No subscription</div>
-                  <a href="#" className="now-plan-cta">Get Now</a>
+                  <span className="now-plan-cta" style={{ opacity: 0.5, pointerEvents: 'none', cursor: 'not-allowed' }}>Coming Soon</span>
                 </div>
                 <ul className="now-plan-features">
                   {includedFeatures.map((feat, i) => (
