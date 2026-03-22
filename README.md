@@ -19,6 +19,7 @@ A modern, interactive portfolio site with multiple routes, showcasing software a
 |-------|-----------|-------------|
 | `/` | `ricardo-portfolio.tsx` | Main portfolio with 3D orb, project showcase, skills, and contact |
 | `/products/auris` | `auris-landing.tsx` | Product landing page for the Auris Chrome extension |
+| `/products/now` | `now-landing-frontend.tsx` | Product landing page for the Now pixel-art companion timer |
 
 ## Features
 
@@ -29,6 +30,7 @@ A modern, interactive portfolio site with multiple routes, showcasing software a
 - Downloadable resume (PDF)
 - Responsive layout with mobile navigation
 - Auris product page with auto-playing slideshow, FAQ accordion, and scroll-reveal animations
+- Now product page with pixel-art companions, interactive timer/pomodoro, and retro UI
 
 ## Getting Started
 
@@ -53,6 +55,7 @@ src/
   main.tsx                 # App entry with React Router setup
   ricardo-portfolio.tsx    # Main portfolio page
   auris-landing.tsx        # Auris product landing page
+  now-landing-frontend.tsx # Now product landing page
   index.css                # Global styles and Tailwind imports
   vite-env.d.ts            # Vite type declarations
   assets/                  # Bundled static assets
