@@ -489,6 +489,16 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
                           <div className="text-xs text-zinc-500 dark:text-zinc-500 mt-0.5">AI voice assistant for <span style={{ color: '#D97757', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}><img src="/claude-ai-icon.svg" alt="Claude" width="14" height="14" />Claude Code</span></div>
                         </div>
                       </a>
+                      <a
+                        href="/products/now"
+                        className="flex items-center gap-4 w-full px-5 py-4 text-left text-zinc-600 dark:text-zinc-400 hover:text-emerald-500 dark:hover:text-emerald-400 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/50 transition-all font-outfit group"
+                      >
+                        <span className="group-hover:scale-110 transition-transform" style={{ display: 'inline-grid', gridTemplateColumns: 'repeat(3, 5px)', gap: '2px' }}>{[1,0,1,0,1,0,1,0,1].map((on, idx) => <span key={idx} style={{ width: 5, height: 5, borderRadius: 1, background: on ? '#7BEAD2' : 'rgba(123,234,210,0.15)' }} />)}</span>
+                        <div>
+                          <div className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">Now</div>
+                          <div className="text-xs text-zinc-500 dark:text-zinc-500 mt-0.5">Pixel companion for your desktop</div>
+                        </div>
+                      </a>
                     </motion.div>
                   )}
                 </div>
@@ -565,13 +575,22 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
                   <svg className={`w-3 h-3 transition-transform duration-200 ${productsOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
                 </button>
                 {productsOpen && (
-                  <a
-                    href="/products/auris"
-                    className="flex items-center gap-3 w-full px-8 py-2.5 text-left text-zinc-500 dark:text-zinc-500 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors font-outfit"
-                  >
-                    <span className="text-lg" style={{ color: '#7b6cff' }}>&#x25C8;</span>
-                    <span className="text-sm">Auris</span>
-                  </a>
+                  <>
+                    <a
+                      href="/products/auris"
+                      className="flex items-center gap-3 w-full px-8 py-2.5 text-left text-zinc-500 dark:text-zinc-500 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors font-outfit"
+                    >
+                      <span className="text-lg" style={{ color: '#7b6cff' }}>&#x25C8;</span>
+                      <span className="text-sm">Auris</span>
+                    </a>
+                    <a
+                      href="/products/now"
+                      className="flex items-center gap-3 w-full px-8 py-2.5 text-left text-zinc-500 dark:text-zinc-500 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors font-outfit"
+                    >
+                      <span style={{ display: 'inline-grid', gridTemplateColumns: 'repeat(3, 4px)', gap: '1.5px' }}>{[1,0,1,0,1,0,1,0,1].map((on, idx) => <span key={idx} style={{ width: 4, height: 4, borderRadius: 1, background: on ? '#7BEAD2' : 'rgba(123,234,210,0.15)' }} />)}</span>
+                      <span className="text-sm">Now</span>
+                    </a>
+                  </>
                 )}
               </div>
             ) : (
@@ -995,7 +1014,7 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
             </p>
           </ScrollReveal>
 
-          <div className="flex justify-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             <ScrollReveal delay={0.15}>
               <DoubleBezelCard spotlight>
                 <div className="flex items-center gap-4 mb-4">
@@ -1020,6 +1039,32 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
                   className="inline-flex items-center gap-2 text-sm text-emerald-500 font-outfit font-semibold hover:text-emerald-400 transition-colors"
                 >
                   $49 &middot; Learn more &rarr;
+                </a>
+              </DoubleBezelCard>
+            </ScrollReveal>
+            <ScrollReveal delay={0.2}>
+              <DoubleBezelCard spotlight>
+                <div className="flex items-center gap-4 mb-4">
+                  <span style={{ display: 'inline-grid', gridTemplateColumns: 'repeat(3, 6px)', gap: '2px' }}>{[1,0,1,0,1,0,1,0,1].map((on, idx) => <span key={idx} style={{ width: 6, height: 6, borderRadius: 1, background: on ? '#7BEAD2' : 'rgba(123,234,210,0.15)' }} />)}</span>
+                  <h3 className="text-2xl font-space-grotesk font-bold text-zinc-900 dark:text-zinc-100">
+                    Now
+                  </h3>
+                </div>
+                <p className="text-zinc-600 dark:text-zinc-400 font-outfit mb-6 leading-relaxed">
+                  A tiny pixel companion that sits on your screen &mdash; always present, never demanding. Clock, progress bars, pomodoro, notes, and ambient sounds. 6 companions, each with personality.
+                </p>
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {['Multiplatform', 'Pixel Art', 'Desktop', 'Companion', 'Productivity'].map(tag => (
+                    <span key={tag} className="px-2.5 py-1 text-xs font-jetbrains rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                <a
+                  href="/products/now"
+                  className="inline-flex items-center gap-2 text-sm text-emerald-500 font-outfit font-semibold hover:text-emerald-400 transition-colors"
+                >
+                  Learn more &rarr;
                 </a>
               </DoubleBezelCard>
             </ScrollReveal>
