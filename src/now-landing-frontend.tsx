@@ -307,6 +307,16 @@ const NowLandingFrontend: React.FC = () => {
     return `${m}:${s}`
   }
 
+  const scrollToCard = useCallback((index: number) => {
+    const el = carouselRef.current
+    if (!el) return
+    const cards = el.querySelectorAll('.now-char-card') as NodeListOf<HTMLElement>
+    if (!cards.length || index < 0 || index >= cards.length) return
+    const target = cards[index]
+    const scrollPos = target.offsetLeft - el.offsetLeft - (el.offsetWidth - target.offsetWidth) / 2
+    el.scrollTo({ left: scrollPos, behavior: 'smooth' })
+  }, [])
+
   const scrollCarousel = useCallback((direction: number) => {
     const el = carouselRef.current
     if (!el) return
@@ -321,10 +331,8 @@ const NowLandingFrontend: React.FC = () => {
       if (dist < closestDist) { closestDist = dist; closestIdx = i }
     })
     const targetIdx = Math.max(0, Math.min(cards.length - 1, closestIdx + direction))
-    const target = cards[targetIdx]
-    const scrollPos = target.offsetLeft - el.offsetLeft - (el.offsetWidth - target.offsetWidth) / 2
-    el.scrollTo({ left: scrollPos, behavior: 'instant' })
-  }, [])
+    scrollToCard(targetIdx)
+  }, [scrollToCard])
 
   const featureIcons: Record<string, string> = {
     clockprogress: '\u23F0',
@@ -1961,7 +1969,7 @@ const NowLandingFrontend: React.FC = () => {
                   key={i}
                   className={`now-char-card ${i === activeCharacter ? 'active' : ''}`}
                   style={{ '--card-glow': c.bgGlow } as React.CSSProperties}
-                  onClick={() => setActiveCharacter(i)}
+                  onClick={() => { setActiveCharacter(i); scrollToCard(i) }}
                 >
                   <div className="now-char-pixel">
                     <PixelCharacter charKey={c.key} size={72} animate={true} />
