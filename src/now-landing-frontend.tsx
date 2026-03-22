@@ -174,7 +174,7 @@ const NowLandingFrontend: React.FC = () => {
   const howItWorksSteps = [
     { num: '01', title: 'Download & Install', desc: 'Grab the lightweight app. Works on Windows, macOS, and Linux.', icon: '' },
     { num: '02', title: 'Pick Your Companion', desc: 'Choose from 6 pixel companions. Each has unique idle animations and personality.', icon: '' },
-    { num: '03', title: 'Pin & Customize', desc: 'Dock it to any corner of your screen. Adjust transparency, size, and theme. Double-click your companion to minimize to a tiny floating pixel.', icon: '' },
+    { num: '03', title: 'Customize', desc: 'Dock it to any corner of your screen. Adjust transparency, size, and theme. Double-click your companion to minimize to a tiny floating pixel.', icon: '' },
   ]
 
   const faqData = [
@@ -324,7 +324,7 @@ const NowLandingFrontend: React.FC = () => {
     idle: '\u{1F634}',
   }
 
-  const stepIcons = ['\u{1F4E6}', '\u{1F3AE}', '\u{1F4CC}']
+  const stepIcons = ['\u{1F4E6}', '\u{1F3AE}', '\u{1F3A8}']
 
   // Progress bar data — uses clockTime so it updates live
   const ct = clockTime
@@ -2371,6 +2371,9 @@ const NowLandingFrontend: React.FC = () => {
                     </li>
                   ))}
                 </ul>
+                <div style={{ padding: '0 2rem 1.5rem', fontSize: '0.75rem', color: 'var(--muted)', lineHeight: 1.6, borderTop: '1px solid var(--border)', marginTop: '0.5rem', paddingTop: '1rem' }}>
+                  More original &amp; licensed companions coming soon &mdash; available as separate add-ons.
+                </div>
               </div>
             </div>
           </div>
