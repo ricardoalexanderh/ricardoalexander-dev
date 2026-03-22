@@ -323,7 +323,7 @@ const NowLandingFrontend: React.FC = () => {
     const targetIdx = Math.max(0, Math.min(cards.length - 1, closestIdx + direction))
     const target = cards[targetIdx]
     const scrollPos = target.offsetLeft - el.offsetLeft - (el.offsetWidth - target.offsetWidth) / 2
-    el.scrollTo({ left: scrollPos, behavior: 'smooth' })
+    el.scrollTo({ left: scrollPos, behavior: 'instant' })
   }, [])
 
   const featureIcons: Record<string, string> = {
@@ -914,6 +914,7 @@ const NowLandingFrontend: React.FC = () => {
           min-width: 0;
           gap: 1.5rem;
           overflow-x: auto;
+          scroll-snap-type: x mandatory;
           scrollbar-width: none;
           -ms-overflow-style: none;
           padding: 1rem 0.5rem 2rem;
@@ -922,6 +923,7 @@ const NowLandingFrontend: React.FC = () => {
         .now-carousel::-webkit-scrollbar { display: none; }
         .now-char-card {
           flex: 0 0 280px;
+          scroll-snap-align: center;
           background: var(--surface);
           border: 2px solid var(--border);
           border-radius: 8px;
