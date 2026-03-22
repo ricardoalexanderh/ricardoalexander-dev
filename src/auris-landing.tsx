@@ -1496,6 +1496,8 @@ const AurisLanding: React.FC = () => {
         <div className="auris-container">
           <div className="auris-footer-logo"><span className="ear-icon">{'\u25C8'}</span> Auris</div>
           <p className="auris-footer-sub">An AI voice assistant for Claude Code for Web &mdash; keeping you in flow.</p>
+          <a href="/" style={{ display: 'inline-block', marginTop: '1.5rem', fontSize: '0.75rem', color: 'var(--muted)', textDecoration: 'none', transition: 'color 0.2s' }}>{'\u2190'} ricardoalexander.dev</a>
+          <p style={{ marginTop: '0.75rem', fontSize: '0.65rem', color: 'var(--dim)' }}>&copy; 2026 XANDR</p>
         </div>
       </footer>
 
