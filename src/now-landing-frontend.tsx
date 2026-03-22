@@ -905,14 +905,18 @@ const NowLandingFrontend: React.FC = () => {
         .now-carousel-wrap {
           position: relative;
           max-width: 100%;
+          display: flex;
+          align-items: center;
         }
         .now-carousel {
           display: flex;
+          flex: 1;
+          min-width: 0;
           gap: 1.5rem;
           overflow-x: auto;
           scrollbar-width: none;
           -ms-overflow-style: none;
-          padding: 1rem 0 2rem;
+          padding: 1rem 0.5rem 2rem;
           -webkit-overflow-scrolling: touch;
         }
         .now-carousel::-webkit-scrollbar { display: none; }
@@ -967,8 +971,7 @@ const NowLandingFrontend: React.FC = () => {
           position: relative; z-index: 1;
         }
         .now-carousel-arrow {
-          position: absolute; top: 50%;
-          transform: translateY(-50%);
+          flex-shrink: 0;
           width: 44px; height: 44px;
           background: var(--bg); border: 2px solid var(--accent);
           border-radius: 50%;
@@ -981,8 +984,6 @@ const NowLandingFrontend: React.FC = () => {
           box-shadow: 0 0 12px var(--accent-glow);
         }
         .now-carousel-arrow:hover { background: var(--accent); color: var(--bg); box-shadow: 0 0 20px var(--accent-glow); }
-        .now-carousel-arrow.left { left: -0.5rem; }
-        .now-carousel-arrow.right { right: -0.5rem; }
         .now-theme-hint {
           text-align: center;
           font-family: 'Space Mono', monospace;
@@ -1718,9 +1719,7 @@ const NowLandingFrontend: React.FC = () => {
           section { padding: 4rem 0 !important; overflow: hidden; max-width: 100%; }
           #pricing .now-reveal { grid-template-columns: 1fr !important; }
           .now-plan-features { padding: 1.5rem; }
-          .now-carousel-arrow { width: 38px; height: 38px; font-size: 1.1rem; }
-          .now-carousel-arrow.left { left: 0.25rem; }
-          .now-carousel-arrow.right { right: 0.25rem; }
+          .now-carousel-arrow { display: none; }
           .now-faq-q { font-size: 0.88rem; }
           .now-faq-a { font-size: 0.82rem; }
           .now-preview-desktop { height: 280px; }
