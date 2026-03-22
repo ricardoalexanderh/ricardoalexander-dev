@@ -137,7 +137,7 @@ const NowLandingFrontend: React.FC = () => {
   const [clockTime, setClockTime] = useState(new Date())
   const [pomodoroSeconds, setPomodoroSeconds] = useState(25 * 60)
   const [pomodoroRunning, setPomodoroRunning] = useState(false)
-  const [progressDemo, setProgressDemo] = useState(0)
+  const [_progressDemo, setProgressDemo] = useState(0)
   const [sysInfoCpu, setSysInfoCpu] = useState(42)
   const [sysInfoRam, setSysInfoRam] = useState(67)
   const carouselRef = useRef<HTMLDivElement>(null)
