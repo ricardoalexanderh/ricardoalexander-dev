@@ -477,7 +477,7 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
                       initial={{ opacity: 0, y: -6, scale: 0.97 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       transition={{ duration: 0.15 }}
-                      className="absolute top-full left-0 mt-1 w-72 rounded-xl bg-zinc-900/95 dark:bg-zinc-900/95 bg-white/95 backdrop-blur-xl border border-white/[0.06] dark:border-white/[0.06] border-zinc-200/60 shadow-2xl overflow-hidden"
+                      className="absolute top-full left-0 mt-1 w-72 rounded-xl bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-zinc-200/60 dark:border-white/[0.06] shadow-2xl overflow-hidden"
                     >
                       <a
                         href="/products/auris"
@@ -486,17 +486,17 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
                         <span className="text-2xl group-hover:scale-110 transition-transform" style={{ color: '#7b6cff' }}>&#x25C8;</span>
                         <div>
                           <div className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">Auris</div>
-                          <div className="text-xs text-zinc-500 dark:text-zinc-500 mt-0.5">AI voice assistant for <span style={{ color: '#D97757', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}><img src="/claude-ai-icon.svg" alt="Claude" width="14" height="14" />Claude Code</span></div>
+                          <div className="text-xs text-zinc-500 mt-0.5">AI voice assistant for <span style={{ color: '#D97757', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}><img src="/claude-ai-icon.svg" alt="Claude" width="14" height="14" />Claude Code</span></div>
                         </div>
                       </a>
                       <a
                         href="/products/now"
                         className="flex items-center gap-4 w-full px-5 py-4 text-left text-zinc-600 dark:text-zinc-400 hover:text-emerald-500 dark:hover:text-emerald-400 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/50 transition-all font-outfit group"
                       >
-                        <span className="group-hover:scale-110 transition-transform" style={{ display: 'inline-grid', gridTemplateColumns: 'repeat(3, 5px)', gap: '2px' }}>{[1,0,1,0,1,0,1,0,1].map((on, idx) => <span key={idx} style={{ width: 5, height: 5, borderRadius: 1, background: on ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.08)' }} />)}</span>
+                        <span className="group-hover:scale-110 transition-transform" style={{ display: 'inline-grid', gridTemplateColumns: 'repeat(3, 5px)', gap: '2px' }}>{[1,0,1,0,1,0,1,0,1].map((on, idx) => <span key={idx} className={on ? 'bg-zinc-400 dark:bg-white/30' : 'bg-zinc-200 dark:bg-white/[0.08]'} style={{ width: 5, height: 5, borderRadius: 1 }} />)}</span>
                         <div>
                           <div className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">Now</div>
-                          <div className="text-xs text-zinc-500 dark:text-zinc-500 mt-0.5">Pixel companion for your desktop</div>
+                          <div className="text-xs text-zinc-500 mt-0.5">Pixel companion for your desktop</div>
                         </div>
                       </a>
                     </motion.div>
@@ -562,14 +562,14 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.2 }}
-          className="mt-2 rounded-2xl bg-zinc-900/95 dark:bg-zinc-900/95 bg-white/95 backdrop-blur-xl border border-white/[0.06] dark:border-white/[0.06] border-zinc-200/60 p-4 space-y-1"
+          className="mt-2 rounded-2xl bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-zinc-200/60 dark:border-white/[0.06] p-4 space-y-1"
         >
           {navLinks.map((link) =>
             link === 'Products' ? (
               <div key={link}>
                 <button
                   onClick={() => setProductsOpen(!productsOpen)}
-                  className="flex items-center justify-between w-full px-4 py-2.5 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/10 dark:hover:bg-zinc-800/50 transition-colors font-outfit"
+                  className="flex items-center justify-between w-full px-4 py-2.5 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/50 transition-colors font-outfit"
                 >
                   Products
                   <svg className={`w-3 h-3 transition-transform duration-200 ${productsOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
@@ -578,16 +578,16 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
                   <>
                     <a
                       href="/products/auris"
-                      className="flex items-center gap-3 w-full px-8 py-2.5 text-left text-zinc-500 dark:text-zinc-500 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors font-outfit"
+                      className="flex items-center gap-3 w-full px-8 py-2.5 text-left text-zinc-600 dark:text-zinc-500 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors font-outfit"
                     >
                       <span className="text-lg" style={{ color: '#7b6cff' }}>&#x25C8;</span>
                       <span className="text-sm">Auris</span>
                     </a>
                     <a
                       href="/products/now"
-                      className="flex items-center gap-3 w-full px-8 py-2.5 text-left text-zinc-500 dark:text-zinc-500 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors font-outfit"
+                      className="flex items-center gap-3 w-full px-8 py-2.5 text-left text-zinc-600 dark:text-zinc-500 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors font-outfit"
                     >
-                      <span style={{ display: 'inline-grid', gridTemplateColumns: 'repeat(3, 4px)', gap: '1.5px' }}>{[1,0,1,0,1,0,1,0,1].map((on, idx) => <span key={idx} style={{ width: 4, height: 4, borderRadius: 1, background: on ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.08)' }} />)}</span>
+                      <span style={{ display: 'inline-grid', gridTemplateColumns: 'repeat(3, 4px)', gap: '1.5px' }}>{[1,0,1,0,1,0,1,0,1].map((on, idx) => <span key={idx} className={on ? 'bg-zinc-400 dark:bg-white/30' : 'bg-zinc-200 dark:bg-white/[0.08]'} style={{ width: 4, height: 4, borderRadius: 1 }} />)}</span>
                       <span className="text-sm">Now</span>
                     </a>
                   </>
@@ -597,27 +597,27 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
               <button
                 key={link}
                 onClick={() => scrollToSection(link.toLowerCase())}
-                className="block w-full text-left px-4 py-2.5 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/10 dark:hover:bg-zinc-800/50 transition-colors font-outfit"
+                className="block w-full text-left px-4 py-2.5 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/50 transition-colors font-outfit"
               >
                 {link}
               </button>
           ))}
-          <div className="flex items-center space-x-2 px-4 pt-2 border-t border-zinc-800/50 dark:border-zinc-800/50 border-zinc-200/50 mt-2">
+          <div className="flex items-center space-x-2 px-4 pt-2 border-t border-zinc-200/50 dark:border-zinc-800/50 mt-2">
             <a
               href="https://linkedin.com/in/ricardoalexanderh"
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 rounded-full hover:bg-zinc-800/50 transition-colors"
+              className="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800/50 transition-colors"
             >
-              <LinkedinLogo size={18} className="text-zinc-400" weight="bold" />
+              <LinkedinLogo size={18} className="text-zinc-600 dark:text-zinc-400" weight="bold" />
             </a>
             <a
               href="https://github.com/ricardoalexanderh"
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 rounded-full hover:bg-zinc-800/50 transition-colors"
+              className="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800/50 transition-colors"
             >
-              <GithubLogo size={18} className="text-zinc-400" weight="bold" />
+              <GithubLogo size={18} className="text-zinc-600 dark:text-zinc-400" weight="bold" />
             </a>
           </div>
         </motion.div>
