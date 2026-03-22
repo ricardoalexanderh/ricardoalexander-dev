@@ -910,15 +910,14 @@ const NowLandingFrontend: React.FC = () => {
           display: flex;
           gap: 1.5rem;
           overflow-x: auto;
-          scroll-snap-type: x mandatory;
           scrollbar-width: none;
           -ms-overflow-style: none;
           padding: 1rem 0 2rem;
+          -webkit-overflow-scrolling: touch;
         }
         .now-carousel::-webkit-scrollbar { display: none; }
         .now-char-card {
           flex: 0 0 280px;
-          scroll-snap-align: center;
           background: var(--surface);
           border: 2px solid var(--border);
           border-radius: 8px;
@@ -970,16 +969,18 @@ const NowLandingFrontend: React.FC = () => {
         .now-carousel-arrow {
           position: absolute; top: 50%;
           transform: translateY(-50%);
-          width: 36px; height: 36px;
-          background: var(--surface); border: 1px solid var(--border);
-          border-radius: 4px;
-          color: var(--muted);
+          width: 44px; height: 44px;
+          background: var(--bg); border: 2px solid var(--accent);
+          border-radius: 50%;
+          color: var(--accent);
           display: flex; align-items: center; justify-content: center;
-          cursor: pointer; z-index: 3;
-          font-size: 1rem;
+          cursor: pointer; z-index: 10;
+          font-size: 1.3rem;
+          font-weight: 700;
           transition: all 0.2s;
+          box-shadow: 0 0 12px var(--accent-glow);
         }
-        .now-carousel-arrow:hover { border-color: var(--accent); color: var(--bright); }
+        .now-carousel-arrow:hover { background: var(--accent); color: var(--bg); box-shadow: 0 0 20px var(--accent-glow); }
         .now-carousel-arrow.left { left: -0.5rem; }
         .now-carousel-arrow.right { right: -0.5rem; }
         .now-theme-hint {
@@ -1717,7 +1718,9 @@ const NowLandingFrontend: React.FC = () => {
           section { padding: 4rem 0 !important; overflow: hidden; max-width: 100%; }
           #pricing .now-reveal { grid-template-columns: 1fr !important; }
           .now-plan-features { padding: 1.5rem; }
-          .now-carousel-arrow { display: none; }
+          .now-carousel-arrow { width: 38px; height: 38px; font-size: 1.1rem; }
+          .now-carousel-arrow.left { left: 0.25rem; }
+          .now-carousel-arrow.right { right: 0.25rem; }
           .now-faq-q { font-size: 0.88rem; }
           .now-faq-a { font-size: 0.82rem; }
           .now-preview-desktop { height: 280px; }
@@ -1946,7 +1949,7 @@ const NowLandingFrontend: React.FC = () => {
           <p className="now-section-sub now-reveal">Each one bounces, blinks, speaks small things, and watches time with you. Pick one &mdash; the whole page follows.</p>
 
           <div className="now-carousel-wrap now-reveal">
-            <button className="now-carousel-arrow left" onClick={() => scrollCarousel(-1)} aria-label="Previous">{'\u2190'}</button>
+            <button className="now-carousel-arrow left" onClick={() => scrollCarousel(-1)} aria-label="Previous">{'\u2039'}</button>
             <div
               className="now-carousel"
               ref={carouselRef}
@@ -1972,7 +1975,7 @@ const NowLandingFrontend: React.FC = () => {
                 </div>
               ))}
             </div>
-            <button className="now-carousel-arrow right" onClick={() => scrollCarousel(1)} aria-label="Next">{'\u2192'}</button>
+            <button className="now-carousel-arrow right" onClick={() => scrollCarousel(1)} aria-label="Next">{'\u203A'}</button>
           </div>
           <p className="now-theme-hint now-reveal">
             {'\u2191'} Choose a companion &mdash; the page accent color transitions to match
