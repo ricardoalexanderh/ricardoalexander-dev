@@ -445,7 +445,7 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
 
   return (
     <nav className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-4xl">
-      <div className="rounded-full bg-zinc-900/80 dark:bg-zinc-900/80 bg-white/80 backdrop-blur-xl border border-white/[0.06] dark:border-white/[0.06] border-zinc-200/60 px-6 py-3">
+      <div className="rounded-full bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-zinc-200/60 dark:border-white/[0.06] px-6 py-3">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center space-x-2.5">
