@@ -308,12 +308,22 @@ const NowLandingFrontend: React.FC = () => {
   }
 
   const scrollCarousel = useCallback((direction: number) => {
-    if (carouselRef.current) {
-      const card = carouselRef.current.querySelector('.now-char-card') as HTMLElement
-      const gap = parseFloat(getComputedStyle(carouselRef.current).gap) || 0
-      const scrollDist = card ? card.offsetWidth + gap : carouselRef.current.offsetWidth * 0.72
-      carouselRef.current.scrollBy({ left: direction * scrollDist, behavior: 'smooth' })
-    }
+    const el = carouselRef.current
+    if (!el) return
+    const cards = el.querySelectorAll('.now-char-card') as NodeListOf<HTMLElement>
+    if (!cards.length) return
+    const containerCenter = el.scrollLeft + el.offsetWidth / 2
+    let closestIdx = 0
+    let closestDist = Infinity
+    cards.forEach((card, i) => {
+      const cardCenter = card.offsetLeft - el.offsetLeft + card.offsetWidth / 2
+      const dist = Math.abs(cardCenter - containerCenter)
+      if (dist < closestDist) { closestDist = dist; closestIdx = i }
+    })
+    const targetIdx = Math.max(0, Math.min(cards.length - 1, closestIdx + direction))
+    const target = cards[targetIdx]
+    const scrollPos = target.offsetLeft - el.offsetLeft - (el.offsetWidth - target.offsetWidth) / 2
+    el.scrollTo({ left: scrollPos, behavior: 'smooth' })
   }, [])
 
   const featureIcons: Record<string, string> = {
