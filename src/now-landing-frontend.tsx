@@ -141,7 +141,7 @@ const NowLandingFrontend: React.FC = () => {
   const [sysInfoCpu, setSysInfoCpu] = useState(42)
   const [sysInfoRam, setSysInfoRam] = useState(67)
   const carouselRef = useRef<HTMLDivElement>(null)
-  const touchXRef = useRef(0)
+
   const progressTriggered = useRef(false)
   const [demoNotes, setDemoNotes] = useState<string[]>(['Review PR #42', 'Ship login fix'])
   const [demoNoteInput, setDemoNoteInput] = useState('')
@@ -308,10 +308,22 @@ const NowLandingFrontend: React.FC = () => {
   }
 
   const scrollCarousel = useCallback((direction: number) => {
-    if (carouselRef.current) {
-      const cardWidth = carouselRef.current.offsetWidth * 0.72
-      carouselRef.current.scrollBy({ left: direction * cardWidth, behavior: 'smooth' })
-    }
+    const el = carouselRef.current
+    if (!el) return
+    const cards = el.querySelectorAll('.now-char-card') as NodeListOf<HTMLElement>
+    if (!cards.length) return
+    const containerCenter = el.scrollLeft + el.offsetWidth / 2
+    let closestIdx = 0
+    let closestDist = Infinity
+    cards.forEach((card, i) => {
+      const cardCenter = card.offsetLeft - el.offsetLeft + card.offsetWidth / 2
+      const dist = Math.abs(cardCenter - containerCenter)
+      if (dist < closestDist) { closestDist = dist; closestIdx = i }
+    })
+    const targetIdx = Math.max(0, Math.min(cards.length - 1, closestIdx + direction))
+    const target = cards[targetIdx]
+    const scrollPos = target.offsetLeft - el.offsetLeft - (el.offsetWidth - target.offsetWidth) / 2
+    el.scrollTo({ left: scrollPos, behavior: 'instant' })
   }, [])
 
   const featureIcons: Record<string, string> = {
@@ -893,15 +905,20 @@ const NowLandingFrontend: React.FC = () => {
         .now-carousel-wrap {
           position: relative;
           max-width: 100%;
+          display: flex;
+          align-items: center;
         }
         .now-carousel {
           display: flex;
+          flex: 1;
+          min-width: 0;
           gap: 1.5rem;
           overflow-x: auto;
           scroll-snap-type: x mandatory;
           scrollbar-width: none;
           -ms-overflow-style: none;
-          padding: 1rem 0 2rem;
+          padding: 1rem 0.5rem 2rem;
+          -webkit-overflow-scrolling: touch;
         }
         .now-carousel::-webkit-scrollbar { display: none; }
         .now-char-card {
@@ -956,20 +973,19 @@ const NowLandingFrontend: React.FC = () => {
           position: relative; z-index: 1;
         }
         .now-carousel-arrow {
-          position: absolute; top: 50%;
-          transform: translateY(-50%);
-          width: 36px; height: 36px;
-          background: var(--surface); border: 1px solid var(--border);
-          border-radius: 4px;
-          color: var(--muted);
+          flex-shrink: 0;
+          width: 44px; height: 44px;
+          background: var(--bg); border: 2px solid var(--accent);
+          border-radius: 50%;
+          color: var(--accent);
           display: flex; align-items: center; justify-content: center;
-          cursor: pointer; z-index: 3;
-          font-size: 1rem;
+          cursor: pointer; z-index: 10;
+          font-size: 1.3rem;
+          font-weight: 700;
           transition: all 0.2s;
+          box-shadow: 0 0 12px var(--accent-glow);
         }
-        .now-carousel-arrow:hover { border-color: var(--accent); color: var(--bright); }
-        .now-carousel-arrow.left { left: -0.5rem; }
-        .now-carousel-arrow.right { right: -0.5rem; }
+        .now-carousel-arrow:hover { background: var(--accent); color: var(--bg); box-shadow: 0 0 20px var(--accent-glow); }
         .now-theme-hint {
           text-align: center;
           font-family: 'Space Mono', monospace;
@@ -1287,10 +1303,11 @@ const NowLandingFrontend: React.FC = () => {
           text-transform: uppercase;
         }
         .now-builder-chars {
-          display: flex; gap: 0.5rem; flex-wrap: wrap;
+          display: flex; gap: 0.5rem; flex-wrap: nowrap;
         }
         .now-builder-char-btn {
           width: 42px; height: 42px;
+          flex-shrink: 0;
           background: var(--bg);
           border: 2px solid var(--border);
           border-radius: 4px;
@@ -1934,15 +1951,10 @@ const NowLandingFrontend: React.FC = () => {
           <p className="now-section-sub now-reveal">Each one bounces, blinks, speaks small things, and watches time with you. Pick one &mdash; the whole page follows.</p>
 
           <div className="now-carousel-wrap now-reveal">
-            <button className="now-carousel-arrow left" onClick={() => scrollCarousel(-1)} aria-label="Previous">{'\u2190'}</button>
+            <button className="now-carousel-arrow left" onClick={() => scrollCarousel(-1)} aria-label="Previous">{'\u2039'}</button>
             <div
               className="now-carousel"
               ref={carouselRef}
-              onTouchStart={(e) => { touchXRef.current = e.touches[0].clientX }}
-              onTouchEnd={(e) => {
-                const diff = touchXRef.current - e.changedTouches[0].clientX
-                if (Math.abs(diff) > 40) scrollCarousel(diff > 0 ? 1 : -1)
-              }}
             >
               {characters.map((c, i) => (
                 <div
@@ -1960,7 +1972,7 @@ const NowLandingFrontend: React.FC = () => {
                 </div>
               ))}
             </div>
-            <button className="now-carousel-arrow right" onClick={() => scrollCarousel(1)} aria-label="Next">{'\u2192'}</button>
+            <button className="now-carousel-arrow right" onClick={() => scrollCarousel(1)} aria-label="Next">{'\u203A'}</button>
           </div>
           <p className="now-theme-hint now-reveal">
             {'\u2191'} Choose a companion &mdash; the page accent color transitions to match
