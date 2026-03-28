@@ -140,6 +140,8 @@ const NowLandingFrontend: React.FC = () => {
   const [_progressDemo, setProgressDemo] = useState(0)
   const [sysInfoCpu, setSysInfoCpu] = useState(42)
   const [sysInfoRam, setSysInfoRam] = useState(67)
+  const [sysInfoDisk, setSysInfoDisk] = useState(54)
+  const [sysInfoDiskIo, setSysInfoDiskIo] = useState(5)
   const carouselRef = useRef<HTMLDivElement>(null)
 
   const progressTriggered = useRef(false)
@@ -166,7 +168,7 @@ const NowLandingFrontend: React.FC = () => {
     { icon: '', title: 'Ambient Sounds', desc: 'Rain when you need to settle in. Cafe, fire, wind. Ambient loops that just play.', type: 'waveform' },
     { icon: '', title: 'Pomodoro Timer', desc: 'When you want to focus. 25 minutes on, 5 off. Your companion reacts to each phase.', type: 'pomodoro' },
     { icon: '', title: 'Quick Notes', desc: 'A thought passes — jot it down. No app switching, no friction. Just a quick note, right there.', type: 'notes' },
-    { icon: '', title: 'System Info', desc: 'CPU and RAM, quietly visible. Your companion notices when things get heavy.', type: 'sysinfo' },
+    { icon: '', title: 'System Info', desc: 'CPU, RAM, Disk & I/O, quietly visible. Your companion notices when things get heavy.', type: 'sysinfo' },
     { icon: '', title: 'Idle Detection', desc: 'Step away and your companion falls asleep. Come back and it wakes up, glad you\'re here.', type: 'idle' },
     { icon: '', title: 'Click-Through', desc: 'Your mouse passes right through it. Hold Ctrl when you need it. Release and it\'s invisible again. Never in your way.', type: 'clickthrough' },
   ]
@@ -196,7 +198,7 @@ const NowLandingFrontend: React.FC = () => {
     'Progress bars & custom trackers',
     'Quick notes inside the widget',
     'Ambient sound player',
-    'System info monitor (CPU & RAM)',
+    'System info monitor (CPU, RAM, Disk & I/O)',
     'Idle detection with companion sleep',
     'Click-through mode (Ctrl to interact)',
     'Dark & light theme',
@@ -230,6 +232,8 @@ const NowLandingFrontend: React.FC = () => {
     const timer = setInterval(() => {
       setSysInfoCpu(Math.floor(Math.random() * 40) + 20)
       setSysInfoRam(Math.floor(Math.random() * 30) + 50)
+      setSysInfoDisk(Math.floor(Math.random() * 40) + 30)
+      setSysInfoDiskIo(Math.floor(Math.random() * 25) + 5)
     }, 3000)
     return () => clearInterval(timer)
   }, [])
@@ -748,12 +752,17 @@ const NowLandingFrontend: React.FC = () => {
         }
         /* Sys info strip */
         .now-hwm-sys {
-          display: flex; align-items: center; justify-content: flex-end; gap: 8px;
-          padding: 0 0 6px; font-size: 6px;
+          display: flex; align-items: center; justify-content: flex-end; gap: 5px;
+          padding: 0 0 8px; margin-top: -6px; font-size: 6px;
         }
-        .now-hwm-sys-label { letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.2); }
-        .now-hwm-sys-val { font-weight: 700; color: rgba(255,255,255,0.4); font-size: 8px; }
-        .now-hwm-sys-sep { width: 1px; height: 8px; background: rgba(255,255,255,0.06); }
+        .now-hwm-sys .sys-item { display: flex; align-items: center; gap: 2px; }
+        .now-hwm-sys .sys-ico { width: 11px; height: 11px; color: rgba(255,255,255,0.3); flex-shrink: 0; }
+        .now-hwm-sys .sys-ico svg { width: 100%; height: 100%; }
+        .now-hwm-sys .sys-ico-text { font-size: 8px; font-weight: 700; color: rgba(255,255,255,0.3); flex-shrink: 0; letter-spacing: -0.5px; }
+        .now-hwm-sys .sys-val { font-weight: 700; color: #6BCB77; font-size: 8px; }
+        .now-hwm-sys .sys-sep { width: 1px; height: 8px; background: rgba(255,255,255,0.06); }
+        .now-hwm-sys .sys-warn { color: #F2A871 !important; }
+        .now-hwm-sys .sys-crit { color: #E86050 !important; }
         /* Top row: character + clock */
         .now-hwm-top {
           display: flex; align-items: flex-end; gap: 14px;
@@ -776,7 +785,7 @@ const NowLandingFrontend: React.FC = () => {
           display: flex; align-items: center; gap: 8px; padding: 4px 0;
         }
         .now-hwm-bar-label {
-          width: 42px; min-width: 42px; font-size: 8px; color: #A8A2B0;
+          width: 56px; min-width: 56px; font-size: 9px; color: #A8A2B0;
           overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
         .now-hwm-bar-track {
@@ -1132,7 +1141,7 @@ const NowLandingFrontend: React.FC = () => {
 
         /* Sysinfo demo */
         .now-demo-sysinfo {
-          display: flex; gap: 1.5rem; width: 100%;
+          display: flex; gap: 1rem; width: 100%; flex-wrap: wrap;
           font-family: 'Space Mono', monospace;
           font-size: 0.7rem;
         }
@@ -1815,11 +1824,25 @@ const NowLandingFrontend: React.FC = () => {
           <div className="now-hwm">
             {/* Sys info strip */}
             <div className="now-hwm-sys">
-              <span className="now-hwm-sys-label">CPU</span>
-              <span className="now-hwm-sys-val">{sysInfoCpu}%</span>
-              <span className="now-hwm-sys-sep" />
-              <span className="now-hwm-sys-label">RAM</span>
-              <span className="now-hwm-sys-val">{sysInfoRam}%</span>
+              <span className="sys-item">
+                <span className="sys-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="4" y="4" width="16" height="16" rx="2"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="15" x2="4" y2="15"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="15" x2="23" y2="15"/></svg></span>
+                <span className={`sys-val${sysInfoCpu >= 85 ? ' sys-crit' : sysInfoCpu >= 60 ? ' sys-warn' : ''}`}>{sysInfoCpu}%</span>
+              </span>
+              <span className="sys-sep" />
+              <span className="sys-item">
+                <span className="sys-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="2" y="6" width="20" height="12" rx="2"/><line x1="6" y1="18" x2="6" y2="21"/><line x1="10" y1="18" x2="10" y2="21"/><line x1="14" y1="18" x2="14" y2="21"/><line x1="18" y1="18" x2="18" y2="21"/><rect x="5" y="9" width="4" height="6" rx="1"/><rect x="11" y="9" width="4" height="6" rx="1"/></svg></span>
+                <span className={`sys-val${sysInfoRam >= 85 ? ' sys-crit' : sysInfoRam >= 60 ? ' sys-warn' : ''}`}>{sysInfoRam}%</span>
+              </span>
+              <span className="sys-sep" />
+              <span className="sys-item">
+                <span className="sys-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4.03 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/></svg></span>
+                <span className={`sys-val${sysInfoDisk >= 85 ? ' sys-crit' : sysInfoDisk >= 60 ? ' sys-warn' : ''}`}>{sysInfoDisk}%</span>
+              </span>
+              <span className="sys-sep" />
+              <span className="sys-item">
+                <span className="sys-ico-text">I/O</span>
+                <span className={`sys-val${sysInfoDiskIo >= 85 ? ' sys-crit' : sysInfoDiskIo >= 60 ? ' sys-warn' : ''}`}>{sysInfoDiskIo}%</span>
+              </span>
             </div>
             {/* Character + Clock */}
             <div className="now-hwm-top">
@@ -1833,8 +1856,9 @@ const NowLandingFrontend: React.FC = () => {
                   <span className="now-hwm-colon">:</span>
                   <span>{String(clockTime.getMinutes()).padStart(2, '0')}</span>
                   <span className="now-hwm-sec">{String(clockTime.getSeconds()).padStart(2, '0')}</span>
+                  <span style={{ fontSize: '8px', marginLeft: '3px', color: '#6A6474' }}>{clockTime.getHours() >= 12 ? 'PM' : 'AM'}</span>
                 </div>
-                <div className="now-hwm-date">{clockTime.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</div>
+                <div className="now-hwm-date">{clockTime.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}</div>
               </div>
             </div>
             {/* Built-in progress bars */}
@@ -1856,11 +1880,11 @@ const NowLandingFrontend: React.FC = () => {
               ))}
               {/* Separator */}
               <div className="now-hwm-bar-sep" />
-              {/* Custom trackers — 3 samples */}
+              {/* Custom trackers — samples from widget */}
               {[
-                { label: 'X', pct: 72, display: '8d', color: '#90E8A0' },
-                { label: 'DW', pct: 45, display: '1h48/4h', color: '#70D0F0' },
-                { label: 'SP', pct: 33, display: '40:00', color: '#F5A0C0' },
+                { label: 'LD', pct: 45, display: '79d', color: '#7BB3F5' },
+                { label: 'DW', pct: 33, display: '80:00', color: '#F2A871' },
+                { label: 'PRA', pct: 44, display: '40/90m', color: '#A88BDB' },
               ].map((t) => (
                 <div className="now-hwm-bar" key={t.label}>
                   <span className="now-hwm-bar-label" style={{ color: t.color }}>{t.label}</span>
@@ -1877,7 +1901,7 @@ const NowLandingFrontend: React.FC = () => {
                 <span className="now-hwm-pomo-center">25</span>
               </div>
               <div className="now-hwm-pomo-info">
-                <div className="now-hwm-pomo-label">Ready</div>
+                <div className="now-hwm-pomo-label">Focus</div>
                 <div className="now-hwm-pomo-timer">25:00</div>
                 <div className="now-hwm-pomo-dots">
                   <div className="now-hwm-pomo-dot" />
@@ -1896,6 +1920,8 @@ const NowLandingFrontend: React.FC = () => {
               <div className="now-hwm-foot-left">
                 <PixelGrid size={12} />
                 <span className="now-hwm-foot-label">Now</span>
+                <span style={{ fontSize: '7px', color: '#3E3848', opacity: 0.6 }}>&middot; by </span>
+                <a href="https://ricardoalexander.dev" target="_blank" rel="noopener noreferrer" style={{ fontSize: '7px', color: '#3E3848', textDecoration: 'none', opacity: 0.7, letterSpacing: '0.12em', fontFamily: "'Silkscreen', cursive" }}>XANDR</a>
               </div>
               <div className="now-hwm-foot-actions">
                 <div className="now-hwm-foot-btn" title="Ambient Sound">
@@ -2058,9 +2084,9 @@ const NowLandingFrontend: React.FC = () => {
                   {f.type === 'trackers' && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%', fontFamily: "'Silkscreen', cursive" }}>
                       {[
-                        { label: 'X', name: 'Christmas', pct: 72, display: '8d', color: '#90E8A0', type: 'Countdown', hasPlay: false },
-                        { label: 'DW', name: 'Deep Work', pct: 45, display: '1h48/4h', color: '#70D0F0', type: 'Daily Goal', hasPlay: true },
-                        { label: 'SP', name: 'Sprint', pct: 33, display: '40:00', color: '#F5A0C0', type: 'Timer', hasPlay: true },
+                        { label: 'LD', name: 'Launch Day', pct: 45, display: '79d', color: '#7BB3F5', type: 'Countdown', hasPlay: false },
+                        { label: 'DW', name: 'Deep Work', pct: 33, display: '80:00', color: '#F2A871', type: 'Timer', hasPlay: true },
+                        { label: 'PRA', name: 'Practice', pct: 44, display: '40/90m', color: '#A88BDB', type: 'Daily Goal', hasPlay: true },
                       ].map((t) => (
                         <div key={t.label} style={{ display: 'flex', alignItems: 'center', gap: '6px' }} title={`${t.name} — ${t.display} (${t.type}) — ${t.pct}% complete`}>
                           <span style={{ fontSize: '0.55rem', color: t.color, minWidth: '20px' }}>{t.label}</span>
@@ -2120,20 +2146,20 @@ const NowLandingFrontend: React.FC = () => {
                   )}
                   {f.type === 'sysinfo' && (
                     <div className="now-demo-sysinfo">
-                      <div className="now-sysinfo-item">
-                        <div className="now-sysinfo-label">CPU</div>
-                        <div className="now-sysinfo-value">{sysInfoCpu}%</div>
-                        <div className="now-sysinfo-bar">
-                          <div className="now-sysinfo-fill" style={{ width: `${sysInfoCpu}%` }} />
+                      {[
+                        { label: 'CPU', value: sysInfoCpu },
+                        { label: 'RAM', value: sysInfoRam },
+                        { label: 'Disk', value: sysInfoDisk },
+                        { label: 'I/O', value: sysInfoDiskIo },
+                      ].map((s) => (
+                        <div className="now-sysinfo-item" key={s.label}>
+                          <div className="now-sysinfo-label">{s.label}</div>
+                          <div className="now-sysinfo-value" style={s.value >= 85 ? { color: '#E86050' } : s.value >= 60 ? { color: '#F2A871' } : undefined}>{s.value}%</div>
+                          <div className="now-sysinfo-bar">
+                            <div className="now-sysinfo-fill" style={{ width: `${s.value}%`, backgroundColor: s.value >= 85 ? '#E86050' : s.value >= 60 ? '#F2A871' : undefined }} />
+                          </div>
                         </div>
-                      </div>
-                      <div className="now-sysinfo-item">
-                        <div className="now-sysinfo-label">RAM</div>
-                        <div className="now-sysinfo-value">{sysInfoRam}%</div>
-                        <div className="now-sysinfo-bar">
-                          <div className="now-sysinfo-fill" style={{ width: `${sysInfoRam}%` }} />
-                        </div>
-                      </div>
+                      ))}
                     </div>
                   )}
                   {f.type === 'idle' && (
