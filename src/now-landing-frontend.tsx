@@ -227,13 +227,14 @@ const NowLandingFrontend: React.FC = () => {
     return () => clearInterval(timer)
   }, [pomodoroRunning])
 
-  // System info mock cycling
+  // System info mock cycling — occasionally spikes into warn/crit range
   useEffect(() => {
     const timer = setInterval(() => {
-      setSysInfoCpu(Math.floor(Math.random() * 40) + 20)
-      setSysInfoRam(Math.floor(Math.random() * 30) + 50)
-      setSysInfoDisk(Math.floor(Math.random() * 40) + 30)
-      setSysInfoDiskIo(Math.floor(Math.random() * 25) + 5)
+      const spike = Math.random() < 0.25
+      setSysInfoCpu(spike ? Math.floor(Math.random() * 13) + 85 : Math.floor(Math.random() * 40) + 20)
+      setSysInfoRam(Math.random() < 0.2 ? Math.floor(Math.random() * 10) + 86 : Math.floor(Math.random() * 30) + 50)
+      setSysInfoDisk(Math.random() < 0.15 ? Math.floor(Math.random() * 10) + 85 : Math.floor(Math.random() * 40) + 30)
+      setSysInfoDiskIo(Math.random() < 0.2 ? Math.floor(Math.random() * 12) + 85 : Math.floor(Math.random() * 25) + 5)
     }, 3000)
     return () => clearInterval(timer)
   }, [])
