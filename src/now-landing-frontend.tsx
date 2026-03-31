@@ -143,6 +143,13 @@ const NowLandingFrontend: React.FC = () => {
   const [sysInfoDisk, setSysInfoDisk] = useState(54)
   const [sysInfoDiskIo, setSysInfoDiskIo] = useState(5)
   const carouselRef = useRef<HTMLDivElement>(null)
+  const ambientAudioRef = useRef<HTMLAudioElement | null>(null)
+
+  const playSelectSound = useCallback((charKey: string) => {
+    const audio = new Audio(`/audio/${charKey}-select.mp3`)
+    audio.volume = 0.5
+    audio.play().catch(() => {})
+  }, [])
 
   const progressTriggered = useRef(false)
   const [demoNotes, setDemoNotes] = useState<string[]>(['Review PR #42', 'Ship login fix'])
@@ -241,6 +248,14 @@ const NowLandingFrontend: React.FC = () => {
 
   // Scroll to top on mount
   useEffect(() => { window.scrollTo(0, 0) }, [])
+
+  // Cleanup ambient audio on unmount
+  useEffect(() => {
+    return () => {
+      ambientAudioRef.current?.pause()
+      ambientAudioRef.current = null
+    }
+  }, [])
 
   // Nav scroll effect
   useEffect(() => {
@@ -1991,7 +2006,7 @@ const NowLandingFrontend: React.FC = () => {
                   key={i}
                   className={`now-char-card ${i === activeCharacter ? 'active' : ''}`}
                   style={{ '--card-glow': c.bgGlow } as React.CSSProperties}
-                  onClick={() => { setActiveCharacter(i); scrollToCard(i) }}
+                  onClick={() => { setActiveCharacter(i); scrollToCard(i); playSelectSound(c.key) }}
                 >
                   <div className="now-char-pixel">
                     <PixelCharacter charKey={c.key} size={72} animate={true} />
@@ -2068,7 +2083,20 @@ const NowLandingFrontend: React.FC = () => {
                   {f.type === 'waveform' && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%' }}>
                       <button
-                        onClick={() => setAmbientMuted(!ambientMuted)}
+                        onClick={() => {
+                          if (ambientMuted) {
+                            if (!ambientAudioRef.current) {
+                              const a = new Audio('/audio/ambient.mp3')
+                              a.loop = true
+                              a.volume = 0.4
+                              ambientAudioRef.current = a
+                            }
+                            ambientAudioRef.current.play().catch(() => {})
+                          } else {
+                            ambientAudioRef.current?.pause()
+                          }
+                          setAmbientMuted(!ambientMuted)
+                        }}
                         style={{ width: '30px', height: '30px', borderRadius: '6px', border: 'none', background: ambientMuted ? 'rgba(255,255,255,0.06)' : 'var(--accent)', color: ambientMuted ? '#A8A2B0' : '#0a0a12', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all 0.3s', fontSize: '14px' }}
                         title={ambientMuted ? 'Play' : 'Mute'}
                       >
