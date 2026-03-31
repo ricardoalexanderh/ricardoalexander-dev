@@ -172,7 +172,7 @@ const NowLandingFrontend: React.FC = () => {
   const featuresData = [
     { icon: '', title: 'Clock & Progress', desc: 'A clock that feels alive — and below it, how far through the day, the week, the month, the quarter, the year. Time in context.', type: 'clockprogress' },
     { icon: '', title: 'Custom Trackers', desc: 'Countdown to a date. A running timer. A daily goal. Your companion celebrates the milestones along the way.', type: 'trackers' },
-    { icon: '', title: 'Ambient Sounds', desc: 'Rain when you need to settle in. Cafe, fire, forest. Ambient loops that just play.', type: 'waveform' },
+    { icon: '', title: 'Ambient Sounds', desc: 'Rain when you need to settle in. Cafe, snow, forest. Ambient loops that just play.', type: 'waveform' },
     { icon: '', title: 'Pomodoro Timer', desc: 'When you want to focus. 25 minutes on, 5 off. Your companion reacts to each phase.', type: 'pomodoro' },
     { icon: '', title: 'Quick Notes', desc: 'A thought passes — jot it down. No app switching, no friction. Just a quick note, right there.', type: 'notes' },
     { icon: '', title: 'System Info', desc: 'CPU, RAM, Disk & I/O, quietly visible. Your companion notices when things get heavy.', type: 'sysinfo' },
