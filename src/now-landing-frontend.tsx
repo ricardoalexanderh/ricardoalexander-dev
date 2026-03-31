@@ -143,6 +143,13 @@ const NowLandingFrontend: React.FC = () => {
   const [sysInfoDisk, setSysInfoDisk] = useState(54)
   const [sysInfoDiskIo, setSysInfoDiskIo] = useState(5)
   const carouselRef = useRef<HTMLDivElement>(null)
+  const ambientAudioRef = useRef<HTMLAudioElement | null>(null)
+
+  const playSelectSound = useCallback((charKey: string) => {
+    const audio = new Audio(`/audio/${charKey}-select.mp3`)
+    audio.volume = 0.5
+    audio.play().catch(() => {})
+  }, [])
 
   const progressTriggered = useRef(false)
   const [demoNotes, setDemoNotes] = useState<string[]>(['Review PR #42', 'Ship login fix'])
@@ -165,7 +172,7 @@ const NowLandingFrontend: React.FC = () => {
   const featuresData = [
     { icon: '', title: 'Clock & Progress', desc: 'A clock that feels alive — and below it, how far through the day, the week, the month, the quarter, the year. Time in context.', type: 'clockprogress' },
     { icon: '', title: 'Custom Trackers', desc: 'Countdown to a date. A running timer. A daily goal. Your companion celebrates the milestones along the way.', type: 'trackers' },
-    { icon: '', title: 'Ambient Sounds', desc: 'Rain when you need to settle in. Cafe, fire, wind. Ambient loops that just play.', type: 'waveform' },
+    { icon: '', title: 'Ambient Sounds', desc: 'Rain when you need to settle in. Cafe, snow, forest. Ambient loops that just play.', type: 'waveform' },
     { icon: '', title: 'Pomodoro Timer', desc: 'When you want to focus. 25 minutes on, 5 off. Your companion reacts to each phase.', type: 'pomodoro' },
     { icon: '', title: 'Quick Notes', desc: 'A thought passes — jot it down. No app switching, no friction. Just a quick note, right there.', type: 'notes' },
     { icon: '', title: 'System Info', desc: 'CPU, RAM, Disk & I/O, quietly visible. Your companion notices when things get heavy.', type: 'sysinfo' },
@@ -175,7 +182,7 @@ const NowLandingFrontend: React.FC = () => {
 
   const howItWorksSteps = [
     { num: '01', title: 'Download & Install', desc: 'Grab the lightweight app. Works on Windows, macOS, and Linux.', icon: '' },
-    { num: '02', title: 'Pick Your Companion', desc: 'Choose from 6 pixel companions. Each has unique idle animations and personality.', icon: '' },
+    { num: '02', title: 'Pick Your Companion', desc: 'Choose from 6 pixel companions. Each has a unique voice, idle animations, and personality.', icon: '' },
     { num: '03', title: 'Customize', desc: 'Dock it to any corner of your screen. Adjust transparency, size, and theme. Double-click your companion to minimize to a tiny floating pixel.', icon: '' },
   ]
 
@@ -187,7 +194,7 @@ const NowLandingFrontend: React.FC = () => {
     { q: 'Can I customize the widget?', a: 'Yes. You can pick your companion, adjust transparency, choose from 3 sizes (S, M, L), dock to any corner, switch between dark and light theme, and configure pomodoro presets and custom trackers.' },
     { q: 'Does it work with multiple monitors?', a: 'Yes! You can pin Now to any monitor. It stays always-on-top with a transparent background, so it sits right on your desktop.' },
     { q: 'What about privacy?', a: 'Now is 100% local. No telemetry, no analytics, no data collection. Everything runs on your machine. Your habits, notes, and data never leave your device.' },
-    { q: 'Will more companions be released?', a: 'Yes! More original companions are coming, and we\'re exploring collaborations with licensed and iconic characters. New companions will be available as separate purchases.' },
+    { q: 'Will more companions be released?', a: 'Yes! More original companions are coming — each with their own unique voice and personality. We\'re also exploring collaborations with licensed and iconic characters. New companions will be available as separate purchases.' },
     { q: 'How does the Pomodoro timer work?', a: 'Standard 25-minute focus / 5-minute break cycles with configurable presets. Your companion reacts to each phase — a message when focus starts, another when it\'s break time, and celebration when all sessions are done.' },
   ]
 
@@ -241,6 +248,14 @@ const NowLandingFrontend: React.FC = () => {
 
   // Scroll to top on mount
   useEffect(() => { window.scrollTo(0, 0) }, [])
+
+  // Cleanup ambient audio on unmount
+  useEffect(() => {
+    return () => {
+      ambientAudioRef.current?.pause()
+      ambientAudioRef.current = null
+    }
+  }, [])
 
   // Nav scroll effect
   useEffect(() => {
@@ -1978,7 +1993,7 @@ const NowLandingFrontend: React.FC = () => {
         <div className="now-container">
           <p className="now-section-label now-reveal">Meet Your Companions</p>
           <h2 className="now-section-title now-reveal">Pick your companion.</h2>
-          <p className="now-section-sub now-reveal">Each one bounces, blinks, speaks small things, and watches time with you. Pick one &mdash; the whole page follows.</p>
+          <p className="now-section-sub now-reveal">Each one bounces, blinks, and speaks in its own unique voice &mdash; not just text, but a distinct personality that watches time with you. Pick one &mdash; the whole page follows.</p>
 
           <div className="now-carousel-wrap now-reveal">
             <button className="now-carousel-arrow left" onClick={() => scrollCarousel(-1)} aria-label="Previous">{'\u2039'}</button>
@@ -1991,7 +2006,7 @@ const NowLandingFrontend: React.FC = () => {
                   key={i}
                   className={`now-char-card ${i === activeCharacter ? 'active' : ''}`}
                   style={{ '--card-glow': c.bgGlow } as React.CSSProperties}
-                  onClick={() => { setActiveCharacter(i); scrollToCard(i) }}
+                  onClick={() => { setActiveCharacter(i); scrollToCard(i); playSelectSound(c.key) }}
                 >
                   <div className="now-char-pixel">
                     <PixelCharacter charKey={c.key} size={72} animate={true} />
@@ -2068,7 +2083,20 @@ const NowLandingFrontend: React.FC = () => {
                   {f.type === 'waveform' && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%' }}>
                       <button
-                        onClick={() => setAmbientMuted(!ambientMuted)}
+                        onClick={() => {
+                          if (ambientMuted) {
+                            if (!ambientAudioRef.current) {
+                              const a = new Audio('/audio/ambient.mp3')
+                              a.loop = true
+                              a.volume = 0.4
+                              ambientAudioRef.current = a
+                            }
+                            ambientAudioRef.current.play().catch(() => {})
+                          } else {
+                            ambientAudioRef.current?.pause()
+                          }
+                          setAmbientMuted(!ambientMuted)
+                        }}
                         style={{ width: '30px', height: '30px', borderRadius: '6px', border: 'none', background: ambientMuted ? 'rgba(255,255,255,0.06)' : 'var(--accent)', color: ambientMuted ? '#A8A2B0' : '#0a0a12', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all 0.3s', fontSize: '14px' }}
                         title={ambientMuted ? 'Play' : 'Mute'}
                       >
