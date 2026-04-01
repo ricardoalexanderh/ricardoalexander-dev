@@ -925,8 +925,8 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
           </div>
 
           {/* Video + PDF in Double-Bezel cards */}
-          <div className="grid md:grid-cols-2 gap-6">
-            <ScrollReveal delay={0.15}>
+          <div className="grid gap-6">
+            {/* <ScrollReveal delay={0.15}>
               <DoubleBezelCard spotlight>
                 <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-3 font-space-grotesk">
                   Professional Overview
@@ -942,7 +942,7 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
                   Watch Video
                 </button>
               </DoubleBezelCard>
-            </ScrollReveal>
+            </ScrollReveal> */}
 
             <ScrollReveal delay={0.2}>
               <DoubleBezelCard spotlight>
