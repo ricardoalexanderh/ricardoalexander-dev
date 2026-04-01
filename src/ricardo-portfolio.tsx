@@ -3,7 +3,7 @@ import { motion, useMotionValue, useSpring, useInView } from 'motion/react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
-import { LinkedinLogo, GithubLogo, Sun, Moon, List, X, Play, DownloadSimple, EnvelopeSimple, Code, Globe, DeviceMobile, Cube, Cloud, Database, Lightning, Cpu } from '@phosphor-icons/react'
+import { LinkedinLogo, GithubLogo, Sun, Moon, List, X, DownloadSimple, EnvelopeSimple, Code, Globe, DeviceMobile, Cube, Cloud, Database, Lightning, Cpu } from '@phosphor-icons/react'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
