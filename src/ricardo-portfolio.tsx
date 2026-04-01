@@ -479,7 +479,7 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
                       transition={{ duration: 0.15 }}
                       className="absolute top-full left-0 mt-1 w-72 rounded-xl bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-zinc-200/60 dark:border-white/[0.06] shadow-2xl overflow-hidden"
                     >
-                      <a
+                      {/* <a
                         href="/products/auris"
                         className="flex items-center gap-4 w-full px-5 py-4 text-left text-zinc-600 dark:text-zinc-400 hover:text-emerald-500 dark:hover:text-emerald-400 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/50 transition-all font-outfit group"
                       >
@@ -488,7 +488,7 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
                           <div className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">Auris</div>
                           <div className="text-xs text-zinc-500 mt-0.5">AI voice assistant for <span style={{ color: '#D97757', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}><img src="/claude-ai-icon.svg" alt="Claude" width="14" height="14" />Claude Code</span></div>
                         </div>
-                      </a>
+                      </a> */}
                       <a
                         href="/products/now"
                         className="flex items-center gap-4 w-full px-5 py-4 text-left text-zinc-600 dark:text-zinc-400 hover:text-emerald-500 dark:hover:text-emerald-400 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/50 transition-all font-outfit group"
@@ -576,13 +576,13 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
                 </button>
                 {productsOpen && (
                   <>
-                    <a
+                    {/* <a
                       href="/products/auris"
                       className="flex items-center gap-3 w-full px-8 py-2.5 text-left text-zinc-600 dark:text-zinc-500 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors font-outfit"
                     >
                       <span className="text-lg" style={{ color: '#7b6cff' }}>&#x25C8;</span>
                       <span className="text-sm">Auris</span>
-                    </a>
+                    </a> */}
                     <a
                       href="/products/now"
                       className="flex items-center gap-3 w-full px-8 py-2.5 text-left text-zinc-600 dark:text-zinc-500 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors font-outfit"
@@ -1014,8 +1014,8 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
             </p>
           </ScrollReveal>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <ScrollReveal delay={0.15}>
+          <div className="grid grid-cols-1 gap-8 max-w-4xl mx-auto">
+            {/* <ScrollReveal delay={0.15}>
               <DoubleBezelCard spotlight>
                 <div className="flex items-center gap-4 mb-4">
                   <span className="text-3xl" style={{ color: '#7b6cff' }}>&#x25C8;</span>
@@ -1041,7 +1041,7 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
                   Coming Soon &middot; Learn more &rarr;
                 </a>
               </DoubleBezelCard>
-            </ScrollReveal>
+            </ScrollReveal> */}
             <ScrollReveal delay={0.2}>
               <DoubleBezelCard spotlight>
                 <div className="flex items-center gap-4 mb-4">
