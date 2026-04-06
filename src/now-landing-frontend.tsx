@@ -188,6 +188,7 @@ const NowLandingFrontend: React.FC = () => {
 
   const faqData = [
     { q: 'What platforms does Now support?', a: 'Now supports Windows, macOS, and Linux. It runs natively on all three platforms with minimal resource usage.' },
+    { q: 'Why does my OS warn me during installation?', a: 'Now is made by an indie developer, so it isn\'t signed with a corporate code-signing certificate — that\'s what triggers the warning. It\'s perfectly safe. On Windows, click "More info" then "Run anyway." On macOS, right-click the app, select "Open," and confirm in the dialog (or go to System Settings > Privacy & Security and click "Open Anyway"). On Linux, you may need to mark the file as executable with chmod +x.' },
     { q: 'How much does Now cost?', a: '$4.99 — one-time purchase. All 6 companions, all features, all platforms. No subscription.' },
     { q: 'Does it get in the way of my work?', a: 'No. The widget is click-through by default — your mouse passes right through it to the apps behind. Hold Ctrl to interact with the widget (click buttons, type notes, drag sliders). Release Ctrl and it becomes transparent to input again.' },
     { q: 'How much resources does it use?', a: 'Now is extremely lightweight. It\'s designed to be always-on without impacting your system performance.' },
