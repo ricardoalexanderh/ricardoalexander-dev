@@ -499,6 +499,18 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
                           <div className="text-xs text-zinc-500 mt-0.5">Pixel companion for your desktop</div>
                         </div>
                       </a>
+                      <a
+                        href="https://www.semakinpintar.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-4 w-full px-5 py-4 text-left text-zinc-600 dark:text-zinc-400 hover:text-emerald-500 dark:hover:text-emerald-400 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/50 transition-all font-outfit group"
+                      >
+                        <img src="/semakin-pintar-logo.png" alt="Semakin Pintar" width={20} height={20} className="rounded group-hover:scale-110 transition-transform" />
+                        <div>
+                          <div className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">Semakin Pintar</div>
+                          <div className="text-xs text-zinc-500 mt-0.5">Educational games for kids &amp; family</div>
+                        </div>
+                      </a>
                     </motion.div>
                   )}
                 </div>
@@ -589,6 +601,15 @@ const Navigation: React.FC<{ theme: 'dark' | 'light'; toggleTheme: () => void }>
                     >
                       <span style={{ display: 'inline-grid', gridTemplateColumns: 'repeat(3, 4px)', gap: '1.5px' }}>{[1,0,1,0,1,0,1,0,1].map((on, idx) => <span key={idx} className={on ? 'bg-zinc-400 dark:bg-white/30' : 'bg-zinc-200 dark:bg-white/[0.08]'} style={{ width: 4, height: 4, borderRadius: 1 }} />)}</span>
                       <span className="text-sm">Now</span>
+                    </a>
+                    <a
+                      href="https://www.semakinpintar.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 w-full px-8 py-2.5 text-left text-zinc-600 dark:text-zinc-500 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors font-outfit"
+                    >
+                      <img src="/semakin-pintar-logo.png" alt="Semakin Pintar" width={16} height={16} className="rounded" />
+                      <span className="text-sm">Semakin Pintar</span>
                     </a>
                   </>
                 )}
@@ -1065,6 +1086,34 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
                   className="inline-flex items-center gap-2 text-sm text-emerald-500 font-outfit font-semibold hover:text-emerald-400 transition-colors mt-auto"
                 >
                   Coming Soon &middot; Learn more &rarr;
+                </a>
+              </DoubleBezelCard>
+            </ScrollReveal>
+            <ScrollReveal delay={0.25}>
+              <DoubleBezelCard spotlight>
+                <div className="flex items-center gap-4 mb-4">
+                  <img src="/semakin-pintar-logo.png" alt="Semakin Pintar" width={32} height={32} className="rounded" />
+                  <h3 className="text-2xl font-space-grotesk font-bold text-zinc-900 dark:text-zinc-100">
+                    Semakin Pintar
+                  </h3>
+                </div>
+                <p className="text-zinc-600 dark:text-zinc-400 font-outfit mb-6 leading-relaxed flex-1">
+                  Free educational games platform for kids &amp; family learning &mdash; mental arithmetic, multiplication tables, and brain training games.
+                </p>
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {['Education', 'Games', 'Kids', 'Brain Training', 'Free'].map(tag => (
+                    <span key={tag} className="px-2.5 py-1 text-xs font-jetbrains rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                <a
+                  href="https://www.semakinpintar.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-sm text-emerald-500 font-outfit font-semibold hover:text-emerald-400 transition-colors mt-auto"
+                >
+                  Visit website &rarr;
                 </a>
               </DoubleBezelCard>
             </ScrollReveal>
