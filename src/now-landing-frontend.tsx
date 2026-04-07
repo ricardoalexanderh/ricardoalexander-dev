@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
-import { useCountryCode, useDetectedOS, NOW_CONFIG, getOSLabel, getDownloadUrl, type DetectedOS } from './hooks/useGeoAndPlatform'
+import { useCountryCode, useDetectedOS, NOW_CONFIG, getOSLabel, getDownloadUrl } from './hooks/useGeoAndPlatform'
 
 const PLATFORM_ICONS: Record<string, React.ReactElement> = {
   windows: (
