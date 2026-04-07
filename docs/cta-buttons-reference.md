@@ -1,15 +1,14 @@
-# CTA Buttons Reference — Original Values
-
-When products are ready to launch, restore these buttons by replacing "Coming Soon" with the original text and removing the disabled styles.
+# CTA Buttons Reference
 
 ## Now Landing Page (`src/now-landing-frontend.tsx`)
 
-| Location | Original Text | Element | Notes |
-|----------|---------------|---------|-------|
-| Nav desktop | `Get Now` | `<a href="#" className="now-nav-cta">` | |
-| Nav mobile | `Get Now` | `<a href="#" className="now-nav-cta">` | Has `onClick={() => setMobileMenuOpen(false)}` |
-| Hero CTA | `Get Now &mdash; $4.99` | `<a href="#" className="now-btn-primary">` | Primary button |
-| Pricing CTA | `Get Now` | `<a href="#" className="now-plan-cta">` | Inside pricing card |
+| Location | Text | Element | Notes |
+|----------|------|---------|-------|
+| Nav desktop | `Get Now` | `<a href={buyUrl} className="now-nav-cta" target="_blank">` | Geo-routed buy URL |
+| Nav mobile | `Get Now` | `<a href={buyUrl} className="now-nav-cta" target="_blank">` | Has `onClick` for menu close |
+| Hero CTA | `Get Now — {displayPrice}` | `<a href={buyUrl} className="now-btn-primary" target="_blank">` | Primary button, geo-routed |
+| Hero download | `Download for {OS}` | `<a href={downloadUrl} className="now-btn-secondary">` | OS-detected |
+| Pricing CTA | `Get Now` | `<a href={buyUrl} className="now-plan-cta" target="_blank">` | Inside pricing card |
 
 ## Auris Landing Page (`src/auris-landing.tsx`)
 
@@ -20,18 +19,32 @@ When products are ready to launch, restore these buttons by replacing "Coming So
 | Hero CTA | `Get Auris` | `<a href="https://chromewebstore.google.com" target="_blank" rel="noopener noreferrer" className="auris-btn-primary">` | Primary button |
 | Pricing CTA | `Get Auris` | `<a href="https://chromewebstore.google.com" target="_blank" rel="noopener noreferrer" className="auris-plan-cta">` | Inside pricing card |
 
+**Note:** Auris buttons are still set to "Coming Soon" (disabled) in the code. The values above are the intended launch values.
+
 ## Portfolio Page (`src/ricardo-portfolio.tsx`)
 
-| Location | Original Text | Element | Notes |
-|----------|---------------|---------|-------|
-| Auris card | `$49 &middot; Learn more &rarr;` | `<a href="/products/auris" className="...text-emerald-500...mt-auto">` | Keep href, just restore text |
-| Now card | `$4.99 &middot; Learn more &rarr;` | `<a href="/products/now" className="...text-emerald-500...mt-auto">` | Keep href, just restore text |
+| Location | Text | Element | Notes |
+|----------|------|---------|-------|
+| Auris card | `Coming Soon · Learn more →` | `<a href="/products/auris">` | Still disabled |
+| Now card | `$5.99 · Learn more →` | `<a href="/products/now">` | Active |
 
-## Disabled Style Applied
+## Geo-Conditional Pricing (Now)
 
-All CTA buttons were changed to:
-- Text: "Coming Soon"
-- Style: `opacity: 0.5; pointer-events: none; cursor: not-allowed`
-- href removed or set to `#`
+Pricing and buy URLs are geo-routed via `src/hooks/useGeoAndPlatform.ts`:
 
-To restore: remove the disabled inline styles and change text back to original values above.
+| Region | Price | Buy URL |
+|--------|-------|---------|
+| Indonesia (`ID`) | Rp. 99.000 | Mayar (placeholder) |
+| Rest of world | $5.99 | Paddle (placeholder) |
+
+## Download Links (Now)
+
+OS-detected via `useDetectedOS()` hook. Download URLs are configured in `NOW_CONFIG.downloadUrls`:
+
+| Platform | URL |
+|----------|-----|
+| Windows | Placeholder |
+| macOS | Placeholder |
+| Linux | Placeholder |
+
+All placeholder URLs are prefixed with `PLACEHOLDER_` in `src/hooks/useGeoAndPlatform.ts` for easy search-and-replace.

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
+import { useCountryCode, useDetectedOS, NOW_CONFIG, getOSLabel, getDownloadUrl } from './hooks/useGeoAndPlatform'
 
 const SPRITE_DATA: Record<string, { sprite: number[][], palette: Record<number, string> }> = {
   ghost: {
@@ -126,6 +127,11 @@ const PixelGrid: React.FC<{ size?: number, style?: React.CSSProperties, classNam
 }
 
 const NowLandingFrontend: React.FC = () => {
+  const { isIndonesia } = useCountryCode()
+  const detectedOS = useDetectedOS()
+  const displayPrice = isIndonesia ? NOW_CONFIG.prices.indonesia : NOW_CONFIG.prices.world
+  const buyUrl = isIndonesia ? NOW_CONFIG.buyUrls.mayar : NOW_CONFIG.buyUrls.paddle
+
   const [scrolled, setScrolled] = useState(false)
   const [showScrollTop, setShowScrollTop] = useState(false)
   const [openFaq, setOpenFaq] = useState<number | null>(null)
@@ -189,7 +195,7 @@ const NowLandingFrontend: React.FC = () => {
   const faqData = [
     { q: 'What platforms does Now support?', a: 'Now supports Windows, macOS, and Linux. It runs natively on all three platforms with minimal resource usage.' },
     { q: 'Why does my OS warn me during installation?', a: 'Now is made by an indie developer, so it isn\'t signed with a corporate code-signing certificate — that\'s what triggers the warning. It\'s perfectly safe. On Windows, click "More info" then "Run anyway." On macOS, right-click the app, select "Open," and confirm in the dialog (or go to System Settings > Privacy & Security and click "Open Anyway"). On Linux, you may need to mark the file as executable with chmod +x.' },
-    { q: 'How much does Now cost?', a: '$4.99 — one-time purchase. All 6 companions, all features, all platforms. No subscription.' },
+    { q: 'How much does Now cost?', a: `${displayPrice} — one-time purchase. All 6 companions, all features, all platforms. No subscription.` },
     { q: 'Does it get in the way of my work?', a: 'No. The widget is click-through by default — your mouse passes right through it to the apps behind. Hold Ctrl to interact with the widget (click buttons, type notes, drag sliders). Release Ctrl and it becomes transparent to input again.' },
     { q: 'How much resources does it use?', a: 'Now is extremely lightweight. It\'s designed to be always-on without impacting your system performance.' },
     { q: 'Can I customize the widget?', a: 'Yes. You can pick your companion, adjust transparency, choose from 3 sizes (S, M, L), dock to any corner, switch between dark and light theme, and configure pomodoro presets and custom trackers.' },
@@ -1784,7 +1790,7 @@ const NowLandingFrontend: React.FC = () => {
           <a href="#how">How it works</a>
           <a href="#pricing">Pricing</a>
           <a href="#faq">FAQ</a>
-          <span className="now-nav-cta" style={{ opacity: 0.5, pointerEvents: 'none', cursor: 'not-allowed' }}>Coming Soon</span>
+          <a href={buyUrl} className="now-nav-cta" target="_blank" rel="noopener noreferrer">Get Now</a>
         </div>
         <button className={`now-hamburger ${mobileMenuOpen ? 'open' : ''}`} onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
           <span /><span /><span />
@@ -1798,7 +1804,7 @@ const NowLandingFrontend: React.FC = () => {
         <a href="#how" onClick={() => setMobileMenuOpen(false)}>How it works</a>
         <a href="#pricing" onClick={() => setMobileMenuOpen(false)}>Pricing</a>
         <a href="#faq" onClick={() => setMobileMenuOpen(false)}>FAQ</a>
-        <span className="now-nav-cta" style={{ opacity: 0.5, pointerEvents: 'none', cursor: 'not-allowed' }}>Coming Soon</span>
+        <a href={buyUrl} className="now-nav-cta" target="_blank" rel="noopener noreferrer" onClick={() => setMobileMenuOpen(false)}>Get Now</a>
       </div>
 
       {/* HERO */}
@@ -1958,10 +1964,10 @@ const NowLandingFrontend: React.FC = () => {
           </div>
 
           <div className="now-hero-actions">
-            <span className="now-btn-primary" style={{ opacity: 0.5, pointerEvents: 'none', cursor: 'not-allowed' }}>Coming Soon</span>
-            <a href="#how" className="now-btn-secondary">How it works &rarr;</a>
+            <a href={buyUrl} className="now-btn-primary" target="_blank" rel="noopener noreferrer">Get Now &mdash; {displayPrice}</a>
+            <a href={getDownloadUrl(detectedOS)} className="now-btn-secondary">Download for {getOSLabel(detectedOS)}</a>
           </div>
-          <p className="now-price-hint"><strong>$4.99</strong> &middot; All 6 companions &middot; Windows, macOS, Linux</p>
+          <p className="now-price-hint"><strong>{displayPrice}</strong> &middot; All 6 companions &middot; Windows, macOS, Linux</p>
 
           <div className="now-hero-characters">
             {characters.map((c, i) => (
@@ -2419,6 +2425,39 @@ const NowLandingFrontend: React.FC = () => {
         </div>
       </section>
 
+      {/* DOWNLOAD */}
+      <section id="download" style={{ padding: '5rem 0', position: 'relative', zIndex: 1 }}>
+        <div className="now-container" style={{ textAlign: 'center' }}>
+          <p className="now-section-label now-reveal">Download</p>
+          <h2 className="now-section-title now-reveal">Get Now for your platform.</h2>
+          <p className="now-section-sub now-reveal">Available on Windows, macOS, and Linux.</p>
+
+          <div className="now-reveal" style={{ marginTop: '2.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.25rem' }}>
+            <a
+              href={getDownloadUrl(detectedOS)}
+              className="now-btn-primary"
+              style={{ fontSize: '1rem', padding: '0.9rem 2.5rem' }}
+            >
+              Download for {getOSLabel(detectedOS)}
+            </a>
+            <div style={{ display: 'flex', gap: '1.5rem', fontSize: '0.85rem' }}>
+              {(['windows', 'macos', 'linux'] as const)
+                .filter(os => os !== (detectedOS === 'unknown' ? 'windows' : detectedOS))
+                .map(os => (
+                  <a
+                    key={os}
+                    href={NOW_CONFIG.downloadUrls[os]}
+                    style={{ color: 'var(--muted)', textDecoration: 'underline', textUnderlineOffset: '3px' }}
+                  >
+                    {os === 'macos' ? 'macOS' : os === 'windows' ? 'Windows' : 'Linux'}
+                  </a>
+                ))
+              }
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* PRICING */}
       <section id="pricing" style={{ padding: '6rem 0', position: 'relative', zIndex: 1, background: 'var(--surface)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
         <div className="now-container">
@@ -2431,9 +2470,9 @@ const NowLandingFrontend: React.FC = () => {
               <div className="now-pricing-inner" style={{ display: 'flex', flexDirection: 'column' }}>
                 <div style={{ padding: '2rem', textAlign: 'center' }}>
                   <div className="now-plan-name">Now</div>
-                  <div className="now-plan-price" style={{ color: 'var(--accent)', transition: 'color 0.6s ease' }}>$4.99</div>
+                  <div className="now-plan-price" style={{ color: 'var(--accent)', transition: 'color 0.6s ease' }}>{displayPrice}</div>
                   <div className="now-plan-note">One-time purchase &middot; No subscription</div>
-                  <span className="now-plan-cta" style={{ opacity: 0.5, pointerEvents: 'none', cursor: 'not-allowed' }}>Coming Soon</span>
+                  <a href={buyUrl} className="now-plan-cta" target="_blank" rel="noopener noreferrer">Get Now</a>
                 </div>
                 <ul className="now-plan-features">
                   {includedFeatures.map((feat, i) => (
