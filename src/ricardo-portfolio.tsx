@@ -1031,7 +1031,7 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
 
           <ScrollReveal delay={0.1}>
             <p className="text-lg text-zinc-600 dark:text-zinc-400 font-outfit max-w-2xl mb-12">
-              Tools and products I&apos;ve built to solve real problems.
+              Products, tools, and fun projects I&apos;ve built and launched.
             </p>
           </ScrollReveal>
 
