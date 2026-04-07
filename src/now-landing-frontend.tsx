@@ -1,5 +1,27 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
-import { useCountryCode, useDetectedOS, NOW_CONFIG, getOSLabel, getDownloadUrl } from './hooks/useGeoAndPlatform'
+import { useCountryCode, useDetectedOS, NOW_CONFIG, getOSLabel, getDownloadUrl, type DetectedOS } from './hooks/useGeoAndPlatform'
+
+const PLATFORM_ICONS: Record<string, React.ReactElement> = {
+  windows: (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style={{ display: 'inline-block', verticalAlign: '-2px' }}>
+      <path d="M0 2.3l6.5-.9v6.3H0V2.3zm7.3-1l8.7-1.3v7.6H7.3V1.3zM16 8.4v7.6l-8.7-1.2V8.4H16zM6.5 14.7L0 13.8V8.4h6.5v6.3z" />
+    </svg>
+  ),
+  macos: (
+    <svg width="14" height="16" viewBox="0 0 14 17" fill="currentColor" style={{ display: 'inline-block', verticalAlign: '-2px' }}>
+      <path d="M11.6 8.9c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.2-2.8.9-3.5.9-.7 0-1.8-.8-3-.8C2 3.7.4 5 .4 8.1c0 1.9.7 3.9 1.6 5.2.7 1 1.5 2.2 2.6 2.1 1-.1 1.4-.7 2.7-.7 1.2 0 1.6.7 2.7.6 1.1 0 1.8-1 2.5-2.1.8-1.2 1.1-2.3 1.1-2.4 0-.1-2-.8-2-2.9zM9.7 2.4C10.3 1.7 10.7.7 10.6 0 9.7 0 8.6.6 8 1.3c-.5.6-1 1.6-.9 2.6 1 .1 2-.5 2.6-1.5z" />
+    </svg>
+  ),
+  linux: (
+    <svg width="14" height="16" viewBox="0 0 14 16" fill="currentColor" style={{ display: 'inline-block', verticalAlign: '-2px' }}>
+      <path d="M7 0C4.8 0 3.4 2 3.4 4.3c0 1.1.3 2.3.8 3.3-.6.5-1.6 1.4-2.2 2.3C1.2 11.1.5 12.8 1 14c.3.8 1 1.3 1.8 1.5.7.2 1.5.1 2.2-.2.5-.2.9-.5 1.3-.8.2-.1.5-.1.7-.1h.1c.2 0 .5 0 .7.1.4.3.8.6 1.3.8.7.3 1.5.4 2.2.2.8-.2 1.5-.7 1.8-1.5.5-1.2-.2-2.9-.9-4.1-.6-.9-1.6-1.8-2.2-2.3.5-1 .8-2.2.8-3.3C10.6 2 9.2 0 7 0zm-.8 3.2c.3 0 .5.3.5.7s-.2.7-.5.7-.5-.3-.5-.7.2-.7.5-.7zm1.6 0c.3 0 .5.3.5.7s-.2.7-.5.7-.5-.3-.5-.7.2-.7.5-.7zM5.5 5.8c.1 0 .1 0 .2.1.3.2.8.4 1.3.4s1-.2 1.3-.4c.1-.1.3 0 .3.1.1.2-.1.5-.4.7-.4.3-.8.4-1.2.4s-.8-.1-1.2-.4c-.3-.2-.5-.5-.4-.7 0-.1.1-.2.1-.2z" />
+    </svg>
+  ),
+}
+
+function PlatformIcon({ os }: { os: string }) {
+  return PLATFORM_ICONS[os] || null
+}
 
 const SPRITE_DATA: Record<string, { sprite: number[][], palette: Record<number, string> }> = {
   ghost: {
@@ -1789,6 +1811,7 @@ const NowLandingFrontend: React.FC = () => {
           <a href="#features-section">Features</a>
           <a href="#how">How it works</a>
           <a href="#pricing">Pricing</a>
+          <a href="#download">Download</a>
           <a href="#faq">FAQ</a>
           <a href={buyUrl} className="now-nav-cta" target="_blank" rel="noopener noreferrer">Get Now</a>
         </div>
@@ -1803,6 +1826,7 @@ const NowLandingFrontend: React.FC = () => {
         <a href="#features-section" onClick={() => setMobileMenuOpen(false)}>Features</a>
         <a href="#how" onClick={() => setMobileMenuOpen(false)}>How it works</a>
         <a href="#pricing" onClick={() => setMobileMenuOpen(false)}>Pricing</a>
+        <a href="#download" onClick={() => setMobileMenuOpen(false)}>Download</a>
         <a href="#faq" onClick={() => setMobileMenuOpen(false)}>FAQ</a>
         <a href={buyUrl} className="now-nav-cta" target="_blank" rel="noopener noreferrer" onClick={() => setMobileMenuOpen(false)}>Get Now</a>
       </div>
@@ -1965,7 +1989,7 @@ const NowLandingFrontend: React.FC = () => {
 
           <div className="now-hero-actions">
             <a href={buyUrl} className="now-btn-primary" target="_blank" rel="noopener noreferrer">Get Now &mdash; {displayPrice}</a>
-            <a href={getDownloadUrl(detectedOS)} className="now-btn-secondary">Download for {getOSLabel(detectedOS)}</a>
+            <a href={getDownloadUrl(detectedOS)} className="now-btn-secondary"><PlatformIcon os={detectedOS === 'unknown' ? 'windows' : detectedOS} /> Download for {getOSLabel(detectedOS)}</a>
           </div>
           <p className="now-price-hint"><strong>{displayPrice}</strong> &middot; All 6 companions &middot; Windows, macOS, Linux</p>
 
@@ -2425,39 +2449,6 @@ const NowLandingFrontend: React.FC = () => {
         </div>
       </section>
 
-      {/* DOWNLOAD */}
-      <section id="download" style={{ padding: '5rem 0', position: 'relative', zIndex: 1 }}>
-        <div className="now-container" style={{ textAlign: 'center' }}>
-          <p className="now-section-label now-reveal">Download</p>
-          <h2 className="now-section-title now-reveal">Get Now for your platform.</h2>
-          <p className="now-section-sub now-reveal">Available on Windows, macOS, and Linux.</p>
-
-          <div className="now-reveal" style={{ marginTop: '2.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.25rem' }}>
-            <a
-              href={getDownloadUrl(detectedOS)}
-              className="now-btn-primary"
-              style={{ fontSize: '1rem', padding: '0.9rem 2.5rem' }}
-            >
-              Download for {getOSLabel(detectedOS)}
-            </a>
-            <div style={{ display: 'flex', gap: '1.5rem', fontSize: '0.85rem' }}>
-              {(['windows', 'macos', 'linux'] as const)
-                .filter(os => os !== (detectedOS === 'unknown' ? 'windows' : detectedOS))
-                .map(os => (
-                  <a
-                    key={os}
-                    href={NOW_CONFIG.downloadUrls[os]}
-                    style={{ color: 'var(--muted)', textDecoration: 'underline', textUnderlineOffset: '3px' }}
-                  >
-                    {os === 'macos' ? 'macOS' : os === 'windows' ? 'Windows' : 'Linux'}
-                  </a>
-                ))
-              }
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* PRICING */}
       <section id="pricing" style={{ padding: '6rem 0', position: 'relative', zIndex: 1, background: 'var(--surface)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
         <div className="now-container">
@@ -2485,6 +2476,39 @@ const NowLandingFrontend: React.FC = () => {
                   More original &amp; licensed companions coming soon &mdash; available as separate add-ons.
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* DOWNLOAD */}
+      <section id="download" style={{ padding: '5rem 0', position: 'relative', zIndex: 1 }}>
+        <div className="now-container" style={{ textAlign: 'center' }}>
+          <p className="now-section-label now-reveal">Download</p>
+          <h2 className="now-section-title now-reveal">Get Now for your platform.</h2>
+          <p className="now-section-sub now-reveal">Available on Windows, macOS, and Linux.</p>
+
+          <div className="now-reveal" style={{ marginTop: '2.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.25rem' }}>
+            <a
+              href={getDownloadUrl(detectedOS)}
+              className="now-btn-primary"
+              style={{ fontSize: '1rem', padding: '0.9rem 2.5rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
+            >
+              <PlatformIcon os={detectedOS === 'unknown' ? 'windows' : detectedOS} /> Download for {getOSLabel(detectedOS)}
+            </a>
+            <div style={{ display: 'flex', gap: '1.5rem', fontSize: '0.85rem' }}>
+              {(['windows', 'macos', 'linux'] as const)
+                .filter(os => os !== (detectedOS === 'unknown' ? 'windows' : detectedOS))
+                .map(os => (
+                  <a
+                    key={os}
+                    href={NOW_CONFIG.downloadUrls[os]}
+                    style={{ color: 'var(--muted)', textDecoration: 'underline', textUnderlineOffset: '3px', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
+                  >
+                    <PlatformIcon os={os} /> {os === 'macos' ? 'macOS' : os === 'windows' ? 'Windows' : 'Linux'}
+                  </a>
+                ))
+              }
             </div>
           </div>
         </div>
