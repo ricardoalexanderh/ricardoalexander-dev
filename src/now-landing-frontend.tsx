@@ -1067,9 +1067,6 @@ const NowLandingFrontend: React.FC = () => {
           font-size: 1.4rem;
           color: var(--subtle);
         }
-        .now-packs-text {
-          text-align: left;
-        }
         .now-packs-title {
           font-family: 'Silkscreen', cursive;
           font-size: 0.85rem;
