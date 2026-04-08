@@ -1040,6 +1040,48 @@ const NowLandingFrontend: React.FC = () => {
           margin-top: 1rem;
         }
 
+        .now-packs-teaser {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 1.25rem;
+          margin-top: 2.5rem;
+          padding: 1.25rem 2rem;
+          background: var(--surface);
+          border: 2px dashed var(--dim);
+          border-radius: 8px;
+          max-width: 520px;
+          margin-left: auto;
+          margin-right: auto;
+        }
+        .now-packs-silhouette {
+          flex-shrink: 0;
+          width: 48px;
+          height: 48px;
+          border-radius: 50% 50% 45% 45%;
+          background: var(--dim);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-family: 'Silkscreen', cursive;
+          font-size: 1.4rem;
+          color: var(--subtle);
+        }
+        .now-packs-text {
+          text-align: left;
+        }
+        .now-packs-title {
+          font-family: 'Silkscreen', cursive;
+          font-size: 0.85rem;
+          color: var(--bright);
+          margin-bottom: 0.25rem;
+        }
+        .now-packs-desc {
+          font-size: 0.78rem;
+          color: var(--subtle);
+          line-height: 1.5;
+        }
+
         /* FEATURES */
         .now-features-grid {
           display: grid;
@@ -2042,6 +2084,13 @@ const NowLandingFrontend: React.FC = () => {
           <p className="now-theme-hint now-reveal">
             {'\u2191'} Choose a companion &mdash; the page accent color transitions to match
           </p>
+          <div className="now-packs-teaser">
+            <div className="now-packs-silhouette">?</div>
+            <div className="now-packs-text">
+              <div className="now-packs-title">Character Packs Coming Soon</div>
+              <div className="now-packs-desc">New original &amp; licensed companions &mdash; each with their own voice, animations, and personality.</div>
+            </div>
+          </div>
         </div>
       </section>
 
