@@ -2518,6 +2518,20 @@ const NowLandingFrontend: React.FC = () => {
         </div>
       </section>
 
+      {/* UPCOMING */}
+      <section id="upcoming" style={{ padding: '5rem 0', position: 'relative', zIndex: 1 }}>
+        <div className="now-container">
+          <p className="now-section-label now-reveal">What's Next</p>
+          <h2 className="now-section-title now-reveal">More is coming.</h2>
+          <p className="now-section-sub now-reveal" style={{ marginBottom: '2rem' }}>
+            Tools, productivity, and AI features &mdash; included as free updates.
+          </p>
+          <p className="now-reveal" style={{ textAlign: 'center', fontSize: '0.75rem', color: 'var(--muted)', maxWidth: '480px', margin: '0 auto', lineHeight: 1.6 }}>
+            AI features may incur additional charges via BYOK (bring your own key) or run free with a local LLM.
+          </p>
+        </div>
+      </section>
+
       {/* DOWNLOAD */}
       <section id="download" style={{ padding: '5rem 0', position: 'relative', zIndex: 1 }}>
         <div className="now-container" style={{ textAlign: 'center' }}>
