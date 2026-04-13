@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { WindowsLogo, AppleLogo, LinuxLogo } from '@phosphor-icons/react'
 import { useCountryCode, useDetectedOS, NOW_CONFIG, getOSLabel, getDownloadUrl } from './hooks/useGeoAndPlatform'
 
@@ -137,6 +137,171 @@ const PixelGrid: React.FC<{ size?: number, style?: React.CSSProperties, classNam
   )
 }
 
+const CALC_FUNCS: Record<string, (...args: number[]) => number> = {
+  sqrt: Math.sqrt, abs: Math.abs, round: Math.round, floor: Math.floor, ceil: Math.ceil,
+  log: Math.log10, ln: Math.log, sin: Math.sin, cos: Math.cos, tan: Math.tan,
+  min: Math.min, max: Math.max, pow: Math.pow,
+}
+
+type CalcTok = { t: 'num' | 'id' | 'op' | 'lp' | 'rp' | 'comma'; v: string }
+
+function calcTokenize(src: string): CalcTok[] {
+  const out: CalcTok[] = []
+  let i = 0
+  while (i < src.length) {
+    const c = src[i]
+    if (c === ' ' || c === '\t') { i++; continue }
+    if (c >= '0' && c <= '9' || c === '.') {
+      let j = i
+      while (j < src.length && (src[j] >= '0' && src[j] <= '9' || src[j] === '.')) j++
+      out.push({ t: 'num', v: src.slice(i, j) }); i = j; continue
+    }
+    if (c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c === '_') {
+      let j = i
+      while (j < src.length && (src[j].match(/[a-zA-Z0-9_]/))) j++
+      out.push({ t: 'id', v: src.slice(i, j).toLowerCase() }); i = j; continue
+    }
+    if (c === '(') { out.push({ t: 'lp', v: c }); i++; continue }
+    if (c === ')') { out.push({ t: 'rp', v: c }); i++; continue }
+    if (c === ',') { out.push({ t: 'comma', v: c }); i++; continue }
+    if ('+-*/^%'.indexOf(c) >= 0) { out.push({ t: 'op', v: c }); i++; continue }
+    throw new Error('bad char')
+  }
+  return out
+}
+
+function calcEval(src: string): number {
+  const toks = calcTokenize(src)
+  let pos = 0
+  const peek = () => toks[pos]
+  const eat = (t: string, v?: string) => {
+    const tk = toks[pos]
+    if (!tk || tk.t !== t || (v !== undefined && tk.v !== v)) throw new Error('parse')
+    pos++; return tk
+  }
+  const parseExpr = (): number => {
+    let left = parseTerm()
+    while (peek() && peek().t === 'op' && (peek().v === '+' || peek().v === '-')) {
+      const op = eat('op').v
+      const right = parseTerm()
+      left = op === '+' ? left + right : left - right
+    }
+    return left
+  }
+  const parseTerm = (): number => {
+    let left = parsePower()
+    while (peek() && peek().t === 'op' && (peek().v === '*' || peek().v === '/')) {
+      const op = eat('op').v
+      const right = parsePower()
+      left = op === '*' ? left * right : left / right
+    }
+    return left
+  }
+  const parsePower = (): number => {
+    const base = parsePostfix()
+    if (peek() && peek().t === 'op' && peek().v === '^') { eat('op'); return Math.pow(base, parsePower()) }
+    return base
+  }
+  const parsePostfix = (): number => {
+    let v = parseUnary()
+    while (peek() && peek().t === 'op' && peek().v === '%') { eat('op'); v = v / 100 }
+    return v
+  }
+  const parseUnary = (): number => {
+    if (peek() && peek().t === 'op' && (peek().v === '-' || peek().v === '+')) {
+      const op = eat('op').v; const v = parseUnary(); return op === '-' ? -v : v
+    }
+    return parsePrimary()
+  }
+  const parsePrimary = (): number => {
+    const tk = peek()
+    if (!tk) throw new Error('parse')
+    if (tk.t === 'num') { pos++; return parseFloat(tk.v) }
+    if (tk.t === 'lp') { eat('lp'); const v = parseExpr(); eat('rp'); return v }
+    if (tk.t === 'id') {
+      pos++
+      if (tk.v === 'pi') return Math.PI
+      if (tk.v === 'e') return Math.E
+      if (peek() && peek().t === 'lp') {
+        eat('lp')
+        const args: number[] = []
+        if (!peek() || peek().t !== 'rp') {
+          args.push(parseExpr())
+          while (peek() && peek().t === 'comma') { eat('comma'); args.push(parseExpr()) }
+        }
+        eat('rp')
+        const fn = CALC_FUNCS[tk.v]
+        if (!fn) throw new Error('fn')
+        return fn(...args)
+      }
+      throw new Error('id')
+    }
+    throw new Error('parse')
+  }
+  const result = parseExpr()
+  if (pos < toks.length) throw new Error('trailing')
+  return result
+}
+
+const CALC_UNIT_ALIASES: Record<string, string> = {
+  km: 'km', mi: 'mi', lb: 'lb', lbs: 'lb', kg: 'kg', ml: 'ml', cup: 'cup', cups: 'cup',
+  degf: 'degF', degc: 'degC', min: 'min', hour: 'hour', hours: 'hour',
+  mph: 'mph', 'km/h': 'km/h', kmh: 'km/h', gb: 'GB', mb: 'MB',
+}
+
+function calcConvert(val: number, from: string, to: string): { value: number; label: string } | null {
+  const pairs: Record<string, { factor?: number; fn?: (v: number) => number; label: string }> = {
+    'km>mi': { factor: 0.621371, label: 'mi' },
+    'mi>km': { factor: 1.609344, label: 'km' },
+    'lb>kg': { factor: 0.453592, label: 'kg' },
+    'kg>lb': { factor: 2.204623, label: 'lbs' },
+    'ml>cup': { factor: 1 / 236.588, label: 'cups' },
+    'cup>ml': { factor: 236.588, label: 'ml' },
+    'degF>degC': { fn: (v) => (v - 32) * 5 / 9, label: '\u00B0C' },
+    'degC>degF': { fn: (v) => v * 9 / 5 + 32, label: '\u00B0F' },
+    'min>hour': { factor: 1 / 60, label: 'h' },
+    'hour>min': { factor: 60, label: 'min' },
+    'mph>km/h': { factor: 1.609344, label: 'km/h' },
+    'km/h>mph': { factor: 0.621371, label: 'mph' },
+    'GB>MB': { factor: 1000, label: 'MB' },
+    'MB>GB': { factor: 1 / 1000, label: 'GB' },
+  }
+  const rule = pairs[`${from}>${to}`]
+  if (!rule) return null
+  const v = rule.fn ? rule.fn(val) : val * (rule.factor ?? 1)
+  return { value: v, label: rule.label }
+}
+
+function calcFormat(n: number): string {
+  if (!isFinite(n)) return '...'
+  if (Math.abs(n) >= 1e12 || (Math.abs(n) > 0 && Math.abs(n) < 1e-4)) return n.toExponential(2)
+  const rounded = Math.round(n * 1e6) / 1e6
+  return Number.isInteger(rounded) ? rounded.toString() : rounded.toFixed(2).replace(/\.?0+$/, '')
+}
+
+function evaluateCalc(raw: string): string {
+  const trimmed = raw.trim()
+  if (!trimmed.startsWith('=')) return '...'
+  const body = trimmed.slice(1).trim()
+  if (!body) return '...'
+  try {
+    const convRe = /^(.+?)\s*([A-Za-z/]+)\s+to\s+([A-Za-z/]+)\s*$/
+    const m = body.match(convRe)
+    if (m) {
+      const from = CALC_UNIT_ALIASES[m[2].toLowerCase()]
+      const to = CALC_UNIT_ALIASES[m[3].toLowerCase()]
+      if (from && to) {
+        const v = calcEval(m[1])
+        const r = calcConvert(v, from, to)
+        if (r) return `${calcFormat(r.value)} ${r.label}`
+      }
+    }
+    return calcFormat(calcEval(body))
+  } catch {
+    return '...'
+  }
+}
+
 const NowLandingFrontend: React.FC = () => {
   const { isIndonesia } = useCountryCode()
   const detectedOS = useDetectedOS()
@@ -172,6 +337,9 @@ const NowLandingFrontend: React.FC = () => {
   const progressTriggered = useRef(false)
   const [demoNotes, setDemoNotes] = useState<string[]>(['Review PR #42', 'Ship login fix'])
   const [demoNoteInput, setDemoNoteInput] = useState('')
+  const [calcInput, setCalcInput] = useState('= 15% * 340')
+  const [calcCopied, setCalcCopied] = useState(false)
+  const calcResult = useMemo(() => evaluateCalc(calcInput), [calcInput])
   const [ambientMuted, setAmbientMuted] = useState(true)
   const [trackerRunning, setTrackerRunning] = useState<Record<string, boolean>>({})
   const [builderTheme, setBuilderTheme] = useState<'dark' | 'light'>('dark')
@@ -193,6 +361,7 @@ const NowLandingFrontend: React.FC = () => {
     { icon: '', title: 'Ambient Sounds', desc: 'Rain when you need to settle in. Cafe, snow, forest. Ambient loops that just play.', type: 'waveform' },
     { icon: '', title: 'Pomodoro Timer', desc: 'When you want to focus. 25 minutes on, 5 off. Your companion reacts to each phase.', type: 'pomodoro' },
     { icon: '', title: 'Quick Notes', desc: 'A thought passes — jot it down. No app switching, no friction. Just a quick note, right there.', type: 'notes' },
+    { icon: '', title: 'Calculator', desc: 'Type = in the note bar — the answer appears live in your companion\u2019s speech bubble. Math, functions, unit conversions. Press Enter to copy.', type: 'calculator' },
     { icon: '', title: 'System Info', desc: 'CPU, RAM, Disk & I/O, quietly visible. Your companion notices when things get heavy.', type: 'sysinfo' },
     { icon: '', title: 'Weather', desc: 'A glance at the sky. Temperature and your city, right where time lives.', type: 'weather' },
     { icon: '', title: 'Idle Detection', desc: 'Step away and your companion falls asleep. Come back and it wakes up, glad you\'re here.', type: 'idle' },
@@ -224,6 +393,7 @@ const NowLandingFrontend: React.FC = () => {
     'Pomodoro timer with companion reactions',
     'Progress bars & custom trackers',
     'Quick notes inside the widget',
+    'Built-in calculator (math, functions, unit conversions)',
     'Ambient sound player',
     'System info monitor (CPU, RAM, Disk & I/O)',
     'Weather display (°C/°F, city)',
@@ -405,6 +575,7 @@ const NowLandingFrontend: React.FC = () => {
     waveform: '\u{1F3B5}',
     trackers: '\u2705',
     notes: '\u{1F4DD}',
+    calculator: '\u{1F9EE}',
     sysinfo: '\u{1F4BB}',
     idle: '\u{1F634}',
   }
@@ -2278,6 +2449,33 @@ const NowLandingFrontend: React.FC = () => {
                             >{'\u00D7'}</span>
                           </div>
                         ))}
+                      </div>
+                    </div>
+                  )}
+                  {f.type === 'calculator' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <input
+                          type="text"
+                          value={calcInput}
+                          onChange={(e) => { setCalcInput(e.target.value); setCalcCopied(false) }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && calcResult !== '...') {
+                              e.preventDefault()
+                              navigator.clipboard?.writeText(calcResult).catch(() => {})
+                              setCalcCopied(true)
+                            }
+                          }}
+                          placeholder="= 15% * 340"
+                          maxLength={40}
+                          style={{ flex: 1, minWidth: 0, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '4px', padding: '4px 8px', fontFamily: "'Silkscreen', cursive", fontSize: '0.6rem', color: '#F0ECE4', outline: 'none' }}
+                        />
+                        <div className="now-demo-idle-bubble" style={{ background: characters[activeCharacter].color, flexShrink: 0, maxWidth: '45%', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {calcResult}
+                        </div>
+                      </div>
+                      <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.55rem', color: 'var(--muted)', textAlign: 'center', letterSpacing: '0.02em' }}>
+                        {calcCopied ? '\u2713 copied to clipboard' : 'try = sqrt(144)  \u00B7  = 5km to mi  \u00B7  Enter to copy'}
                       </div>
                     </div>
                   )}
