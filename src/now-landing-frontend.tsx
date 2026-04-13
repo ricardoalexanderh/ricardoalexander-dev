@@ -159,6 +159,7 @@ const NowLandingFrontend: React.FC = () => {
   const [sysInfoRam, setSysInfoRam] = useState(67)
   const [sysInfoDisk, setSysInfoDisk] = useState(54)
   const [sysInfoDiskIo, setSysInfoDiskIo] = useState(5)
+  const [weather, setWeather] = useState<{ icon: string; temp: string; city: string }>({ icon: '\u2600\uFE0F', temp: '30\u00B0C', city: 'Jakarta Raya' })
   const carouselRef = useRef<HTMLDivElement>(null)
   const ambientAudioRef = useRef<HTMLAudioElement | null>(null)
 
@@ -193,6 +194,7 @@ const NowLandingFrontend: React.FC = () => {
     { icon: '', title: 'Pomodoro Timer', desc: 'When you want to focus. 25 minutes on, 5 off. Your companion reacts to each phase.', type: 'pomodoro' },
     { icon: '', title: 'Quick Notes', desc: 'A thought passes — jot it down. No app switching, no friction. Just a quick note, right there.', type: 'notes' },
     { icon: '', title: 'System Info', desc: 'CPU, RAM, Disk & I/O, quietly visible. Your companion notices when things get heavy.', type: 'sysinfo' },
+    { icon: '', title: 'Weather', desc: 'A glance at the sky. Temperature and your city, right where time lives.', type: 'weather' },
     { icon: '', title: 'Idle Detection', desc: 'Step away and your companion falls asleep. Come back and it wakes up, glad you\'re here.', type: 'idle' },
     { icon: '', title: 'Click-Through', desc: 'Your mouse passes right through it. Hold Ctrl when you need it. Release and it\'s invisible again. Never in your way.', type: 'clickthrough' },
   ]
@@ -224,6 +226,7 @@ const NowLandingFrontend: React.FC = () => {
     'Quick notes inside the widget',
     'Ambient sound player',
     'System info monitor (CPU, RAM, Disk & I/O)',
+    'Weather display (°C/°F, city)',
     'Idle detection with companion sleep',
     'Click-through mode (Ctrl to interact)',
     'Dark & light theme',
@@ -238,6 +241,30 @@ const NowLandingFrontend: React.FC = () => {
   useEffect(() => {
     const timer = setInterval(() => setClockTime(new Date()), 1000)
     return () => clearInterval(timer)
+  }, [])
+
+  // Weather — fetch real data from wttr.in (auto-detects location via IP)
+  useEffect(() => {
+    const ac = new AbortController()
+    fetch('https://wttr.in/?format=j1', { signal: ac.signal })
+      .then(r => r.ok ? r.json() : Promise.reject(r.status))
+      .then(data => {
+        const cur = data?.current_condition?.[0]
+        const area = data?.nearest_area?.[0]
+        if (!cur) return
+        const desc = String(cur.weatherDesc?.[0]?.value || '').toLowerCase()
+        let icon = '\u2600\uFE0F'
+        if (desc.includes('thunder')) icon = '\u26C8\uFE0F'
+        else if (desc.includes('snow') || desc.includes('sleet') || desc.includes('blizzard')) icon = '\u2744\uFE0F'
+        else if (desc.includes('rain') || desc.includes('drizzle') || desc.includes('shower')) icon = '\u{1F327}\uFE0F'
+        else if (desc.includes('fog') || desc.includes('mist') || desc.includes('haze')) icon = '\u{1F32B}\uFE0F'
+        else if (desc.includes('partly') || desc.includes('partially')) icon = '\u26C5'
+        else if (desc.includes('cloud') || desc.includes('overcast')) icon = '\u2601\uFE0F'
+        const city = area?.region?.[0]?.value || area?.areaName?.[0]?.value || ''
+        setWeather({ icon, temp: `${cur.temp_C}\u00B0C`, city })
+      })
+      .catch(() => {})
+    return () => ac.abort()
   }, [])
 
   // Pomodoro countdown
@@ -797,6 +824,14 @@ const NowLandingFrontend: React.FC = () => {
         .now-hwm-sys .sys-sep { width: 1px; height: 8px; background: rgba(255,255,255,0.06); }
         .now-hwm-sys .sys-warn { color: #F2A871 !important; }
         .now-hwm-sys .sys-crit { color: #E86050 !important; }
+        /* Weather row */
+        .now-hwm-weather {
+          display: flex; align-items: center; justify-content: flex-end; gap: 4px;
+          padding: 0 0 4px;
+        }
+        .now-hwm-weather-ico { font-size: 10px; line-height: 1; }
+        .now-hwm-weather-temp { font-size: 8px; font-weight: 700; color: #A8A2B0; }
+        .now-hwm-weather-city { font-size: 7px; color: #6A6474; opacity: 0.8; }
         /* Top row: character + clock */
         .now-hwm-top {
           display: flex; align-items: flex-end; gap: 14px;
@@ -1919,6 +1954,12 @@ const NowLandingFrontend: React.FC = () => {
                 <span className={`sys-val${sysInfoDiskIo >= 85 ? ' sys-crit' : sysInfoDiskIo >= 60 ? ' sys-warn' : ''}`}>{sysInfoDiskIo}%</span>
               </span>
             </div>
+            {/* Weather row */}
+            <div className="now-hwm-weather">
+              <span className="now-hwm-weather-ico">{weather.icon}</span>
+              <span className="now-hwm-weather-temp">{weather.temp}</span>
+              <span className="now-hwm-weather-city">{weather.city}</span>
+            </div>
             {/* Character + Clock */}
             <div className="now-hwm-top">
               <div style={{ position: 'relative', flexShrink: 0 }}>
@@ -2256,6 +2297,13 @@ const NowLandingFrontend: React.FC = () => {
                           </div>
                         </div>
                       ))}
+                    </div>
+                  )}
+                  {f.type === 'weather' && (
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', width: '100%', fontFamily: "'Silkscreen', cursive" }}>
+                      <span style={{ fontSize: '1.4rem', lineHeight: 1 }}>{weather.icon}</span>
+                      <span style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--accent)', transition: 'color 0.6s ease' }}>{weather.temp}</span>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--muted)' }}>{weather.city}</span>
                     </div>
                   )}
                   {f.type === 'idle' && (
