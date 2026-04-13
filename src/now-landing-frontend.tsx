@@ -302,6 +302,34 @@ function evaluateCalc(raw: string): string {
   }
 }
 
+const LAUNCHER_APPS: { name: string; icon: string }[] = [
+  { name: 'Slack', icon: '\u{1F4AC}' },
+  { name: 'Spotify', icon: '\u{1F3B5}' },
+  { name: 'Chrome', icon: '\u{1F310}' },
+  { name: 'VS Code', icon: '\u{1F4BB}' },
+  { name: 'Discord', icon: '\u{1F3AE}' },
+  { name: 'Figma', icon: '\u{1F3A8}' },
+  { name: 'Terminal', icon: '\u{2328}\uFE0F' },
+  { name: 'Notion', icon: '\u{1F4D3}' },
+  { name: 'Safari', icon: '\u{1F9ED}' },
+  { name: 'Mail', icon: '\u2709\uFE0F' },
+]
+
+function filterLauncherApps(raw: string): { name: string; icon: string }[] {
+  const trimmed = raw.trim()
+  if (!trimmed.startsWith('>')) return []
+  const q = trimmed.slice(1).trim().toLowerCase()
+  if (!q) return LAUNCHER_APPS.slice(0, 5)
+  const starts: typeof LAUNCHER_APPS = []
+  const contains: typeof LAUNCHER_APPS = []
+  for (const app of LAUNCHER_APPS) {
+    const n = app.name.toLowerCase()
+    if (n.startsWith(q)) starts.push(app)
+    else if (n.includes(q)) contains.push(app)
+  }
+  return [...starts, ...contains].slice(0, 5)
+}
+
 const NowLandingFrontend: React.FC = () => {
   const { isIndonesia } = useCountryCode()
   const detectedOS = useDetectedOS()
@@ -340,6 +368,10 @@ const NowLandingFrontend: React.FC = () => {
   const [calcInput, setCalcInput] = useState('= 15% * 340')
   const [calcCopied, setCalcCopied] = useState(false)
   const calcResult = useMemo(() => evaluateCalc(calcInput), [calcInput])
+  const [launcherInput, setLauncherInput] = useState('>sl')
+  const [launcherSel, setLauncherSel] = useState(0)
+  const [launcherOpened, setLauncherOpened] = useState<string | null>(null)
+  const launcherMatches = useMemo(() => filterLauncherApps(launcherInput), [launcherInput])
   const [ambientMuted, setAmbientMuted] = useState(true)
   const [trackerRunning, setTrackerRunning] = useState<Record<string, boolean>>({})
   const [builderTheme, setBuilderTheme] = useState<'dark' | 'light'>('dark')
@@ -362,6 +394,7 @@ const NowLandingFrontend: React.FC = () => {
     { icon: '', title: 'Pomodoro Timer', desc: 'When you want to focus. 25 minutes on, 5 off. Your companion reacts to each phase.', type: 'pomodoro' },
     { icon: '', title: 'Quick Notes', desc: 'A thought passes — jot it down. No app switching, no friction. Just a quick note, right there.', type: 'notes' },
     { icon: '', title: 'Calculator', desc: 'Type = in the note bar — the answer appears live in your companion\u2019s speech bubble. Math, functions, unit conversions. Press Enter to copy.', type: 'calculator' },
+    { icon: '', title: 'App Launcher', desc: 'Type > and start typing an app name. Matching installed apps appear instantly. Arrow keys to pick, Enter to open. Same command on macOS, Windows, Linux.', type: 'launcher' },
     { icon: '', title: 'System Info', desc: 'CPU, RAM, Disk & I/O, quietly visible. Your companion notices when things get heavy.', type: 'sysinfo' },
     { icon: '', title: 'Weather', desc: 'A glance at the sky. Temperature and your city, right where time lives.', type: 'weather' },
     { icon: '', title: 'Idle Detection', desc: 'Step away and your companion falls asleep. Come back and it wakes up, glad you\'re here.', type: 'idle' },
@@ -394,6 +427,7 @@ const NowLandingFrontend: React.FC = () => {
     'Progress bars & custom trackers',
     'Quick notes inside the widget',
     'Built-in calculator (math, functions, unit conversions)',
+    'App launcher',
     'Ambient sound player',
     'System info monitor (CPU, RAM, Disk & I/O)',
     'Weather display (°C/°F, city)',
@@ -576,8 +610,11 @@ const NowLandingFrontend: React.FC = () => {
     trackers: '\u2705',
     notes: '\u{1F4DD}',
     calculator: '\u{1F9EE}',
+    launcher: '\u{1F680}',
     sysinfo: '\u{1F4BB}',
+    weather: '\u26C5',
     idle: '\u{1F634}',
+    clickthrough: '\u{1F5B1}\uFE0F',
   }
 
   const stepIcons = ['\u{1F4E6}', '\u{1F3AE}', '\u{1F3A8}']
@@ -2477,6 +2514,62 @@ const NowLandingFrontend: React.FC = () => {
                       <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.55rem', color: 'var(--muted)', textAlign: 'center', letterSpacing: '0.02em' }}>
                         {calcCopied ? '\u2713 copied to clipboard' : 'try = sqrt(144)  \u00B7  = 5km to mi  \u00B7  Enter to copy'}
                       </div>
+                    </div>
+                  )}
+                  {f.type === 'launcher' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%' }}>
+                      <input
+                        type="text"
+                        value={launcherInput}
+                        onChange={(e) => { setLauncherInput(e.target.value); setLauncherSel(0); setLauncherOpened(null) }}
+                        onKeyDown={(e) => {
+                          if (launcherMatches.length === 0) return
+                          if (e.key === 'ArrowDown') { e.preventDefault(); setLauncherSel((s) => (s + 1) % launcherMatches.length) }
+                          else if (e.key === 'ArrowUp') { e.preventDefault(); setLauncherSel((s) => (s - 1 + launcherMatches.length) % launcherMatches.length) }
+                          else if (e.key === 'Enter') {
+                            e.preventDefault()
+                            const pick = launcherMatches[Math.min(launcherSel, launcherMatches.length - 1)]
+                            setLauncherOpened(pick.name)
+                          }
+                        }}
+                        placeholder=">slack"
+                        maxLength={40}
+                        style={{ width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '4px', padding: '4px 8px', fontFamily: "'Silkscreen', cursive", fontSize: '0.6rem', color: '#F0ECE4', outline: 'none' }}
+                      />
+                      {launcherOpened ? (
+                        <div className="now-demo-idle-bubble" style={{ background: characters[activeCharacter].color, alignSelf: 'flex-start' }}>
+                          opening {launcherOpened}{'\u2026'}
+                        </div>
+                      ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '4px', padding: '3px', maxHeight: '110px', overflow: 'hidden' }}>
+                          {launcherMatches.length === 0 ? (
+                            <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.55rem', color: 'var(--muted)', padding: '6px 8px', textAlign: 'center' }}>no matches</div>
+                          ) : (
+                            launcherMatches.map((app, j) => {
+                              const active = j === launcherSel
+                              return (
+                                <div
+                                  key={app.name}
+                                  onMouseEnter={() => setLauncherSel(j)}
+                                  onClick={() => setLauncherOpened(app.name)}
+                                  style={{
+                                    display: 'flex', alignItems: 'center', gap: '6px',
+                                    padding: '3px 6px', borderRadius: '3px', cursor: 'pointer',
+                                    fontFamily: "'Silkscreen', cursive", fontSize: '0.6rem',
+                                    background: active ? characters[activeCharacter].color : 'transparent',
+                                    color: active ? '#0a0a12' : '#F0ECE4',
+                                    transition: 'background 0.15s ease, color 0.15s ease',
+                                  }}
+                                >
+                                  <span style={{ fontSize: '0.7rem', lineHeight: 1 }}>{app.icon}</span>
+                                  <span style={{ flex: 1 }}>{app.name}</span>
+                                  {active && <span style={{ fontSize: '0.5rem', opacity: 0.7 }}>{'\u21B5'}</span>}
+                                </div>
+                              )
+                            })
+                          )}
+                        </div>
+                      )}
                     </div>
                   )}
                   {f.type === 'sysinfo' && (
