@@ -330,6 +330,29 @@ function filterLauncherApps(raw: string): { name: string; icon: string }[] {
   return [...starts, ...contains].slice(0, 5)
 }
 
+const SNIPPETS: { trigger: string; body: string }[] = [
+  { trigger: ';;email', body: 'ricardo@example.com' },
+  { trigger: ';;sig', body: '\u2014 Ricardo' },
+  { trigger: ';;meeting', body: 'Mon 10:00 \u2192 zoom.us/j/123' },
+]
+
+const SNIPPET_REACTIONS: Record<string, string> = {
+  ghost: 'pasted ~',
+  cat: 'done hmph',
+  robot: 'inserted: OK',
+  frog: 'om~ pasted',
+  skull: 'shipped!',
+  ninja: '*poof*',
+}
+
+function expandSnippet(raw: string): { text: string; fired: boolean } {
+  for (const s of SNIPPETS) {
+    const re = new RegExp(s.trigger + '(?=[\\s.!?]|$)', 'g')
+    if (re.test(raw)) return { text: raw.replace(re, s.body), fired: true }
+  }
+  return { text: raw, fired: false }
+}
+
 const NowLandingFrontend: React.FC = () => {
   const { isIndonesia } = useCountryCode()
   const detectedOS = useDetectedOS()
@@ -372,6 +395,8 @@ const NowLandingFrontend: React.FC = () => {
   const [launcherSel, setLauncherSel] = useState(0)
   const [launcherOpened, setLauncherOpened] = useState<string | null>(null)
   const launcherMatches = useMemo(() => filterLauncherApps(launcherInput), [launcherInput])
+  const [snippetInput, setSnippetInput] = useState('please reach me at ')
+  const [snippetExpanded, setSnippetExpanded] = useState(false)
   const [ambientMuted, setAmbientMuted] = useState(true)
   const [trackerRunning, setTrackerRunning] = useState<Record<string, boolean>>({})
   const [builderTheme, setBuilderTheme] = useState<'dark' | 'light'>('dark')
@@ -395,6 +420,7 @@ const NowLandingFrontend: React.FC = () => {
     { icon: '', title: 'Quick Notes', desc: 'A thought passes — jot it down. No app switching, no friction. Just a quick note, right there.', type: 'notes' },
     { icon: '', title: 'Calculator', desc: 'Type = in the note bar — the answer appears live in your companion\u2019s speech bubble. Math, functions, unit conversions. Press Enter to copy.', type: 'calculator' },
     { icon: '', title: 'App Launcher', desc: 'Type > and start typing an app name. Matching installed apps appear instantly. Arrow keys to pick, Enter to open. Same command on macOS, Windows, Linux.', type: 'launcher' },
+    { icon: '', title: 'Snippets', desc: 'Type ;;shortcut anywhere — Slack, your browser, a code editor — and it expands instantly into whatever text you set. Global text expander, no second app.', type: 'snippets' },
     { icon: '', title: 'System Info', desc: 'CPU, RAM, Disk & I/O, quietly visible. Your companion notices when things get heavy.', type: 'sysinfo' },
     { icon: '', title: 'Weather', desc: 'A glance at the sky. Temperature and your city, right where time lives.', type: 'weather' },
     { icon: '', title: 'Idle Detection', desc: 'Step away and your companion falls asleep. Come back and it wakes up, glad you\'re here.', type: 'idle' },
@@ -428,6 +454,7 @@ const NowLandingFrontend: React.FC = () => {
     'Quick notes inside the widget',
     'Built-in calculator (math, functions, unit conversions)',
     'App launcher',
+    'Global snippets / text expander',
     'Ambient sound player',
     'System info monitor (CPU, RAM, Disk & I/O)',
     'Weather display (°C/°F, city)',
@@ -611,6 +638,7 @@ const NowLandingFrontend: React.FC = () => {
     notes: '\u{1F4DD}',
     calculator: '\u{1F9EE}',
     launcher: '\u{1F680}',
+    snippets: '\u{1F3F7}\uFE0F',
     sysinfo: '\u{1F4BB}',
     weather: '\u26C5',
     idle: '\u{1F634}',
@@ -2570,6 +2598,63 @@ const NowLandingFrontend: React.FC = () => {
                           )}
                         </div>
                       )}
+                    </div>
+                  )}
+                  {f.type === 'snippets' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%' }}>
+                      <div style={{ display: 'flex', gap: '6px', alignItems: 'flex-start' }}>
+                        <textarea
+                          rows={2}
+                          value={snippetInput}
+                          onChange={(e) => {
+                            const next = e.target.value
+                            const { text, fired } = expandSnippet(next)
+                            if (fired) {
+                              setSnippetInput(text)
+                              setSnippetExpanded(true)
+                              setTimeout(() => setSnippetExpanded(false), 1600)
+                            } else {
+                              setSnippetInput(next)
+                              setSnippetExpanded(false)
+                            }
+                          }}
+                          placeholder={'type ;;email then space\u2026'}
+                          style={{ flex: 1, minWidth: 0, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '4px', padding: '4px 8px', fontFamily: "'Space Mono', monospace", fontSize: '0.6rem', color: '#F0ECE4', outline: 'none', resize: 'none', lineHeight: 1.4 }}
+                        />
+                        {snippetExpanded && (
+                          <div className="now-demo-idle-bubble" style={{ background: characters[activeCharacter].color, flexShrink: 0, marginTop: '2px' }}>
+                            {SNIPPET_REACTIONS[characters[activeCharacter].key] ?? 'pasted!'}
+                          </div>
+                        )}
+                      </div>
+                      <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                        {SNIPPETS.map((s) => (
+                          <button
+                            key={s.trigger}
+                            onClick={() => {
+                              setSnippetInput((prev) => {
+                                const base = prev.length === 0 || /\s$/.test(prev) ? prev : prev + ' '
+                                return base + s.trigger + ' '
+                              })
+                              setSnippetExpanded(false)
+                              setTimeout(() => {
+                                setSnippetInput((prev) => {
+                                  const { text, fired } = expandSnippet(prev)
+                                  if (fired) {
+                                    setSnippetExpanded(true)
+                                    setTimeout(() => setSnippetExpanded(false), 1600)
+                                    return text
+                                  }
+                                  return prev
+                                })
+                              }, 250)
+                            }}
+                            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '3px', padding: '2px 6px', color: 'var(--muted)', fontFamily: "'Space Mono', monospace", fontSize: '0.55rem', cursor: 'pointer' }}
+                          >
+                            {s.trigger}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   )}
                   {f.type === 'sysinfo' && (
