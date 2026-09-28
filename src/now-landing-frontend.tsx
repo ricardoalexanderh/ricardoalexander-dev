@@ -1,4 +1,31 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { WindowsLogo, AppleLogo, LinuxLogo } from '@phosphor-icons/react'
+import { useCountryCode, useDetectedOS, NOW_CONFIG, PLATFORMS, getPlatformLabel, getDownloadUrl, isPlatformAvailable, joinPlatformLabels, type Platform } from './hooks/useGeoAndPlatform'
+
+const PLATFORM_ICONS: Record<string, React.ReactElement> = {
+  windows: <WindowsLogo size={16} weight="fill" style={{ display: 'inline-block', verticalAlign: '-2px' }} />,
+  macos: <AppleLogo size={16} weight="fill" style={{ display: 'inline-block', verticalAlign: '-2px' }} />,
+  linux: <LinuxLogo size={16} weight="fill" style={{ display: 'inline-block', verticalAlign: '-2px' }} />,
+}
+
+function PlatformIcon({ os }: { os: string }) {
+  return PLATFORM_ICONS[os] || null
+}
+
+const AVAILABLE_PLATFORMS = PLATFORMS.filter(isPlatformAvailable)
+const UPCOMING_PLATFORMS = PLATFORMS.filter(p => !isPlatformAvailable(p))
+const AVAILABLE_TEXT = joinPlatformLabels(AVAILABLE_PLATFORMS)
+const UPCOMING_TEXT = joinPlatformLabels(UPCOMING_PLATFORMS)
+
+// Only steps for live platforms are shown in the FAQ
+const INSTALL_WARNING_STEPS: Record<Platform, string> = {
+  windows: 'On Windows, click "More info" then "Run anyway."',
+  macos: 'On macOS, open the app once and close the warning, then go to System Settings > Privacy & Security, scroll down, and click "Open Anyway."',
+  linux: 'On Linux, you may need to mark the file as executable with chmod +x.',
+}
+
+const COMING_SOON_STYLE: React.CSSProperties = { opacity: 0.5, pointerEvents: 'none', cursor: 'not-allowed' }
+const DOWNLOAD_BTN_STYLE: React.CSSProperties = { fontSize: '1rem', padding: '0.9rem 2.5rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }
 
 const SPRITE_DATA: Record<string, { sprite: number[][], palette: Record<number, string> }> = {
   ghost: {
@@ -125,7 +152,231 @@ const PixelGrid: React.FC<{ size?: number, style?: React.CSSProperties, classNam
   )
 }
 
+const CALC_FUNCS: Record<string, (...args: number[]) => number> = {
+  sqrt: Math.sqrt, abs: Math.abs, round: Math.round, floor: Math.floor, ceil: Math.ceil,
+  log: Math.log10, ln: Math.log, sin: Math.sin, cos: Math.cos, tan: Math.tan,
+  min: Math.min, max: Math.max, pow: Math.pow,
+}
+
+type CalcTok = { t: 'num' | 'id' | 'op' | 'lp' | 'rp' | 'comma'; v: string }
+
+function calcTokenize(src: string): CalcTok[] {
+  const out: CalcTok[] = []
+  let i = 0
+  while (i < src.length) {
+    const c = src[i]
+    if (c === ' ' || c === '\t') { i++; continue }
+    if (c >= '0' && c <= '9' || c === '.') {
+      let j = i
+      while (j < src.length && (src[j] >= '0' && src[j] <= '9' || src[j] === '.')) j++
+      out.push({ t: 'num', v: src.slice(i, j) }); i = j; continue
+    }
+    if (c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c === '_') {
+      let j = i
+      while (j < src.length && (src[j].match(/[a-zA-Z0-9_]/))) j++
+      out.push({ t: 'id', v: src.slice(i, j).toLowerCase() }); i = j; continue
+    }
+    if (c === '(') { out.push({ t: 'lp', v: c }); i++; continue }
+    if (c === ')') { out.push({ t: 'rp', v: c }); i++; continue }
+    if (c === ',') { out.push({ t: 'comma', v: c }); i++; continue }
+    if ('+-*/^%'.indexOf(c) >= 0) { out.push({ t: 'op', v: c }); i++; continue }
+    throw new Error('bad char')
+  }
+  return out
+}
+
+function calcEval(src: string): number {
+  const toks = calcTokenize(src)
+  let pos = 0
+  const peek = () => toks[pos]
+  const eat = (t: string, v?: string) => {
+    const tk = toks[pos]
+    if (!tk || tk.t !== t || (v !== undefined && tk.v !== v)) throw new Error('parse')
+    pos++; return tk
+  }
+  const parseExpr = (): number => {
+    let left = parseTerm()
+    while (peek() && peek().t === 'op' && (peek().v === '+' || peek().v === '-')) {
+      const op = eat('op').v
+      const right = parseTerm()
+      left = op === '+' ? left + right : left - right
+    }
+    return left
+  }
+  const parseTerm = (): number => {
+    let left = parsePower()
+    while (peek() && peek().t === 'op' && (peek().v === '*' || peek().v === '/')) {
+      const op = eat('op').v
+      const right = parsePower()
+      left = op === '*' ? left * right : left / right
+    }
+    return left
+  }
+  const parsePower = (): number => {
+    const base = parsePostfix()
+    if (peek() && peek().t === 'op' && peek().v === '^') { eat('op'); return Math.pow(base, parsePower()) }
+    return base
+  }
+  const parsePostfix = (): number => {
+    let v = parseUnary()
+    while (peek() && peek().t === 'op' && peek().v === '%') { eat('op'); v = v / 100 }
+    return v
+  }
+  const parseUnary = (): number => {
+    if (peek() && peek().t === 'op' && (peek().v === '-' || peek().v === '+')) {
+      const op = eat('op').v; const v = parseUnary(); return op === '-' ? -v : v
+    }
+    return parsePrimary()
+  }
+  const parsePrimary = (): number => {
+    const tk = peek()
+    if (!tk) throw new Error('parse')
+    if (tk.t === 'num') { pos++; return parseFloat(tk.v) }
+    if (tk.t === 'lp') { eat('lp'); const v = parseExpr(); eat('rp'); return v }
+    if (tk.t === 'id') {
+      pos++
+      if (tk.v === 'pi') return Math.PI
+      if (tk.v === 'e') return Math.E
+      if (peek() && peek().t === 'lp') {
+        eat('lp')
+        const args: number[] = []
+        if (!peek() || peek().t !== 'rp') {
+          args.push(parseExpr())
+          while (peek() && peek().t === 'comma') { eat('comma'); args.push(parseExpr()) }
+        }
+        eat('rp')
+        const fn = CALC_FUNCS[tk.v]
+        if (!fn) throw new Error('fn')
+        return fn(...args)
+      }
+      throw new Error('id')
+    }
+    throw new Error('parse')
+  }
+  const result = parseExpr()
+  if (pos < toks.length) throw new Error('trailing')
+  return result
+}
+
+const CALC_UNIT_ALIASES: Record<string, string> = {
+  km: 'km', mi: 'mi', lb: 'lb', lbs: 'lb', kg: 'kg', ml: 'ml', cup: 'cup', cups: 'cup',
+  degf: 'degF', degc: 'degC', min: 'min', hour: 'hour', hours: 'hour',
+  mph: 'mph', 'km/h': 'km/h', kmh: 'km/h', gb: 'GB', mb: 'MB',
+}
+
+function calcConvert(val: number, from: string, to: string): { value: number; label: string } | null {
+  const pairs: Record<string, { factor?: number; fn?: (v: number) => number; label: string }> = {
+    'km>mi': { factor: 0.621371, label: 'mi' },
+    'mi>km': { factor: 1.609344, label: 'km' },
+    'lb>kg': { factor: 0.453592, label: 'kg' },
+    'kg>lb': { factor: 2.204623, label: 'lbs' },
+    'ml>cup': { factor: 1 / 236.588, label: 'cups' },
+    'cup>ml': { factor: 236.588, label: 'ml' },
+    'degF>degC': { fn: (v) => (v - 32) * 5 / 9, label: '\u00B0C' },
+    'degC>degF': { fn: (v) => v * 9 / 5 + 32, label: '\u00B0F' },
+    'min>hour': { factor: 1 / 60, label: 'h' },
+    'hour>min': { factor: 60, label: 'min' },
+    'mph>km/h': { factor: 1.609344, label: 'km/h' },
+    'km/h>mph': { factor: 0.621371, label: 'mph' },
+    'GB>MB': { factor: 1000, label: 'MB' },
+    'MB>GB': { factor: 1 / 1000, label: 'GB' },
+  }
+  const rule = pairs[`${from}>${to}`]
+  if (!rule) return null
+  const v = rule.fn ? rule.fn(val) : val * (rule.factor ?? 1)
+  return { value: v, label: rule.label }
+}
+
+function calcFormat(n: number): string {
+  if (!isFinite(n)) return '...'
+  if (Math.abs(n) >= 1e12 || (Math.abs(n) > 0 && Math.abs(n) < 1e-4)) return n.toExponential(2)
+  const rounded = Math.round(n * 1e6) / 1e6
+  return Number.isInteger(rounded) ? rounded.toString() : rounded.toFixed(2).replace(/\.?0+$/, '')
+}
+
+function evaluateCalc(raw: string): string {
+  const trimmed = raw.trim()
+  if (!trimmed.startsWith('=')) return '...'
+  const body = trimmed.slice(1).trim()
+  if (!body) return '...'
+  try {
+    const convRe = /^(.+?)\s*([A-Za-z/]+)\s+to\s+([A-Za-z/]+)\s*$/
+    const m = body.match(convRe)
+    if (m) {
+      const from = CALC_UNIT_ALIASES[m[2].toLowerCase()]
+      const to = CALC_UNIT_ALIASES[m[3].toLowerCase()]
+      if (from && to) {
+        const v = calcEval(m[1])
+        const r = calcConvert(v, from, to)
+        if (r) return `${calcFormat(r.value)} ${r.label}`
+      }
+    }
+    return calcFormat(calcEval(body))
+  } catch {
+    return '...'
+  }
+}
+
+const LAUNCHER_APPS: { name: string; icon: string }[] = [
+  { name: 'Slack', icon: '\u{1F4AC}' },
+  { name: 'Spotify', icon: '\u{1F3B5}' },
+  { name: 'Chrome', icon: '\u{1F310}' },
+  { name: 'VS Code', icon: '\u{1F4BB}' },
+  { name: 'Discord', icon: '\u{1F3AE}' },
+  { name: 'Figma', icon: '\u{1F3A8}' },
+  { name: 'Terminal', icon: '\u{2328}\uFE0F' },
+  { name: 'Notion', icon: '\u{1F4D3}' },
+  { name: 'Safari', icon: '\u{1F9ED}' },
+  { name: 'Mail', icon: '\u2709\uFE0F' },
+]
+
+function filterLauncherApps(raw: string): { name: string; icon: string }[] {
+  const trimmed = raw.trim()
+  if (!trimmed.startsWith('>')) return []
+  const q = trimmed.slice(1).trim().toLowerCase()
+  if (!q) return LAUNCHER_APPS.slice(0, 5)
+  const starts: typeof LAUNCHER_APPS = []
+  const contains: typeof LAUNCHER_APPS = []
+  for (const app of LAUNCHER_APPS) {
+    const n = app.name.toLowerCase()
+    if (n.startsWith(q)) starts.push(app)
+    else if (n.includes(q)) contains.push(app)
+  }
+  return [...starts, ...contains].slice(0, 5)
+}
+
+const SNIPPETS: { trigger: string; body: string }[] = [
+  { trigger: ';;email', body: 'ricardo@example.com' },
+  { trigger: ';;sig', body: '\u2014 Ricardo' },
+  { trigger: ';;meeting', body: 'Mon 10:00 \u2192 zoom.us/j/123' },
+]
+
+const SNIPPET_REACTIONS: Record<string, string> = {
+  ghost: 'pasted ~',
+  cat: 'done hmph',
+  robot: 'inserted: OK',
+  frog: 'om~ pasted',
+  skull: 'shipped!',
+  ninja: '*poof*',
+}
+
+function expandSnippet(raw: string): { text: string; fired: boolean } {
+  for (const s of SNIPPETS) {
+    const re = new RegExp(s.trigger + '(?=[\\s.!?]|$)', 'g')
+    if (re.test(raw)) return { text: raw.replace(re, s.body), fired: true }
+  }
+  return { text: raw, fired: false }
+}
+
 const NowLandingFrontend: React.FC = () => {
+  const { isIndonesia } = useCountryCode()
+  const detectedOS = useDetectedOS()
+  const isMobile = detectedOS === 'mobile'
+  // Unrecognised desktops fall back to Windows
+  const primaryPlatform: Platform = detectedOS === 'mobile' || detectedOS === 'unknown' ? 'windows' : detectedOS
+  const displayPrice = isIndonesia ? NOW_CONFIG.prices.indonesia : NOW_CONFIG.prices.world
+  const buyUrl = isIndonesia ? NOW_CONFIG.buyUrls.mayar : NOW_CONFIG.buyUrls.paddle
+
   const [scrolled, setScrolled] = useState(false)
   const [showScrollTop, setShowScrollTop] = useState(false)
   const [openFaq, setOpenFaq] = useState<number | null>(null)
@@ -142,6 +393,7 @@ const NowLandingFrontend: React.FC = () => {
   const [sysInfoRam, setSysInfoRam] = useState(67)
   const [sysInfoDisk, setSysInfoDisk] = useState(54)
   const [sysInfoDiskIo, setSysInfoDiskIo] = useState(5)
+  const [weather, setWeather] = useState<{ icon: string; temp: string; city: string }>({ icon: '\u2600\uFE0F', temp: '30\u00B0C', city: 'Jakarta Raya' })
   const carouselRef = useRef<HTMLDivElement>(null)
   const ambientAudioRef = useRef<HTMLAudioElement | null>(null)
 
@@ -154,6 +406,15 @@ const NowLandingFrontend: React.FC = () => {
   const progressTriggered = useRef(false)
   const [demoNotes, setDemoNotes] = useState<string[]>(['Review PR #42', 'Ship login fix'])
   const [demoNoteInput, setDemoNoteInput] = useState('')
+  const [calcInput, setCalcInput] = useState('= 15% * 340')
+  const [calcCopied, setCalcCopied] = useState(false)
+  const calcResult = useMemo(() => evaluateCalc(calcInput), [calcInput])
+  const [launcherInput, setLauncherInput] = useState('>sl')
+  const [launcherSel, setLauncherSel] = useState(0)
+  const [launcherOpened, setLauncherOpened] = useState<string | null>(null)
+  const launcherMatches = useMemo(() => filterLauncherApps(launcherInput), [launcherInput])
+  const [snippetInput, setSnippetInput] = useState('please reach me at ')
+  const [snippetExpanded, setSnippetExpanded] = useState(false)
   const [ambientMuted, setAmbientMuted] = useState(true)
   const [trackerRunning, setTrackerRunning] = useState<Record<string, boolean>>({})
   const [builderTheme, setBuilderTheme] = useState<'dark' | 'light'>('dark')
@@ -175,21 +436,27 @@ const NowLandingFrontend: React.FC = () => {
     { icon: '', title: 'Ambient Sounds', desc: 'Rain when you need to settle in. Cafe, snow, forest. Ambient loops that just play.', type: 'waveform' },
     { icon: '', title: 'Pomodoro Timer', desc: 'When you want to focus. 25 minutes on, 5 off. Your companion reacts to each phase.', type: 'pomodoro' },
     { icon: '', title: 'Quick Notes', desc: 'A thought passes — jot it down. No app switching, no friction. Just a quick note, right there.', type: 'notes' },
+    { icon: '', title: 'Calculator', desc: 'Type = in the note bar — the answer appears live in your companion\u2019s speech bubble. Math, functions, unit conversions. Press Enter to copy.', type: 'calculator' },
+    { icon: '', title: 'App Launcher', desc: 'Type > and start typing an app name. Matching installed apps appear instantly. Arrow keys to pick, Enter to open. Same command on macOS, Windows, Linux.', type: 'launcher' },
+    { icon: '', title: 'Snippets', desc: 'Type ;;shortcut anywhere — Slack, your browser, a code editor — and it expands instantly into whatever text you set. Global text expander, no second app.', type: 'snippets' },
     { icon: '', title: 'System Info', desc: 'CPU, RAM, Disk & I/O, quietly visible. Your companion notices when things get heavy.', type: 'sysinfo' },
+    { icon: '', title: 'Weather', desc: 'A glance at the sky. Temperature and your city, right where time lives.', type: 'weather' },
     { icon: '', title: 'Idle Detection', desc: 'Step away and your companion falls asleep. Come back and it wakes up, glad you\'re here.', type: 'idle' },
     { icon: '', title: 'Click-Through', desc: 'Your mouse passes right through it. Hold Ctrl when you need it. Release and it\'s invisible again. Never in your way.', type: 'clickthrough' },
   ]
 
   const howItWorksSteps = [
-    { num: '01', title: 'Download & Install', desc: 'Grab the lightweight app. Works on Windows, macOS, and Linux.', icon: '' },
+    { num: '01', title: 'Download & Install', desc: `Grab the lightweight app. Works on ${AVAILABLE_TEXT}${UPCOMING_PLATFORMS.length ? `, with ${UPCOMING_TEXT} coming soon` : ''}.`, icon: '' },
     { num: '02', title: 'Pick Your Companion', desc: 'Choose from 6 pixel companions. Each has a unique voice, idle animations, and personality.', icon: '' },
     { num: '03', title: 'Customize', desc: 'Dock it to any corner of your screen. Adjust transparency, size, and theme. Double-click your companion to minimize to a tiny floating pixel.', icon: '' },
   ]
 
   const faqData = [
-    { q: 'What platforms does Now support?', a: 'Now supports Windows, macOS, and Linux. It runs natively on all three platforms with minimal resource usage.' },
-    { q: 'Why does my OS warn me during installation?', a: 'Now is made by an indie developer, so it isn\'t signed with a corporate code-signing certificate — that\'s what triggers the warning. It\'s perfectly safe. On Windows, click "More info" then "Run anyway." On macOS, right-click the app, select "Open," and confirm in the dialog (or go to System Settings > Privacy & Security and click "Open Anyway"). On Linux, you may need to mark the file as executable with chmod +x.' },
-    { q: 'How much does Now cost?', a: '$4.99 — one-time purchase. All 6 companions, all features, all platforms. No subscription.' },
+    { q: 'What platforms does Now support?', a: UPCOMING_PLATFORMS.length
+      ? `Now is available on ${AVAILABLE_TEXT} today, with ${UPCOMING_TEXT} coming soon. It runs natively with minimal resource usage.`
+      : 'Now supports Windows, macOS, and Linux. It runs natively on all three platforms with minimal resource usage.' },
+    { q: 'Why does my OS warn me during installation?', a: `Now is made by an indie developer, so it isn't signed with a corporate code-signing certificate — that's what triggers the warning. It's perfectly safe. ${AVAILABLE_PLATFORMS.map(p => INSTALL_WARNING_STEPS[p]).join(' ')}` },
+    { q: 'How much does Now cost?', a: `${displayPrice} — one-time purchase. All 6 companions, all features, all platforms. No subscription.` },
     { q: 'Does it get in the way of my work?', a: 'No. The widget is click-through by default — your mouse passes right through it to the apps behind. Hold Ctrl to interact with the widget (click buttons, type notes, drag sliders). Release Ctrl and it becomes transparent to input again.' },
     { q: 'How much resources does it use?', a: 'Now is extremely lightweight. It\'s designed to be always-on without impacting your system performance.' },
     { q: 'Can I customize the widget?', a: 'Yes. You can pick your companion, adjust transparency, choose from 3 sizes (S, M, L), dock to any corner, switch between dark and light theme, and configure pomodoro presets and custom trackers.' },
@@ -205,8 +472,12 @@ const NowLandingFrontend: React.FC = () => {
     'Pomodoro timer with companion reactions',
     'Progress bars & custom trackers',
     'Quick notes inside the widget',
+    'Built-in calculator (math, functions, unit conversions)',
+    'App launcher',
+    'Global snippets / text expander',
     'Ambient sound player',
     'System info monitor (CPU, RAM, Disk & I/O)',
+    'Weather display (°C/°F, city)',
     'Idle detection with companion sleep',
     'Click-through mode (Ctrl to interact)',
     'Dark & light theme',
@@ -221,6 +492,30 @@ const NowLandingFrontend: React.FC = () => {
   useEffect(() => {
     const timer = setInterval(() => setClockTime(new Date()), 1000)
     return () => clearInterval(timer)
+  }, [])
+
+  // Weather — fetch real data from wttr.in (auto-detects location via IP)
+  useEffect(() => {
+    const ac = new AbortController()
+    fetch('https://wttr.in/?format=j1', { signal: ac.signal })
+      .then(r => r.ok ? r.json() : Promise.reject(r.status))
+      .then(data => {
+        const cur = data?.current_condition?.[0]
+        const area = data?.nearest_area?.[0]
+        if (!cur) return
+        const desc = String(cur.weatherDesc?.[0]?.value || '').toLowerCase()
+        let icon = '\u2600\uFE0F'
+        if (desc.includes('thunder')) icon = '\u26C8\uFE0F'
+        else if (desc.includes('snow') || desc.includes('sleet') || desc.includes('blizzard')) icon = '\u2744\uFE0F'
+        else if (desc.includes('rain') || desc.includes('drizzle') || desc.includes('shower')) icon = '\u{1F327}\uFE0F'
+        else if (desc.includes('fog') || desc.includes('mist') || desc.includes('haze')) icon = '\u{1F32B}\uFE0F'
+        else if (desc.includes('partly') || desc.includes('partially')) icon = '\u26C5'
+        else if (desc.includes('cloud') || desc.includes('overcast')) icon = '\u2601\uFE0F'
+        const city = area?.region?.[0]?.value || area?.areaName?.[0]?.value || ''
+        setWeather({ icon, temp: `${cur.temp_C}\u00B0C`, city })
+      })
+      .catch(() => {})
+    return () => ac.abort()
   }, [])
 
   // Pomodoro countdown
@@ -361,8 +656,13 @@ const NowLandingFrontend: React.FC = () => {
     waveform: '\u{1F3B5}',
     trackers: '\u2705',
     notes: '\u{1F4DD}',
+    calculator: '\u{1F9EE}',
+    launcher: '\u{1F680}',
+    snippets: '\u{1F3F7}\uFE0F',
     sysinfo: '\u{1F4BB}',
+    weather: '\u26C5',
     idle: '\u{1F634}',
+    clickthrough: '\u{1F5B1}\uFE0F',
   }
 
   const stepIcons = ['\u{1F4E6}', '\u{1F3AE}', '\u{1F3A8}']
@@ -780,6 +1080,14 @@ const NowLandingFrontend: React.FC = () => {
         .now-hwm-sys .sys-sep { width: 1px; height: 8px; background: rgba(255,255,255,0.06); }
         .now-hwm-sys .sys-warn { color: #F2A871 !important; }
         .now-hwm-sys .sys-crit { color: #E86050 !important; }
+        /* Weather row */
+        .now-hwm-weather {
+          display: flex; align-items: center; justify-content: flex-end; gap: 4px;
+          padding: 0 0 4px;
+        }
+        .now-hwm-weather-ico { font-size: 10px; line-height: 1; }
+        .now-hwm-weather-temp { font-size: 8px; font-weight: 700; color: #A8A2B0; }
+        .now-hwm-weather-city { font-size: 7px; color: #6A6474; opacity: 0.8; }
         /* Top row: character + clock */
         .now-hwm-top {
           display: flex; align-items: flex-end; gap: 14px;
@@ -1021,6 +1329,45 @@ const NowLandingFrontend: React.FC = () => {
           font-size: 0.72rem;
           color: var(--muted);
           margin-top: 1rem;
+        }
+
+        .now-packs-teaser {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 1.25rem;
+          margin-top: 2.5rem;
+          padding: 1.25rem 2rem;
+          background: var(--surface);
+          border: 2px dashed var(--dim);
+          border-radius: 8px;
+          max-width: 520px;
+          margin-left: auto;
+          margin-right: auto;
+        }
+        .now-packs-silhouette {
+          flex-shrink: 0;
+          width: 48px;
+          height: 48px;
+          border-radius: 50% 50% 45% 45%;
+          background: var(--dim);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-family: 'Silkscreen', cursive;
+          font-size: 1.4rem;
+          color: var(--subtle);
+        }
+        .now-packs-title {
+          font-family: 'Silkscreen', cursive;
+          font-size: 0.85rem;
+          color: var(--bright);
+          margin-bottom: 0.25rem;
+        }
+        .now-packs-desc {
+          font-size: 0.78rem;
+          color: var(--subtle);
+          line-height: 1.5;
         }
 
         /* FEATURES */
@@ -1655,6 +2002,12 @@ const NowLandingFrontend: React.FC = () => {
         .now-footer-char {
           display: inline-flex; align-items: center; justify-content: center;
         }
+        .now-footer-legal {
+          display: flex; gap: 1.25rem; justify-content: center; flex-wrap: wrap;
+          margin-top: 1.5rem; font-size: 0.75rem;
+        }
+        .now-footer-legal a { color: var(--muted); text-decoration: none; transition: color 0.2s; }
+        .now-footer-legal a:hover { color: var(--bright); }
 
         /* SCROLL TO TOP */
         .now-scroll-top {
@@ -1783,8 +2136,9 @@ const NowLandingFrontend: React.FC = () => {
           <a href="#features-section">Features</a>
           <a href="#how">How it works</a>
           <a href="#pricing">Pricing</a>
+          <a href="#download">Download</a>
           <a href="#faq">FAQ</a>
-          <span className="now-nav-cta" style={{ opacity: 0.5, pointerEvents: 'none', cursor: 'not-allowed' }}>Coming Soon</span>
+          <a href={buyUrl} className="now-nav-cta" target="_blank" rel="noopener noreferrer">Get Now</a>
         </div>
         <button className={`now-hamburger ${mobileMenuOpen ? 'open' : ''}`} onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
           <span /><span /><span />
@@ -1797,8 +2151,9 @@ const NowLandingFrontend: React.FC = () => {
         <a href="#features-section" onClick={() => setMobileMenuOpen(false)}>Features</a>
         <a href="#how" onClick={() => setMobileMenuOpen(false)}>How it works</a>
         <a href="#pricing" onClick={() => setMobileMenuOpen(false)}>Pricing</a>
+        <a href="#download" onClick={() => setMobileMenuOpen(false)}>Download</a>
         <a href="#faq" onClick={() => setMobileMenuOpen(false)}>FAQ</a>
-        <span className="now-nav-cta" style={{ opacity: 0.5, pointerEvents: 'none', cursor: 'not-allowed' }}>Coming Soon</span>
+        <a href={buyUrl} className="now-nav-cta" target="_blank" rel="noopener noreferrer" onClick={() => setMobileMenuOpen(false)}>Get Now</a>
       </div>
 
       {/* HERO */}
@@ -1860,6 +2215,12 @@ const NowLandingFrontend: React.FC = () => {
                 <span className="sys-ico-text">I/O</span>
                 <span className={`sys-val${sysInfoDiskIo >= 85 ? ' sys-crit' : sysInfoDiskIo >= 60 ? ' sys-warn' : ''}`}>{sysInfoDiskIo}%</span>
               </span>
+            </div>
+            {/* Weather row */}
+            <div className="now-hwm-weather">
+              <span className="now-hwm-weather-ico">{weather.icon}</span>
+              <span className="now-hwm-weather-temp">{weather.temp}</span>
+              <span className="now-hwm-weather-city">{weather.city}</span>
             </div>
             {/* Character + Clock */}
             <div className="now-hwm-top">
@@ -1958,10 +2319,14 @@ const NowLandingFrontend: React.FC = () => {
           </div>
 
           <div className="now-hero-actions">
-            <span className="now-btn-primary" style={{ opacity: 0.5, pointerEvents: 'none', cursor: 'not-allowed' }}>Coming Soon</span>
-            <a href="#how" className="now-btn-secondary">How it works &rarr;</a>
+            <a href={buyUrl} className="now-btn-primary" target="_blank" rel="noopener noreferrer">Get Now &mdash; {displayPrice}</a>
+            {!isMobile && (isPlatformAvailable(primaryPlatform) ? (
+              <a href={getDownloadUrl(primaryPlatform)} className="now-btn-secondary"><PlatformIcon os={primaryPlatform} /> Download for {getPlatformLabel(primaryPlatform)}</a>
+            ) : (
+              <span className="now-btn-secondary" style={COMING_SOON_STYLE}><PlatformIcon os={primaryPlatform} /> {getPlatformLabel(primaryPlatform)} &mdash; Coming Soon</span>
+            ))}
           </div>
-          <p className="now-price-hint"><strong>$4.99</strong> &middot; All 6 companions &middot; Windows, macOS, Linux</p>
+          <p className="now-price-hint"><strong>{displayPrice}</strong> &middot; All 6 companions &middot; {AVAILABLE_TEXT}{UPCOMING_PLATFORMS.length > 0 && <> &middot; {UPCOMING_TEXT} coming soon</>}</p>
 
           <div className="now-hero-characters">
             {characters.map((c, i) => (
@@ -2023,6 +2388,13 @@ const NowLandingFrontend: React.FC = () => {
           <p className="now-theme-hint now-reveal">
             {'\u2191'} Choose a companion &mdash; the page accent color transitions to match
           </p>
+          <div className="now-packs-teaser">
+            <div className="now-packs-silhouette">?</div>
+            <div className="now-packs-text">
+              <div className="now-packs-title">Character Packs Coming Soon</div>
+              <div className="now-packs-desc">New original &amp; licensed companions &mdash; each with their own voice, animations, and personality.</div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -2138,6 +2510,7 @@ const NowLandingFrontend: React.FC = () => {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%' }}>
                       <div style={{ display: 'flex', gap: '4px' }}>
                         <input
+                          id="demo-note-input"
                           type="text"
                           value={demoNoteInput}
                           onChange={(e) => setDemoNoteInput(e.target.value)}
@@ -2174,6 +2547,146 @@ const NowLandingFrontend: React.FC = () => {
                       </div>
                     </div>
                   )}
+                  {f.type === 'calculator' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <input
+                          type="text"
+                          value={calcInput}
+                          onChange={(e) => { setCalcInput(e.target.value); setCalcCopied(false) }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && calcResult !== '...') {
+                              e.preventDefault()
+                              navigator.clipboard?.writeText(calcResult).catch(() => {})
+                              setCalcCopied(true)
+                            }
+                          }}
+                          placeholder="= 15% * 340"
+                          maxLength={40}
+                          style={{ flex: 1, minWidth: 0, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '4px', padding: '4px 8px', fontFamily: "'Silkscreen', cursive", fontSize: '0.6rem', color: '#F0ECE4', outline: 'none' }}
+                        />
+                        <div className="now-demo-idle-bubble" style={{ background: characters[activeCharacter].color, flexShrink: 0, maxWidth: '45%', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {calcResult}
+                        </div>
+                      </div>
+                      <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.55rem', color: 'var(--muted)', textAlign: 'center', letterSpacing: '0.02em' }}>
+                        {calcCopied ? '\u2713 copied to clipboard' : 'try = sqrt(144)  \u00B7  = 5km to mi  \u00B7  Enter to copy'}
+                      </div>
+                    </div>
+                  )}
+                  {f.type === 'launcher' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%' }}>
+                      <input
+                        type="text"
+                        value={launcherInput}
+                        onChange={(e) => { setLauncherInput(e.target.value); setLauncherSel(0); setLauncherOpened(null) }}
+                        onKeyDown={(e) => {
+                          if (launcherMatches.length === 0) return
+                          if (e.key === 'ArrowDown') { e.preventDefault(); setLauncherSel((s) => (s + 1) % launcherMatches.length) }
+                          else if (e.key === 'ArrowUp') { e.preventDefault(); setLauncherSel((s) => (s - 1 + launcherMatches.length) % launcherMatches.length) }
+                          else if (e.key === 'Enter') {
+                            e.preventDefault()
+                            const pick = launcherMatches[Math.min(launcherSel, launcherMatches.length - 1)]
+                            setLauncherOpened(pick.name)
+                          }
+                        }}
+                        placeholder=">slack"
+                        maxLength={40}
+                        style={{ width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '4px', padding: '4px 8px', fontFamily: "'Silkscreen', cursive", fontSize: '0.6rem', color: '#F0ECE4', outline: 'none' }}
+                      />
+                      {launcherOpened ? (
+                        <div className="now-demo-idle-bubble" style={{ background: characters[activeCharacter].color, alignSelf: 'flex-start' }}>
+                          opening {launcherOpened}{'\u2026'}
+                        </div>
+                      ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '4px', padding: '3px', maxHeight: '110px', overflow: 'hidden' }}>
+                          {launcherMatches.length === 0 ? (
+                            <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.55rem', color: 'var(--muted)', padding: '6px 8px', textAlign: 'center' }}>no matches</div>
+                          ) : (
+                            launcherMatches.map((app, j) => {
+                              const active = j === launcherSel
+                              return (
+                                <div
+                                  key={app.name}
+                                  onMouseEnter={() => setLauncherSel(j)}
+                                  onClick={() => setLauncherOpened(app.name)}
+                                  style={{
+                                    display: 'flex', alignItems: 'center', gap: '6px',
+                                    padding: '3px 6px', borderRadius: '3px', cursor: 'pointer',
+                                    fontFamily: "'Silkscreen', cursive", fontSize: '0.6rem',
+                                    background: active ? characters[activeCharacter].color : 'transparent',
+                                    color: active ? '#0a0a12' : '#F0ECE4',
+                                    transition: 'background 0.15s ease, color 0.15s ease',
+                                  }}
+                                >
+                                  <span style={{ fontSize: '0.7rem', lineHeight: 1 }}>{app.icon}</span>
+                                  <span style={{ flex: 1 }}>{app.name}</span>
+                                  {active && <span style={{ fontSize: '0.5rem', opacity: 0.7 }}>{'\u21B5'}</span>}
+                                </div>
+                              )
+                            })
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  {f.type === 'snippets' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%' }}>
+                      <div style={{ display: 'flex', gap: '6px', alignItems: 'flex-start' }}>
+                        <textarea
+                          rows={2}
+                          value={snippetInput}
+                          onChange={(e) => {
+                            const next = e.target.value
+                            const { text, fired } = expandSnippet(next)
+                            if (fired) {
+                              setSnippetInput(text)
+                              setSnippetExpanded(true)
+                              setTimeout(() => setSnippetExpanded(false), 1600)
+                            } else {
+                              setSnippetInput(next)
+                              setSnippetExpanded(false)
+                            }
+                          }}
+                          placeholder={'type ;;email then space\u2026'}
+                          style={{ flex: 1, minWidth: 0, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '4px', padding: '4px 8px', fontFamily: "'Space Mono', monospace", fontSize: '0.6rem', color: '#F0ECE4', outline: 'none', resize: 'none', lineHeight: 1.4 }}
+                        />
+                        {snippetExpanded && (
+                          <div className="now-demo-idle-bubble" style={{ background: characters[activeCharacter].color, flexShrink: 0, marginTop: '2px' }}>
+                            {SNIPPET_REACTIONS[characters[activeCharacter].key] ?? 'pasted!'}
+                          </div>
+                        )}
+                      </div>
+                      <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                        {SNIPPETS.map((s) => (
+                          <button
+                            key={s.trigger}
+                            onClick={() => {
+                              setSnippetInput((prev) => {
+                                const base = prev.length === 0 || /\s$/.test(prev) ? prev : prev + ' '
+                                return base + s.trigger + ' '
+                              })
+                              setSnippetExpanded(false)
+                              setTimeout(() => {
+                                setSnippetInput((prev) => {
+                                  const { text, fired } = expandSnippet(prev)
+                                  if (fired) {
+                                    setSnippetExpanded(true)
+                                    setTimeout(() => setSnippetExpanded(false), 1600)
+                                    return text
+                                  }
+                                  return prev
+                                })
+                              }, 250)
+                            }}
+                            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '3px', padding: '2px 6px', color: 'var(--muted)', fontFamily: "'Space Mono', monospace", fontSize: '0.55rem', cursor: 'pointer' }}
+                          >
+                            {s.trigger}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   {f.type === 'sysinfo' && (
                     <div className="now-demo-sysinfo">
                       {[
@@ -2190,6 +2703,13 @@ const NowLandingFrontend: React.FC = () => {
                           </div>
                         </div>
                       ))}
+                    </div>
+                  )}
+                  {f.type === 'weather' && (
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', width: '100%', fontFamily: "'Silkscreen', cursive" }}>
+                      <span style={{ fontSize: '1.4rem', lineHeight: 1 }}>{weather.icon}</span>
+                      <span style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--accent)', transition: 'color 0.6s ease' }}>{weather.temp}</span>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--muted)' }}>{weather.city}</span>
                     </div>
                   )}
                   {f.type === 'idle' && (
@@ -2259,6 +2779,20 @@ const NowLandingFrontend: React.FC = () => {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* UPCOMING */}
+      <section id="upcoming" style={{ padding: '5rem 0', position: 'relative', zIndex: 1 }}>
+        <div className="now-container">
+          <p className="now-section-label now-reveal">What's Next</p>
+          <h2 className="now-section-title now-reveal">More is coming.</h2>
+          <p className="now-section-sub now-reveal" style={{ marginBottom: '2rem' }}>
+            Tools, productivity, and AI features &mdash; included as free updates.
+          </p>
+          <p className="now-reveal" style={{ textAlign: 'center', fontSize: '0.75rem', color: 'var(--muted)', maxWidth: '480px', margin: '0 auto', lineHeight: 1.6 }}>
+            AI features may incur additional charges via BYOK (bring your own key) or run free with a local LLM such as LM Studio or Ollama.
+          </p>
         </div>
       </section>
 
@@ -2334,6 +2868,7 @@ const NowLandingFrontend: React.FC = () => {
                 <div className="now-builder-group-title">Transparency</div>
                 <div className="now-builder-slider">
                   <input
+                    id="builder-transparency"
                     type="range"
                     min="20"
                     max="100"
@@ -2431,9 +2966,9 @@ const NowLandingFrontend: React.FC = () => {
               <div className="now-pricing-inner" style={{ display: 'flex', flexDirection: 'column' }}>
                 <div style={{ padding: '2rem', textAlign: 'center' }}>
                   <div className="now-plan-name">Now</div>
-                  <div className="now-plan-price" style={{ color: 'var(--accent)', transition: 'color 0.6s ease' }}>$4.99</div>
+                  <div className="now-plan-price" style={{ color: 'var(--accent)', transition: 'color 0.6s ease' }}>{displayPrice}</div>
                   <div className="now-plan-note">One-time purchase &middot; No subscription</div>
-                  <span className="now-plan-cta" style={{ opacity: 0.5, pointerEvents: 'none', cursor: 'not-allowed' }}>Coming Soon</span>
+                  <a href={buyUrl} className="now-plan-cta" target="_blank" rel="noopener noreferrer">Get Now</a>
                 </div>
                 <ul className="now-plan-features">
                   {includedFeatures.map((feat, i) => (
@@ -2446,6 +2981,54 @@ const NowLandingFrontend: React.FC = () => {
                   More original &amp; licensed companions coming soon &mdash; available as separate add-ons.
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* DOWNLOAD */}
+      <section id="download" style={{ padding: '5rem 0', position: 'relative', zIndex: 1 }}>
+        <div className="now-container" style={{ textAlign: 'center' }}>
+          <p className="now-section-label now-reveal">Download</p>
+          <h2 className="now-section-title now-reveal">Get Now for your platform.</h2>
+          <p className="now-section-sub now-reveal">
+            {UPCOMING_PLATFORMS.length ? `Available now on ${AVAILABLE_TEXT}. ${UPCOMING_TEXT} coming soon.` : `Available on ${AVAILABLE_TEXT}.`}
+          </p>
+
+          <div className="now-reveal" style={{ marginTop: '2.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.25rem' }}>
+            {isMobile ? (
+              <p style={{ fontSize: '0.9rem', color: 'var(--subtle)', maxWidth: '22rem', margin: 0 }}>
+                Now is a desktop app. Open this page on your computer to download it.
+              </p>
+            ) : isPlatformAvailable(primaryPlatform) ? (
+              <a href={getDownloadUrl(primaryPlatform)} className="now-btn-primary" style={DOWNLOAD_BTN_STYLE}>
+                <PlatformIcon os={primaryPlatform} /> Download for {getPlatformLabel(primaryPlatform)}
+              </a>
+            ) : (
+              <span className="now-btn-primary" style={{ ...DOWNLOAD_BTN_STYLE, ...COMING_SOON_STYLE }}>
+                <PlatformIcon os={primaryPlatform} /> {getPlatformLabel(primaryPlatform)} &mdash; Coming Soon
+              </span>
+            )}
+            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '0.75rem 1.5rem', fontSize: '0.85rem' }}>
+              {PLATFORMS
+                .filter(os => isMobile || os !== primaryPlatform)
+                .map(os => isPlatformAvailable(os) && !isMobile ? (
+                  <a
+                    key={os}
+                    href={getDownloadUrl(os)}
+                    style={{ color: 'var(--muted)', textDecoration: 'underline', textUnderlineOffset: '3px', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
+                  >
+                    <PlatformIcon os={os} /> {getPlatformLabel(os)}
+                  </a>
+                ) : (
+                  <span
+                    key={os}
+                    style={{ color: 'var(--muted)', opacity: isPlatformAvailable(os) ? 1 : 0.5, display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
+                  >
+                    <PlatformIcon os={os} /> {getPlatformLabel(os)}{!isPlatformAvailable(os) && <> &mdash; Coming Soon</>}
+                  </span>
+                ))
+              }
             </div>
           </div>
         </div>
@@ -2487,7 +3070,12 @@ const NowLandingFrontend: React.FC = () => {
                 </span>
               ))}
             </div>
-            <a href="/" style={{ display: 'inline-block', marginTop: '1.5rem', fontSize: '0.75rem', color: 'var(--muted)', textDecoration: 'none', transition: 'color 0.2s' }}>{'\u2190'} ricardoalexander.dev</a>
+            <nav className="now-footer-legal" aria-label="Legal">
+              <a href="/products/now/terms">Terms</a>
+              <a href="/products/now/privacy">Privacy</a>
+              <a href="/products/now/refund">Refunds</a>
+            </nav>
+            <a href="/" style={{ display: 'inline-block', marginTop: '1rem', fontSize: '0.75rem', color: 'var(--muted)', textDecoration: 'none', transition: 'color 0.2s' }}>{'\u2190'} ricardoalexander.dev</a>
             <p style={{ marginTop: '0.75rem', fontSize: '0.65rem', color: 'var(--dim)' }}>&copy; 2026 XANDR</p>
           </div>
         </div>
