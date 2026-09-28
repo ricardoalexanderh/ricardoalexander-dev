@@ -145,6 +145,10 @@ export function NowTerms() {
         </li>
         <li>Orders from Indonesia are processed by Mayar and charged in Indonesian Rupiah.</li>
         <li>The price shown depends on your country. Taxes may be added at checkout where required.</li>
+        <li>
+          Refunds are covered by our <a href="/products/now/refund">Refund Policy</a>. Orders from Indonesia are
+          final and can&rsquo;t be refunded.
+        </li>
       </ul>
 
       <h2>Your license</h2>
@@ -268,40 +272,51 @@ export function NowRefund() {
   return (
     <LegalLayout title="Refund Policy" path="/products/now/refund">
       <p>
-        <strong>14-day money-back guarantee.</strong> If Now isn&rsquo;t right for you, ask for a refund within 14
-        days of your purchase and you&rsquo;ll get your money back in full. You don&rsquo;t need to give a reason.
+        Now is a digital product, and your license key is delivered right after you pay. Because of that, refunds are
+        limited as described below. Please check the platforms and features on the product page before you buy.
       </p>
 
-      <h2>How to ask for a refund</h2>
+      <h2>Orders from Indonesia (Mayar)</h2>
       <ul>
         <li>
-          <strong>Bought outside Indonesia (Paddle):</strong> use the link in your Paddle receipt email, or find your
-          order at <a href="https://paddle.net" target="_blank" rel="noopener noreferrer">paddle.net</a>. You can also
-          email us.
+          <strong>All sales are final.</strong> Orders paid through Mayar can&rsquo;t be refunded once your license
+          key has been delivered.
+        </li>
+        <li>If you were charged more than once for the same order, email us and we&rsquo;ll refund the extra charge.</li>
+        <li>If Now won&rsquo;t install or run, email us and we&rsquo;ll help you get it working.</li>
+      </ul>
+
+      <h2>Orders from outside Indonesia (Paddle)</h2>
+      <ul>
+        <li>
+          You can ask for a refund within 14 days of purchase <strong>only if Now doesn&rsquo;t run on your computer
+          and we can&rsquo;t fix it together.</strong>
         </li>
         <li>
-          <strong>Bought in Indonesia (Mayar):</strong> email us with your order number and the email address you used
-          at checkout.
+          Email us first with your order number, your operating system, and what happens when you open Now, so we can
+          try to fix it. If we can&rsquo;t, we&rsquo;ll refund you in full.
+        </li>
+        <li>We don&rsquo;t give refunds for a change of mind, or after 14 days.</li>
+        <li>
+          Paddle, our Merchant of Record, may also handle refund requests under its{' '}
+          <a href="https://www.paddle.com/legal/checkout-buyer-terms" target="_blank" rel="noopener noreferrer">Buyer Terms</a>.
         </li>
       </ul>
 
-      <h2>After your refund</h2>
+      <h2>If you&rsquo;re refunded</h2>
       <ul>
+        <li>A refund ends your license. You must stop using Now and uninstall it.</li>
         <li>
           Refunds go back to your original payment method. How long they take to appear depends on your bank or
           payment provider.
         </li>
-        <li>Once you&rsquo;re refunded, your license ends and you should uninstall Now.</li>
       </ul>
 
-      <h2>After 14 days</h2>
-      <p>
-        We may still help case by case, so get in touch. This policy doesn&rsquo;t affect any rights you have under
-        the consumer protection laws where you live.
-      </p>
+      <h2>Your legal rights</h2>
+      <p>This policy doesn&rsquo;t affect any rights you have under the consumer protection laws where you live.</p>
 
       <h2>Contact</h2>
-      <p>Refund requests and questions: <Email /></p>
+      <p>Support and refund questions: <Email /></p>
     </LegalLayout>
   )
 }
