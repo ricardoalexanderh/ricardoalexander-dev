@@ -39,12 +39,20 @@ Pricing and buy URLs are geo-routed via `src/hooks/useGeoAndPlatform.ts`:
 
 ## Download Links (Now)
 
-OS-detected via `useDetectedOS()` hook. Download URLs are configured in `NOW_CONFIG.downloadUrls`:
+OS-detected via `useDetectedOS()` hook. Download URLs are configured in `NOW_CONFIG.downloadUrls`, and which platforms are live is set in `NOW_CONFIG.availablePlatforms`:
 
-| Platform | URL |
-|----------|-----|
-| Windows | Placeholder |
-| macOS | Placeholder |
-| Linux | Placeholder |
+| Platform | URL | Live |
+|----------|-----|------|
+| Windows | Placeholder | Yes |
+| macOS | Placeholder | No — shows "Coming Soon" |
+| Linux | Placeholder | No — shows "Coming Soon" |
+
+Flipping a platform to `true` updates every download button, the platform copy (hero, How It Works, FAQ, Download section), and adds that platform's install-warning steps to the FAQ.
+
+Phones and tablets are detected as `mobile`: the hero hides the download button and the Download section asks visitors to open the page on a computer.
+
+## Legal Pages (Now)
+
+Linked from the Now footer (`src/now-legal.tsx`): `/products/now/terms`, `/products/now/privacy`, `/products/now/refund`.
 
 All placeholder URLs are prefixed with `PLACEHOLDER_` in `src/hooks/useGeoAndPlatform.ts` for easy search-and-replace.

@@ -9,13 +9,19 @@ export const NOW_CONFIG = {
     world: '$5.99',
   },
   buyUrls: {
-    mayar: 'https://PLACEHOLDER_MAYAR_URL.example.com/now',    // Indonesia
+    mayar: 'https://xandr.myr.id/catalog/now-desktop-pixel-companion',    // Indonesia
     paddle: 'https://PLACEHOLDER_PADDLE_URL.example.com/now',  // Rest of world
   },
   downloadUrls: {
-    windows: 'https://PLACEHOLDER_DOWNLOAD.example.com/now-windows.exe',
+    windows: 'https://dl.ricardoalexander.dev/releases/v0.1.0/Now_0.1.0_x64-setup.exe',
     macos: 'https://PLACEHOLDER_DOWNLOAD.example.com/now-macos.dmg',
     linux: 'https://PLACEHOLDER_DOWNLOAD.example.com/now-linux.AppImage',
+  },
+  // Platforms whose download is live. The rest show "Coming Soon" across the page.
+  availablePlatforms: {
+    windows: true,
+    macos: false,
+    linux: false,
   },
 } as const
 
@@ -54,11 +60,16 @@ export function useCountryCode() {
 
 // ─── OS detection hook ──────────────────────────────────────────────────────
 
-export type DetectedOS = 'windows' | 'macos' | 'linux' | 'unknown'
+export type Platform = 'windows' | 'macos' | 'linux'
+export type DetectedOS = Platform | 'mobile' | 'unknown'
 
 export function useDetectedOS(): DetectedOS {
   return useMemo(() => {
     const ua = navigator.userAgent
+    // Check phones/tablets first: iPhone UAs contain "Mac OS X" and Android UAs contain "Linux".
+    // iPadOS reports a desktop Mac UA, so touch support is what gives it away.
+    if (/Android|iPhone|iPad|iPod|Mobile/i.test(ua)) return 'mobile'
+    if (ua.includes('Mac') && navigator.maxTouchPoints > 1) return 'mobile'
     if (ua.includes('Win')) return 'windows'
     if (ua.includes('Mac')) return 'macos'
     if (ua.includes('Linux')) return 'linux'
@@ -68,18 +79,29 @@ export function useDetectedOS(): DetectedOS {
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
-const OS_LABELS: Record<DetectedOS, string> = {
+export const PLATFORMS: Platform[] = ['windows', 'macos', 'linux']
+
+const PLATFORM_LABELS: Record<Platform, string> = {
   windows: 'Windows',
   macos: 'macOS',
   linux: 'Linux',
-  unknown: 'Windows',
 }
 
-export function getOSLabel(os: DetectedOS): string {
-  return OS_LABELS[os]
+export function getPlatformLabel(platform: Platform): string {
+  return PLATFORM_LABELS[platform]
 }
 
-export function getDownloadUrl(os: DetectedOS): string {
-  const key = os === 'unknown' ? 'windows' : os
-  return NOW_CONFIG.downloadUrls[key]
+export function isPlatformAvailable(platform: Platform): boolean {
+  return NOW_CONFIG.availablePlatforms[platform]
+}
+
+export function getDownloadUrl(platform: Platform): string {
+  return NOW_CONFIG.downloadUrls[platform]
+}
+
+// "Windows", "macOS and Linux", "Windows, macOS, and Linux"
+export function joinPlatformLabels(platforms: Platform[]): string {
+  const labels = platforms.map(getPlatformLabel)
+  if (labels.length <= 2) return labels.join(' and ')
+  return `${labels.slice(0, -1).join(', ')}, and ${labels[labels.length - 1]}`
 }

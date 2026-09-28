@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { WindowsLogo, AppleLogo, LinuxLogo } from '@phosphor-icons/react'
-import { useCountryCode, useDetectedOS, NOW_CONFIG, getOSLabel, getDownloadUrl } from './hooks/useGeoAndPlatform'
+import { useCountryCode, useDetectedOS, NOW_CONFIG, PLATFORMS, getPlatformLabel, getDownloadUrl, isPlatformAvailable, joinPlatformLabels, type Platform } from './hooks/useGeoAndPlatform'
 
 const PLATFORM_ICONS: Record<string, React.ReactElement> = {
   windows: <WindowsLogo size={16} weight="fill" style={{ display: 'inline-block', verticalAlign: '-2px' }} />,
@@ -11,6 +11,21 @@ const PLATFORM_ICONS: Record<string, React.ReactElement> = {
 function PlatformIcon({ os }: { os: string }) {
   return PLATFORM_ICONS[os] || null
 }
+
+const AVAILABLE_PLATFORMS = PLATFORMS.filter(isPlatformAvailable)
+const UPCOMING_PLATFORMS = PLATFORMS.filter(p => !isPlatformAvailable(p))
+const AVAILABLE_TEXT = joinPlatformLabels(AVAILABLE_PLATFORMS)
+const UPCOMING_TEXT = joinPlatformLabels(UPCOMING_PLATFORMS)
+
+// Only steps for live platforms are shown in the FAQ
+const INSTALL_WARNING_STEPS: Record<Platform, string> = {
+  windows: 'On Windows, click "More info" then "Run anyway."',
+  macos: 'On macOS, open the app once and close the warning, then go to System Settings > Privacy & Security, scroll down, and click "Open Anyway."',
+  linux: 'On Linux, you may need to mark the file as executable with chmod +x.',
+}
+
+const COMING_SOON_STYLE: React.CSSProperties = { opacity: 0.5, pointerEvents: 'none', cursor: 'not-allowed' }
+const DOWNLOAD_BTN_STYLE: React.CSSProperties = { fontSize: '1rem', padding: '0.9rem 2.5rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }
 
 const SPRITE_DATA: Record<string, { sprite: number[][], palette: Record<number, string> }> = {
   ghost: {
@@ -356,6 +371,9 @@ function expandSnippet(raw: string): { text: string; fired: boolean } {
 const NowLandingFrontend: React.FC = () => {
   const { isIndonesia } = useCountryCode()
   const detectedOS = useDetectedOS()
+  const isMobile = detectedOS === 'mobile'
+  // Unrecognised desktops fall back to Windows
+  const primaryPlatform: Platform = detectedOS === 'mobile' || detectedOS === 'unknown' ? 'windows' : detectedOS
   const displayPrice = isIndonesia ? NOW_CONFIG.prices.indonesia : NOW_CONFIG.prices.world
   const buyUrl = isIndonesia ? NOW_CONFIG.buyUrls.mayar : NOW_CONFIG.buyUrls.paddle
 
@@ -428,14 +446,16 @@ const NowLandingFrontend: React.FC = () => {
   ]
 
   const howItWorksSteps = [
-    { num: '01', title: 'Download & Install', desc: 'Grab the lightweight app. Works on Windows, macOS, and Linux.', icon: '' },
+    { num: '01', title: 'Download & Install', desc: `Grab the lightweight app. Works on ${AVAILABLE_TEXT}${UPCOMING_PLATFORMS.length ? `, with ${UPCOMING_TEXT} coming soon` : ''}.`, icon: '' },
     { num: '02', title: 'Pick Your Companion', desc: 'Choose from 6 pixel companions. Each has a unique voice, idle animations, and personality.', icon: '' },
     { num: '03', title: 'Customize', desc: 'Dock it to any corner of your screen. Adjust transparency, size, and theme. Double-click your companion to minimize to a tiny floating pixel.', icon: '' },
   ]
 
   const faqData = [
-    { q: 'What platforms does Now support?', a: 'Now supports Windows, macOS, and Linux. It runs natively on all three platforms with minimal resource usage.' },
-    { q: 'Why does my OS warn me during installation?', a: 'Now is made by an indie developer, so it isn\'t signed with a corporate code-signing certificate — that\'s what triggers the warning. It\'s perfectly safe. On Windows, click "More info" then "Run anyway." On macOS, right-click the app, select "Open," and confirm in the dialog (or go to System Settings > Privacy & Security and click "Open Anyway"). On Linux, you may need to mark the file as executable with chmod +x.' },
+    { q: 'What platforms does Now support?', a: UPCOMING_PLATFORMS.length
+      ? `Now is available on ${AVAILABLE_TEXT} today, with ${UPCOMING_TEXT} coming soon. It runs natively with minimal resource usage.`
+      : 'Now supports Windows, macOS, and Linux. It runs natively on all three platforms with minimal resource usage.' },
+    { q: 'Why does my OS warn me during installation?', a: `Now is made by an indie developer, so it isn't signed with a corporate code-signing certificate — that's what triggers the warning. It's perfectly safe. ${AVAILABLE_PLATFORMS.map(p => INSTALL_WARNING_STEPS[p]).join(' ')}` },
     { q: 'How much does Now cost?', a: `${displayPrice} — one-time purchase. All 6 companions, all features, all platforms. No subscription.` },
     { q: 'Does it get in the way of my work?', a: 'No. The widget is click-through by default — your mouse passes right through it to the apps behind. Hold Ctrl to interact with the widget (click buttons, type notes, drag sliders). Release Ctrl and it becomes transparent to input again.' },
     { q: 'How much resources does it use?', a: 'Now is extremely lightweight. It\'s designed to be always-on without impacting your system performance.' },
@@ -1982,6 +2002,12 @@ const NowLandingFrontend: React.FC = () => {
         .now-footer-char {
           display: inline-flex; align-items: center; justify-content: center;
         }
+        .now-footer-legal {
+          display: flex; gap: 1.25rem; justify-content: center; flex-wrap: wrap;
+          margin-top: 1.5rem; font-size: 0.75rem;
+        }
+        .now-footer-legal a { color: var(--muted); text-decoration: none; transition: color 0.2s; }
+        .now-footer-legal a:hover { color: var(--bright); }
 
         /* SCROLL TO TOP */
         .now-scroll-top {
@@ -2294,9 +2320,13 @@ const NowLandingFrontend: React.FC = () => {
 
           <div className="now-hero-actions">
             <a href={buyUrl} className="now-btn-primary" target="_blank" rel="noopener noreferrer">Get Now &mdash; {displayPrice}</a>
-            <a href={getDownloadUrl(detectedOS)} className="now-btn-secondary"><PlatformIcon os={detectedOS === 'unknown' ? 'windows' : detectedOS} /> Download for {getOSLabel(detectedOS)}</a>
+            {!isMobile && (isPlatformAvailable(primaryPlatform) ? (
+              <a href={getDownloadUrl(primaryPlatform)} className="now-btn-secondary"><PlatformIcon os={primaryPlatform} /> Download for {getPlatformLabel(primaryPlatform)}</a>
+            ) : (
+              <span className="now-btn-secondary" style={COMING_SOON_STYLE}><PlatformIcon os={primaryPlatform} /> {getPlatformLabel(primaryPlatform)} &mdash; Coming Soon</span>
+            ))}
           </div>
-          <p className="now-price-hint"><strong>{displayPrice}</strong> &middot; All 6 companions &middot; Windows, macOS, Linux</p>
+          <p className="now-price-hint"><strong>{displayPrice}</strong> &middot; All 6 companions &middot; {AVAILABLE_TEXT}{UPCOMING_PLATFORMS.length > 0 && <> &middot; {UPCOMING_TEXT} coming soon</>}</p>
 
           <div className="now-hero-characters">
             {characters.map((c, i) => (
@@ -2961,27 +2991,42 @@ const NowLandingFrontend: React.FC = () => {
         <div className="now-container" style={{ textAlign: 'center' }}>
           <p className="now-section-label now-reveal">Download</p>
           <h2 className="now-section-title now-reveal">Get Now for your platform.</h2>
-          <p className="now-section-sub now-reveal">Available on Windows, macOS, and Linux.</p>
+          <p className="now-section-sub now-reveal">
+            {UPCOMING_PLATFORMS.length ? `Available now on ${AVAILABLE_TEXT}. ${UPCOMING_TEXT} coming soon.` : `Available on ${AVAILABLE_TEXT}.`}
+          </p>
 
           <div className="now-reveal" style={{ marginTop: '2.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.25rem' }}>
-            <a
-              href={getDownloadUrl(detectedOS)}
-              className="now-btn-primary"
-              style={{ fontSize: '1rem', padding: '0.9rem 2.5rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
-            >
-              <PlatformIcon os={detectedOS === 'unknown' ? 'windows' : detectedOS} /> Download for {getOSLabel(detectedOS)}
-            </a>
-            <div style={{ display: 'flex', gap: '1.5rem', fontSize: '0.85rem' }}>
-              {(['windows', 'macos', 'linux'] as const)
-                .filter(os => os !== (detectedOS === 'unknown' ? 'windows' : detectedOS))
-                .map(os => (
+            {isMobile ? (
+              <p style={{ fontSize: '0.9rem', color: 'var(--subtle)', maxWidth: '22rem', margin: 0 }}>
+                Now is a desktop app. Open this page on your computer to download it.
+              </p>
+            ) : isPlatformAvailable(primaryPlatform) ? (
+              <a href={getDownloadUrl(primaryPlatform)} className="now-btn-primary" style={DOWNLOAD_BTN_STYLE}>
+                <PlatformIcon os={primaryPlatform} /> Download for {getPlatformLabel(primaryPlatform)}
+              </a>
+            ) : (
+              <span className="now-btn-primary" style={{ ...DOWNLOAD_BTN_STYLE, ...COMING_SOON_STYLE }}>
+                <PlatformIcon os={primaryPlatform} /> {getPlatformLabel(primaryPlatform)} &mdash; Coming Soon
+              </span>
+            )}
+            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '0.75rem 1.5rem', fontSize: '0.85rem' }}>
+              {PLATFORMS
+                .filter(os => isMobile || os !== primaryPlatform)
+                .map(os => isPlatformAvailable(os) && !isMobile ? (
                   <a
                     key={os}
-                    href={NOW_CONFIG.downloadUrls[os]}
+                    href={getDownloadUrl(os)}
                     style={{ color: 'var(--muted)', textDecoration: 'underline', textUnderlineOffset: '3px', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
                   >
-                    <PlatformIcon os={os} /> {os === 'macos' ? 'macOS' : os === 'windows' ? 'Windows' : 'Linux'}
+                    <PlatformIcon os={os} /> {getPlatformLabel(os)}
                   </a>
+                ) : (
+                  <span
+                    key={os}
+                    style={{ color: 'var(--muted)', opacity: isPlatformAvailable(os) ? 1 : 0.5, display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
+                  >
+                    <PlatformIcon os={os} /> {getPlatformLabel(os)}{!isPlatformAvailable(os) && <> &mdash; Coming Soon</>}
+                  </span>
                 ))
               }
             </div>
@@ -3025,7 +3070,12 @@ const NowLandingFrontend: React.FC = () => {
                 </span>
               ))}
             </div>
-            <a href="/" style={{ display: 'inline-block', marginTop: '1.5rem', fontSize: '0.75rem', color: 'var(--muted)', textDecoration: 'none', transition: 'color 0.2s' }}>{'\u2190'} ricardoalexander.dev</a>
+            <nav className="now-footer-legal" aria-label="Legal">
+              <a href="/products/now/terms">Terms</a>
+              <a href="/products/now/privacy">Privacy</a>
+              <a href="/products/now/refund">Refunds</a>
+            </nav>
+            <a href="/" style={{ display: 'inline-block', marginTop: '1rem', fontSize: '0.75rem', color: 'var(--muted)', textDecoration: 'none', transition: 'color 0.2s' }}>{'\u2190'} ricardoalexander.dev</a>
             <p style={{ marginTop: '0.75rem', fontSize: '0.65rem', color: 'var(--dim)' }}>&copy; 2026 XANDR</p>
           </div>
         </div>
