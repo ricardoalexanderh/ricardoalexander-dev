@@ -1,9 +1,8 @@
 import React, { useRef, useState, useEffect, useCallback, Suspense } from 'react'
 import { motion, useMotionValue, useSpring, useInView } from 'motion/react'
-import { Canvas, useFrame } from '@react-three/fiber'
-import { OrbitControls } from '@react-three/drei'
-import * as THREE from 'three'
+import { Canvas } from '@react-three/fiber'
 import { LinkedinLogo, GithubLogo, Sun, Moon, List, X, DownloadSimple, EnvelopeSimple, Code, Globe, DeviceMobile, Cube, Cloud, Database, Lightning, Cpu } from '@phosphor-icons/react'
+import ParticleMorph from './hero-particles'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -146,59 +145,8 @@ const ScrollReveal: React.FC<{ children: React.ReactNode; className?: string; de
 
 // ─── 3D Scene ────────────────────────────────────────────────────────────────
 
-const StellatedStar: React.FC = () => {
-  const groupRef = useRef<THREE.Group>(null)
-  const [hovered, setHovered] = useState(false)
-  const scaleTarget = useRef(1)
-
-  useFrame((state) => {
-    if (!groupRef.current) return
-    groupRef.current.rotation.y = state.clock.elapsedTime * 0.08
-    groupRef.current.rotation.x = state.clock.elapsedTime * 0.05
-    scaleTarget.current = hovered ? 1.08 : 1
-    const s = THREE.MathUtils.lerp(groupRef.current.scale.x, scaleTarget.current, 0.05)
-    groupRef.current.scale.setScalar(s)
-  })
-
-  return (
-    <group
-      ref={groupRef}
-      onPointerOver={() => setHovered(true)}
-      onPointerOut={() => setHovered(false)}
-    >
-      <mesh>
-        <tetrahedronGeometry args={[1.6, 0]} />
-        <meshStandardMaterial
-          color="#10b981"
-          emissive="#10b981"
-          emissiveIntensity={hovered ? 0.8 : 0.5}
-          transparent
-          opacity={0.45}
-          wireframe
-        />
-      </mesh>
-      <mesh>
-        <sphereGeometry args={[1.6, 20, 20]} />
-        <meshStandardMaterial
-          color="#10b981"
-          emissive="#10b981"
-          emissiveIntensity={hovered ? 0.5 : 0.3}
-          transparent
-          opacity={0.25}
-          wireframe
-        />
-      </mesh>
-    </group>
-  )
-}
-
-const HeroScene: React.FC = () => (
-  <>
-    <ambientLight intensity={0.4} />
-    <directionalLight position={[5, 5, 5]} intensity={0.6} />
-    <StellatedStar />
-    <OrbitControls enableZoom={false} enablePan={false} autoRotate autoRotateSpeed={0.5} />
-  </>
+const HeroScene: React.FC<{ dark: boolean; count?: number }> = ({ dark, count }) => (
+  <ParticleMorph dark={dark} count={count} />
 )
 
 // ─── Code Rain Background ────────────────────────────────────────────────────
@@ -839,7 +787,7 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
           <div className="w-[85vw] h-[85vw] max-w-[480px] max-h-[480px] pointer-events-auto">
             <Canvas dpr={[1, 1.5]} camera={{ position: [0, 0, 5], fov: 45 }}>
               <Suspense fallback={null}>
-                <HeroScene />
+                <HeroScene dark={theme === 'dark'} count={3000} />
               </Suspense>
             </Canvas>
           </div>
@@ -892,7 +840,7 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
           <div className="absolute inset-0">
             <Canvas dpr={[1, 2]} camera={{ position: [0, 0, 5], fov: 45 }}>
               <Suspense fallback={null}>
-                <HeroScene />
+                <HeroScene dark={theme === 'dark'} />
               </Suspense>
             </Canvas>
           </div>
@@ -1307,6 +1255,11 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
           <span className="text-sm text-zinc-500 font-outfit">
             &copy; 2026 Ricardo Alexander
           </span>
+          <nav aria-label="Legal" className="flex items-center gap-5 text-sm text-zinc-500 font-outfit">
+            <a href="/products/now/terms" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">Terms</a>
+            <a href="/products/now/privacy" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">Privacy</a>
+            <a href="/products/now/refund" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">Refunds</a>
+          </nav>
           <div className="flex items-center space-x-3">
             <a
               href="https://linkedin.com/in/ricardoalexanderh"
