@@ -1255,6 +1255,11 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
           <span className="text-sm text-zinc-500 font-outfit">
             &copy; 2026 Ricardo Alexander
           </span>
+          <nav aria-label="Legal" className="flex items-center gap-5 text-sm text-zinc-500 font-outfit">
+            <a href="/products/now/terms" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">Terms</a>
+            <a href="/products/now/privacy" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">Privacy</a>
+            <a href="/products/now/refund" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">Refunds</a>
+          </nav>
           <div className="flex items-center space-x-3">
             <a
               href="https://linkedin.com/in/ricardoalexanderh"
