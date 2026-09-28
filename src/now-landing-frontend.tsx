@@ -375,7 +375,7 @@ const NowLandingFrontend: React.FC = () => {
   // Unrecognised desktops fall back to Windows
   const primaryPlatform: Platform = detectedOS === 'mobile' || detectedOS === 'unknown' ? 'windows' : detectedOS
   const displayPrice = isIndonesia ? NOW_CONFIG.prices.indonesia : NOW_CONFIG.prices.world
-  const buyUrl = isIndonesia ? NOW_CONFIG.buyUrls.mayar : NOW_CONFIG.buyUrls.paddle
+  const buyUrl = isIndonesia ? NOW_CONFIG.buyUrls.mayar : NOW_CONFIG.buyUrls.polar
   // Buy buttons show "Coming Soon" until this region's checkout URL is filled in
   const canBuy = isLiveUrl(buyUrl)
 
@@ -3091,7 +3091,6 @@ const NowLandingFrontend: React.FC = () => {
             <nav className="now-footer-legal" aria-label="Legal">
               <a href="/products/now/terms">Terms</a>
               <a href="/products/now/privacy">Privacy</a>
-              <a href="/products/now/refund">Refunds</a>
             </nav>
             <a href="/" style={{ display: 'inline-block', marginTop: '1rem', fontSize: '0.75rem', color: 'var(--muted)', textDecoration: 'none', transition: 'color 0.2s' }}>{'\u2190'} ricardoalexander.dev</a>
             <p style={{ marginTop: '0.75rem', fontSize: '0.65rem', color: 'var(--dim)' }}>&copy; 2026 XANDR</p>

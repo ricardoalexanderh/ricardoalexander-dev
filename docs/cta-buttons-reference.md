@@ -35,7 +35,7 @@ Pricing and buy URLs are geo-routed via `src/hooks/useGeoAndPlatform.ts`:
 | Region | Price | Buy URL |
 |--------|-------|---------|
 | Indonesia (`ID`) | Rp. 99.000 | Mayar |
-| Rest of world | $5.99 | Paddle (placeholder) |
+| Rest of world | $5.99 | Polar (placeholder) |
 
 While a region's buy URL still contains `PLACEHOLDER_`, all 4 buy buttons show a disabled "Coming Soon" for that region (`isLiveUrl()`). Pasting the real URL turns them into "Get Now".
 
@@ -55,6 +55,6 @@ Phones and tablets are detected as `mobile`: the hero hides the download button 
 
 ## Legal Pages (Now)
 
-Linked from the Now footer (`src/now-legal.tsx`): `/products/now/terms`, `/products/now/privacy`, `/products/now/refund`.
+Linked from the Now footer (`src/now-legal.tsx`): `/products/now/terms` and `/products/now/privacy`. Refund rules live in a "Refunds" section of the Terms page.
 
 All placeholder URLs are prefixed with `PLACEHOLDER_` in `src/hooks/useGeoAndPlatform.ts` for easy search-and-replace.
