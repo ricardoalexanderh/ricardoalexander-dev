@@ -439,7 +439,7 @@ const NowLandingFrontend: React.FC = () => {
     { icon: '', title: 'Pomodoro Timer', desc: 'When you want to focus. 25 minutes on, 5 off. Your companion reacts to each phase.', type: 'pomodoro' },
     { icon: '', title: 'Quick Notes', desc: 'A thought passes — jot it down. No app switching, no friction. Just a quick note, right there.', type: 'notes' },
     { icon: '', title: 'Calculator', desc: 'Type = in the note bar — the answer appears live in your companion\u2019s speech bubble. Math, functions, unit conversions. Press Enter to copy.', type: 'calculator' },
-    { icon: '', title: 'App Launcher', desc: 'Type > and start typing an app name. Matching installed apps appear instantly. Arrow keys to pick, Enter to open. Same command on macOS, Windows, Linux.', type: 'launcher' },
+    { icon: '', title: 'App Launcher', desc: `Type > and start typing an app name. Matching installed apps appear instantly. Arrow keys to pick, Enter to open.${UPCOMING_PLATFORMS.length ? '' : ' Same command on macOS, Windows, Linux.'}`, type: 'launcher' },
     { icon: '', title: 'Snippets', desc: 'Type ;;shortcut anywhere — Slack, your browser, a code editor — and it expands instantly into whatever text you set. Global text expander, no second app.', type: 'snippets' },
     { icon: '', title: 'System Info', desc: 'CPU, RAM, Disk & I/O, quietly visible. Your companion notices when things get heavy.', type: 'sysinfo' },
     { icon: '', title: 'Weather', desc: 'A glance at the sky. Temperature and your city, right where time lives.', type: 'weather' },
@@ -458,7 +458,7 @@ const NowLandingFrontend: React.FC = () => {
       ? `Now is available on ${AVAILABLE_TEXT} today, with ${UPCOMING_TEXT} coming soon. It runs natively with minimal resource usage.`
       : 'Now supports Windows, macOS, and Linux. It runs natively on all three platforms with minimal resource usage.' },
     { q: 'Why does my OS warn me during installation?', a: `Now is made by an indie developer, so it isn't signed with a corporate code-signing certificate — that's what triggers the warning. It's perfectly safe. ${AVAILABLE_PLATFORMS.map(p => INSTALL_WARNING_STEPS[p]).join(' ')}` },
-    { q: 'How much does Now cost?', a: `${displayPrice} — one-time purchase. All 6 companions, all features, all platforms. No subscription.` },
+    { q: 'How much does Now cost?', a: `${displayPrice} — one-time purchase. All 6 companions, all features, all platforms${UPCOMING_PLATFORMS.length ? ` (${UPCOMING_TEXT} coming soon)` : ''}. No subscription.` },
     { q: 'Does it get in the way of my work?', a: 'No. The widget is click-through by default — your mouse passes right through it to the apps behind. Hold Ctrl to interact with the widget (click buttons, type notes, drag sliders). Release Ctrl and it becomes transparent to input again.' },
     { q: 'How much resources does it use?', a: 'Now is extremely lightweight. It\'s designed to be always-on without impacting your system performance.' },
     { q: 'Can I customize the widget?', a: 'Yes. You can pick your companion, adjust transparency, choose from 3 sizes (S, M, L), dock to any corner, switch between dark and light theme, and configure pomodoro presets and custom trackers.' },
@@ -485,7 +485,7 @@ const NowLandingFrontend: React.FC = () => {
     'Dark & light theme',
     '3 widget sizes (S, M, L)',
     'Multi-monitor support',
-    'Windows, macOS & Linux',
+    UPCOMING_PLATFORMS.length ? `${AVAILABLE_TEXT} (${UPCOMING_TEXT} coming soon)` : 'Windows, macOS & Linux',
     '100% local — zero telemetry',
     'All future updates',
   ]

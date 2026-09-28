@@ -1,10 +1,18 @@
-import React, { useRef, useState, useEffect, useCallback, Suspense } from 'react'
+import React, { useRef, useState, useEffect, useCallback, Suspense, lazy } from 'react'
 import { motion, useMotionValue, useSpring, useInView } from 'motion/react'
-import { Canvas } from '@react-three/fiber'
 import { LinkedinLogo, GithubLogo, Sun, Moon, List, X, DownloadSimple, EnvelopeSimple, Code, Globe, DeviceMobile, Cube, Cloud, Database, Lightning, Cpu } from '@phosphor-icons/react'
-import ParticleMorph from './hero-particles'
+import { useCountryCode, NOW_CONFIG, PLATFORMS, isPlatformAvailable, getPlatformLabel } from './hooks/useGeoAndPlatform'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
+
+// "Multiplatform" only once every Now platform is live; until then, list live and upcoming ones
+const NOW_UPCOMING_PLATFORMS = PLATFORMS.filter(p => !isPlatformAvailable(p)).map(getPlatformLabel)
+const NOW_PLATFORM_TAGS = NOW_UPCOMING_PLATFORMS.length === 0
+  ? ['Multiplatform']
+  : [
+      PLATFORMS.filter(isPlatformAvailable).map(getPlatformLabel).join(' · '),
+      `${NOW_UPCOMING_PLATFORMS.join(' & ')} coming soon`,
+    ]
 
 const SPRING = { type: 'spring' as const, stiffness: 100, damping: 20 }
 
@@ -145,9 +153,21 @@ const ScrollReveal: React.FC<{ children: React.ReactNode; className?: string; de
 
 // ─── 3D Scene ────────────────────────────────────────────────────────────────
 
-const HeroScene: React.FC<{ dark: boolean; count?: number }> = ({ dark, count }) => (
-  <ParticleMorph dark={dark} count={count} />
-)
+const HeroParticles = lazy(() => import('./hero-particles'))
+
+// Matches Tailwind's lg breakpoint, so only the visible hero canvas is mounted
+const DESKTOP_QUERY = '(min-width: 1024px)'
+
+const useIsDesktop = () => {
+  const [isDesktop, setIsDesktop] = useState(() => window.matchMedia(DESKTOP_QUERY).matches)
+  useEffect(() => {
+    const mq = window.matchMedia(DESKTOP_QUERY)
+    const onChange = () => setIsDesktop(mq.matches)
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [])
+  return isDesktop
+}
 
 // ─── Code Rain Background ────────────────────────────────────────────────────
 
@@ -605,7 +625,7 @@ const skills: SkillRow[] = [
   },
   {
     category: 'Frontend',
-    technologies: ['React', 'Angular', 'Next.js', 'Vue.js', 'TypeScript'],
+    technologies: ['React', 'Angular', 'Next.js', 'Vue.js'],
     icon: <Globe size={20} weight="bold" />,
   },
   {
@@ -645,7 +665,7 @@ const projects: Project[] = [
     title: 'Toyota Performance Optimization',
     description:
       'Re-engineered costing system for Toyota Astra Motor, transforming a system that took 3+ hours and frequently failed into one that processes in 10-15 minutes with 99.9% reliability.',
-    impact: '90% Performance Improvement',
+    impact: '300% Performance Improvement',
     technologies: ['SQL Server', 'Microservices', '.NET', 'Performance Tuning'],
     metrics: '1-2M daily transactions',
   },
@@ -676,8 +696,8 @@ const projects: Project[] = [
   {
     title: 'Web3 & Blockchain Development',
     description:
-      'Learned blockchain platforms and Web3 applications using Solidity smart contracts with focus on security and decentralized architecture.',
-    impact: 'Web3 Learning Path',
+      'Blockchain and Web3 development with Solidity smart contracts, focused on security and decentralized architecture.',
+    impact: 'Smart Contract Development',
     technologies: ['Solidity', 'Foundry', 'Hardhat', 'Ethers.js', 'Smart Contracts'],
     metrics: '',
   },
@@ -758,6 +778,9 @@ const DoubleBezelCard: React.FC<{
 
 const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
   const { theme, toggleTheme } = useTheme()
+  const isDesktop = useIsDesktop()
+  const { isIndonesia } = useCountryCode()
+  const nowPrice = isIndonesia ? NOW_CONFIG.prices.indonesia : NOW_CONFIG.prices.world
   const [isVideoOpen, setIsVideoOpen] = useState(false)
   const [heroReady, setHeroReady] = useState(false)
 
@@ -783,15 +806,15 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
         <CodeRain />
 
         {/* Mobile 3D background */}
-        <div className="absolute inset-0 z-[1] lg:hidden opacity-40 flex items-center justify-center pointer-events-none">
-          <div className="w-[85vw] h-[85vw] max-w-[480px] max-h-[480px] pointer-events-auto">
-            <Canvas dpr={[1, 1.5]} camera={{ position: [0, 0, 5], fov: 45 }}>
+        {!isDesktop && (
+          <div className="absolute inset-0 z-[1] lg:hidden opacity-40 flex items-center justify-center pointer-events-none">
+            <div className="w-[85vw] h-[85vw] max-w-[480px] max-h-[480px] pointer-events-auto">
               <Suspense fallback={null}>
-                <HeroScene dark={theme === 'dark'} count={3000} />
+                <HeroParticles dark={theme === 'dark'} count={3000} maxDpr={1.5} />
               </Suspense>
-            </Canvas>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Left content */}
         <motion.div
@@ -800,19 +823,6 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
           animate={{ opacity: 1, y: 0 }}
           transition={SPRING}
         >
-          <div className="flex flex-wrap gap-2 mb-6 pointer-events-auto">
-            <div className="inline-block px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/10">
-              <span className="text-xs font-jetbrains text-emerald-500 tracking-wider uppercase">
-                Software Architect
-              </span>
-            </div>
-            <div className="inline-block px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/10">
-              <span className="text-xs font-jetbrains text-emerald-500 tracking-wider uppercase">
-                Tech Entrepreneur
-              </span>
-            </div>
-          </div>
-
           <h1 className="text-6xl sm:text-7xl lg:text-8xl font-space-grotesk font-bold leading-[0.9] mb-6 text-zinc-900 dark:text-zinc-100">
             {heroName || '\u00A0'}
           </h1>
@@ -838,11 +848,11 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
             <div className="w-[500px] h-[500px] rounded-full bg-emerald-500/10 blur-[120px]" />
           </div>
           <div className="absolute inset-0">
-            <Canvas dpr={[1, 2]} camera={{ position: [0, 0, 5], fov: 45 }}>
+            {isDesktop && (
               <Suspense fallback={null}>
-                <HeroScene dark={theme === 'dark'} />
+                <HeroParticles dark={theme === 'dark'} />
               </Suspense>
-            </Canvas>
+            )}
           </div>
         </div>
       </section>
@@ -885,9 +895,9 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
                 </div>
                 <div className="border-t border-zinc-200 dark:border-zinc-800 py-6">
                   <div className="text-3xl font-space-grotesk font-bold text-zinc-900 dark:text-zinc-100">
-                    <AnimatedCounter end={99} suffix=".9%" />
+                    <AnimatedCounter end={20} suffix="+" />
                   </div>
-                  <div className="text-sm text-zinc-500 dark:text-zinc-500 font-outfit mt-1">System Uptime</div>
+                  <div className="text-sm text-zinc-500 dark:text-zinc-500 font-outfit mt-1">Enterprise Clients</div>
                 </div>
               </div>
             </ScrollReveal>
@@ -915,21 +925,25 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
 
             <ScrollReveal delay={0.2}>
               <DoubleBezelCard spotlight>
-                <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-3 font-space-grotesk">
-                  Complete Portfolio
-                </h3>
-                <p className="text-zinc-600 dark:text-zinc-400 mb-6 font-outfit text-sm leading-relaxed">
-                  Download my comprehensive portfolio with detailed project experiences and client work.
-                </p>
-                <a
-                  href="/Ricardo Alexander - Portfolio 2025.pdf"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-auto inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 font-outfit font-medium text-sm hover:border-zinc-500 dark:hover:border-zinc-500 transition-colors"
-                >
-                  <DownloadSimple size={16} weight="bold" />
-                  Download PDF
-                </a>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+                  <div>
+                    <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-3 font-space-grotesk">
+                      Complete Portfolio
+                    </h3>
+                    <p className="text-zinc-600 dark:text-zinc-400 font-outfit text-sm leading-relaxed">
+                      Download my comprehensive portfolio with detailed project experiences and client work.
+                    </p>
+                  </div>
+                  <a
+                    href="/Ricardo Alexander - Portfolio 2025.pdf"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="self-start sm:self-auto shrink-0 inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 font-outfit font-medium text-sm hover:border-zinc-500 dark:hover:border-zinc-500 transition-colors"
+                  >
+                    <DownloadSimple size={16} weight="bold" />
+                    Download PDF
+                  </a>
+                </div>
               </DoubleBezelCard>
             </ScrollReveal>
           </div>
@@ -1023,7 +1037,7 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
                   A tiny pixel companion that sits on your screen &mdash; always present, never demanding. Clock, progress bars, pomodoro, notes, and ambient sounds. 6 companions, each with personality.
                 </p>
                 <div className="flex flex-wrap gap-2 mb-6">
-                  {['Multiplatform', 'Pixel Art', 'Desktop', 'Companion', 'Productivity'].map(tag => (
+                  {[...NOW_PLATFORM_TAGS, 'Pixel Art', 'Desktop', 'Companion', 'Productivity'].map(tag => (
                     <span key={tag} className="px-2.5 py-1 text-xs font-jetbrains rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700">
                       {tag}
                     </span>
@@ -1033,7 +1047,7 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
                   href="/products/now"
                   className="inline-flex items-center gap-2 text-sm text-emerald-500 font-outfit font-semibold hover:text-emerald-400 transition-colors mt-auto"
                 >
-                  $5.99 &middot; Learn more &rarr;
+                  {nowPrice} &middot; Learn more &rarr;
                 </a>
               </DoubleBezelCard>
             </ScrollReveal>
@@ -1194,7 +1208,7 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
             <div className="grid grid-cols-1 md:grid-cols-3">
               <div className="border-t border-zinc-200 dark:border-zinc-800 py-6 md:pr-8">
                 <div className="text-2xl font-space-grotesk font-bold text-zinc-900 dark:text-zinc-100">300%</div>
-                <div className="text-sm text-zinc-500 font-outfit mt-1">Performance Improvements</div>
+                <div className="text-sm text-zinc-500 font-outfit mt-1">Performance Improvement</div>
               </div>
               <div className="border-t border-zinc-200 dark:border-zinc-800 py-6 md:px-8">
                 <div className="text-2xl font-space-grotesk font-bold text-zinc-900 dark:text-zinc-100">$200K+</div>
@@ -1218,9 +1232,16 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
             </ScrollReveal>
 
             <ScrollReveal delay={0.1}>
-              <h2 className="text-5xl md:text-7xl font-bold font-space-grotesk text-zinc-900 dark:text-zinc-100 mb-10">
+              <h2 className="text-5xl md:text-7xl font-bold font-space-grotesk text-zinc-900 dark:text-zinc-100 mb-6">
                 Let's talk.
               </h2>
+            </ScrollReveal>
+
+            <ScrollReveal delay={0.15}>
+              <p className="text-lg text-zinc-600 dark:text-zinc-400 font-outfit max-w-2xl mb-10">
+                Open to consulting, software and app development, architecture reviews, and AI/LLM projects, from
+                agentic workflows to scaling enterprise systems. Tell me what you&apos;re building.
+              </p>
             </ScrollReveal>
 
             <ScrollReveal delay={0.2}>

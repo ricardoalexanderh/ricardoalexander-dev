@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef } from 'react'
-import { useFrame, useThree } from '@react-three/fiber'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 
 // Hero particle cloud: morphs sphere → cube lattice → double helix → "RA" → sphere,
@@ -326,4 +326,11 @@ const ParticleMorph: React.FC<{ dark: boolean; count?: number }> = ({ dark, coun
   )
 }
 
-export default ParticleMorph
+// The whole 3D hero. The portfolio lazy-loads this file so three.js stays out of the main bundle.
+const HeroParticles: React.FC<{ dark: boolean; count?: number; maxDpr?: number }> = ({ dark, count, maxDpr = 2 }) => (
+  <Canvas dpr={[1, maxDpr]} camera={{ position: [0, 0, 5], fov: 45 }}>
+    <ParticleMorph dark={dark} count={count} />
+  </Canvas>
+)
+
+export default HeroParticles
