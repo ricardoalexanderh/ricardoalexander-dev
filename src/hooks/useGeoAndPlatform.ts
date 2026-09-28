@@ -10,7 +10,7 @@ export const NOW_CONFIG = {
   },
   buyUrls: {
     mayar: 'https://xandr.myr.id/catalog/now-desktop-pixel-companion',    // Indonesia
-    polar: 'https://PLACEHOLDER_POLAR_URL.example.com/now',    // Rest of world
+    polar: 'https://buy.polar.sh/polar_cl_H1luSZ4oRjqO5OFrQr1tx4QICPFDC4ynnRelX1MJmBA', // Rest of world
   },
   downloadUrls: {
     windows: 'https://dl.ricardoalexander.dev/releases/v0.1.0/Now_0.1.0_x64-setup.exe',
