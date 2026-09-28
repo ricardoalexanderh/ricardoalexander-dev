@@ -95,6 +95,11 @@ export function isPlatformAvailable(platform: Platform): boolean {
   return NOW_CONFIG.availablePlatforms[platform]
 }
 
+// False while a URL in NOW_CONFIG is still a PLACEHOLDER_ value
+export function isLiveUrl(url: string): boolean {
+  return !url.includes('PLACEHOLDER_')
+}
+
 export function getDownloadUrl(platform: Platform): string {
   return NOW_CONFIG.downloadUrls[platform]
 }

@@ -34,8 +34,10 @@ Pricing and buy URLs are geo-routed via `src/hooks/useGeoAndPlatform.ts`:
 
 | Region | Price | Buy URL |
 |--------|-------|---------|
-| Indonesia (`ID`) | Rp. 99.000 | Mayar (placeholder) |
+| Indonesia (`ID`) | Rp. 99.000 | Mayar |
 | Rest of world | $5.99 | Paddle (placeholder) |
+
+While a region's buy URL still contains `PLACEHOLDER_`, all 4 buy buttons show a disabled "Coming Soon" for that region (`isLiveUrl()`). Pasting the real URL turns them into "Get Now".
 
 ## Download Links (Now)
 

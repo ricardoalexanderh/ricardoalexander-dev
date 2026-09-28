@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { WindowsLogo, AppleLogo, LinuxLogo } from '@phosphor-icons/react'
-import { useCountryCode, useDetectedOS, NOW_CONFIG, PLATFORMS, getPlatformLabel, getDownloadUrl, isPlatformAvailable, joinPlatformLabels, type Platform } from './hooks/useGeoAndPlatform'
+import { useCountryCode, useDetectedOS, NOW_CONFIG, PLATFORMS, getPlatformLabel, getDownloadUrl, isPlatformAvailable, isLiveUrl, joinPlatformLabels, type Platform } from './hooks/useGeoAndPlatform'
 
 const PLATFORM_ICONS: Record<string, React.ReactElement> = {
   windows: <WindowsLogo size={16} weight="fill" style={{ display: 'inline-block', verticalAlign: '-2px' }} />,
@@ -376,6 +376,8 @@ const NowLandingFrontend: React.FC = () => {
   const primaryPlatform: Platform = detectedOS === 'mobile' || detectedOS === 'unknown' ? 'windows' : detectedOS
   const displayPrice = isIndonesia ? NOW_CONFIG.prices.indonesia : NOW_CONFIG.prices.world
   const buyUrl = isIndonesia ? NOW_CONFIG.buyUrls.mayar : NOW_CONFIG.buyUrls.paddle
+  // Buy buttons show "Coming Soon" until this region's checkout URL is filled in
+  const canBuy = isLiveUrl(buyUrl)
 
   const [scrolled, setScrolled] = useState(false)
   const [showScrollTop, setShowScrollTop] = useState(false)
@@ -2138,7 +2140,11 @@ const NowLandingFrontend: React.FC = () => {
           <a href="#pricing">Pricing</a>
           <a href="#download">Download</a>
           <a href="#faq">FAQ</a>
-          <a href={buyUrl} className="now-nav-cta" target="_blank" rel="noopener noreferrer">Get Now</a>
+          {canBuy ? (
+            <a href={buyUrl} className="now-nav-cta" target="_blank" rel="noopener noreferrer">Get Now</a>
+          ) : (
+            <span className="now-nav-cta" style={COMING_SOON_STYLE}>Coming Soon</span>
+          )}
         </div>
         <button className={`now-hamburger ${mobileMenuOpen ? 'open' : ''}`} onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
           <span /><span /><span />
@@ -2153,7 +2159,11 @@ const NowLandingFrontend: React.FC = () => {
         <a href="#pricing" onClick={() => setMobileMenuOpen(false)}>Pricing</a>
         <a href="#download" onClick={() => setMobileMenuOpen(false)}>Download</a>
         <a href="#faq" onClick={() => setMobileMenuOpen(false)}>FAQ</a>
-        <a href={buyUrl} className="now-nav-cta" target="_blank" rel="noopener noreferrer" onClick={() => setMobileMenuOpen(false)}>Get Now</a>
+        {canBuy ? (
+          <a href={buyUrl} className="now-nav-cta" target="_blank" rel="noopener noreferrer" onClick={() => setMobileMenuOpen(false)}>Get Now</a>
+        ) : (
+          <span className="now-nav-cta" style={COMING_SOON_STYLE}>Coming Soon</span>
+        )}
       </div>
 
       {/* HERO */}
@@ -2319,7 +2329,11 @@ const NowLandingFrontend: React.FC = () => {
           </div>
 
           <div className="now-hero-actions">
-            <a href={buyUrl} className="now-btn-primary" target="_blank" rel="noopener noreferrer">Get Now &mdash; {displayPrice}</a>
+            {canBuy ? (
+              <a href={buyUrl} className="now-btn-primary" target="_blank" rel="noopener noreferrer">Get Now &mdash; {displayPrice}</a>
+            ) : (
+              <span className="now-btn-primary" style={COMING_SOON_STYLE}>Coming Soon</span>
+            )}
             {!isMobile && (isPlatformAvailable(primaryPlatform) ? (
               <a href={getDownloadUrl(primaryPlatform)} className="now-btn-secondary"><PlatformIcon os={primaryPlatform} /> Download for {getPlatformLabel(primaryPlatform)}</a>
             ) : (
@@ -2968,7 +2982,11 @@ const NowLandingFrontend: React.FC = () => {
                   <div className="now-plan-name">Now</div>
                   <div className="now-plan-price" style={{ color: 'var(--accent)', transition: 'color 0.6s ease' }}>{displayPrice}</div>
                   <div className="now-plan-note">One-time purchase &middot; No subscription</div>
-                  <a href={buyUrl} className="now-plan-cta" target="_blank" rel="noopener noreferrer">Get Now</a>
+                  {canBuy ? (
+                    <a href={buyUrl} className="now-plan-cta" target="_blank" rel="noopener noreferrer">Get Now</a>
+                  ) : (
+                    <span className="now-plan-cta" style={COMING_SOON_STYLE}>Coming Soon</span>
+                  )}
                 </div>
                 <ul className="now-plan-features">
                   {includedFeatures.map((feat, i) => (
