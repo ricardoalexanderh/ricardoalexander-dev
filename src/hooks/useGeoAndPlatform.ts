@@ -9,7 +9,7 @@ export const NOW_CONFIG = {
     world: '$5.99',
   },
   buyUrls: {
-    mayar: 'https://xandr.myr.id/catalog/now-desktop-pixel-companion',    // Indonesia
+    mayar: 'https://xandr.myr.id/app/now-your-desktop-pixel-companions',    // Indonesia
     polar: 'https://buy.polar.sh/polar_cl_H1luSZ4oRjqO5OFrQr1tx4QICPFDC4ynnRelX1MJmBA', // Rest of world
   },
   downloadUrls: {
