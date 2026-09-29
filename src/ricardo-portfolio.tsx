@@ -1247,7 +1247,7 @@ const RicardoPortfolio: React.FC<PortfolioProps> = ({ showContact = true }) => {
             <ScrollReveal delay={0.2}>
               <div className="flex flex-col sm:flex-row gap-4">
                 <motion.a
-                  href="mailto:ricardoalexanderh@gmail.com"
+                  href="mailto:main@ricardoalexander.dev"
                   className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-emerald-500 text-white font-outfit font-semibold text-sm hover:bg-emerald-400 transition-colors"
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}

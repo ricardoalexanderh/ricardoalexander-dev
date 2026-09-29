@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 
 // Terms and Privacy pages for Now — linked from the Now footer.
 
-const CONTACT_EMAIL = 'ricardoalexanderh@gmail.com'
+const CONTACT_EMAIL = 'main@ricardoalexander.dev'
 const LAST_UPDATED = 'September 28, 2026'
 
 const LEGAL_PAGES = [
