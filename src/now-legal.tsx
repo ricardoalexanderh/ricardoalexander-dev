@@ -3,7 +3,7 @@ import React, { useEffect } from 'react'
 // Terms and Privacy pages for Now — linked from the Now footer.
 
 const CONTACT_EMAIL = 'main@ricardoalexander.dev'
-const LAST_UPDATED = 'September 28, 2026'
+const LAST_UPDATED = 'September 30, 2026'
 
 const LEGAL_PAGES = [
   { path: '/products/now/terms', label: 'Terms' },
@@ -163,8 +163,19 @@ export function NowTerms() {
       <h2>Your license</h2>
       <ul>
         <li>
-          When you buy Now, you get a personal, non-exclusive, non-transferable license to install and use it on
-          computers you own or control.
+          When you buy Now, you get a personal, non-exclusive, non-transferable license to use it on one computer
+          at a time that you own or control.
+        </li>
+        <li>
+          You can move your license to another computer anytime: click <strong>Deactivate this PC</strong> in
+          Now&rsquo;s settings, then activate it on the new one. If you can&rsquo;t reach the old computer (for
+          example, it broke or Windows was reinstalled), deactivate it from the Polar customer portal, or email us for
+          orders from Indonesia.
+        </li>
+        <li>
+          Activation needs an internet connection once. After that, Now works offline. When you&rsquo;re online, Now
+          checks about once a week that your license is still active. Being offline never turns Now off, but a
+          license that was refunded, disabled, or deactivated stops working on that computer.
         </li>
         <li>
           Your purchase includes the companions and features described on the product page when you buy, plus the
@@ -229,6 +240,27 @@ export function NowPrivacy() {
         <li>
           Now runs locally on your computer. It has no telemetry or analytics, and we don&rsquo;t collect your habits,
           notes, or other data.
+        </li>
+        <li>
+          <strong>License activation.</strong> When you activate, Now sends your license key, a machine ID, your
+          computer&rsquo;s name, and the app version to our license server (license.ricardoalexander.dev). The
+          machine ID is a one-way hash of your computer&rsquo;s hardware ID, so the hardware ID can&rsquo;t be read
+          back from it. The server checks the key with the store you bought from and keeps a record of the activation:
+          a hash of your key (never the key itself), the machine ID, computer name, app version, and dates. For
+          orders through Polar, the computer name, machine ID, and app version are also sent to Polar, which shows the
+          computer name in its customer portal so you can tell which PC to deactivate.
+        </li>
+        <li>
+          About once a week, when you&rsquo;re online, Now sends your license key and machine ID to the license
+          server to check that the license is still active. Deactivating a PC sends the same two things.
+        </li>
+        <li>
+          Each time Now starts, it checks dl.ricardoalexander.dev for a newer version. This doesn&rsquo;t send any
+          personal data.
+        </li>
+        <li>
+          The license and download servers run on Cloudflare, which processes your IP address to deliver requests
+          and block abuse.
         </li>
         <li>
           Features that need online data, such as weather or AI features that use your own API key, connect directly

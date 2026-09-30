@@ -463,7 +463,7 @@ const NowLandingFrontend: React.FC = () => {
     { q: 'How much resources does it use?', a: 'Now is extremely lightweight. It\'s designed to be always-on without impacting your system performance.' },
     { q: 'Can I customize the widget?', a: 'Yes. You can pick your companion, adjust transparency, choose from 3 sizes (S, M, L), dock to any corner, switch between dark and light theme, and configure pomodoro presets and custom trackers.' },
     { q: 'Does it work with multiple monitors?', a: 'Yes! You can pin Now to any monitor. It stays always-on-top with a transparent background, so it sits right on your desktop.' },
-    { q: 'What about privacy?', a: 'Now is 100% local. No telemetry, no analytics, no data collection. Everything runs on your machine. Your habits, notes, and data never leave your device.' },
+    { q: 'What about privacy?', a: 'No telemetry, no analytics, no data collection. Everything runs on your machine, and your habits, notes, and data never leave your device. Now only goes online to activate your license (once), re-check it about once a week, look for updates, and for features that need it, like weather.' },
     { q: 'Will more companions be released?', a: 'Yes! More original companions are coming — each with their own unique voice and personality. We\'re also exploring collaborations with licensed and iconic characters. New companions will be available as separate purchases.' },
     { q: 'How does the Pomodoro timer work?', a: 'Standard 25-minute focus / 5-minute break cycles with configurable presets. Your companion reacts to each phase — a message when focus starts, another when it\'s break time, and celebration when all sessions are done.' },
   ]
@@ -486,7 +486,7 @@ const NowLandingFrontend: React.FC = () => {
     '3 widget sizes (S, M, L)',
     'Multi-monitor support',
     UPCOMING_PLATFORMS.length ? `${AVAILABLE_TEXT} (${UPCOMING_TEXT} coming soon)` : 'Windows, macOS & Linux',
-    '100% local — zero telemetry',
+    'Runs locally — zero telemetry',
     'All future updates',
   ]
 
@@ -2981,7 +2981,7 @@ const NowLandingFrontend: React.FC = () => {
                 <div style={{ padding: '2rem', textAlign: 'center' }}>
                   <div className="now-plan-name">Now</div>
                   <div className="now-plan-price" style={{ color: 'var(--accent)', transition: 'color 0.6s ease' }}>{displayPrice}</div>
-                  <div className="now-plan-note">One-time purchase &middot; No subscription</div>
+                  <div className="now-plan-note">One-time purchase &middot; 1 PC per license (movable anytime) &middot; works offline after a one-time activation</div>
                   {canBuy ? (
                     <a href={buyUrl} className="now-plan-cta" target="_blank" rel="noopener noreferrer">Get Now</a>
                   ) : (
