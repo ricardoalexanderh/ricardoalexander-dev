@@ -278,6 +278,7 @@ export function NowPrivacy() {
         </li>
         <li>The weather demo on the Now page asks wttr.in for the weather near you, based on your IP address.</li>
         <li>Fonts are loaded from Google Fonts, which receives your IP address when it serves them.</li>
+        <li>The Product Hunt badge on the Now page is loaded from Product Hunt, which receives your IP address.</li>
         <li>The site is hosted on Vercel, which keeps standard server logs such as IP address and browser type.</li>
       </ul>
 

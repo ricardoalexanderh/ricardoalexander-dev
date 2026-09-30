@@ -1206,6 +1206,14 @@ const NowLandingFrontend: React.FC = () => {
           position: relative; z-index: 2;
         }
         .now-price-hint strong { color: var(--green); }
+        .now-ph-badge {
+          display: inline-block; margin-top: 1.5rem;
+          animation: now-fadeUp 0.6s 0.45s ease both;
+          position: relative; z-index: 2;
+          transition: transform 0.2s;
+        }
+        .now-ph-badge:hover { transform: translateY(-2px); }
+        .now-ph-badge img { display: block; width: 250px; height: 54px; }
 
         /* CHARACTER PREVIEW ROW IN HERO */
         .now-hero-characters {
@@ -2341,6 +2349,19 @@ const NowLandingFrontend: React.FC = () => {
             ))}
           </div>
           <p className="now-price-hint"><strong>{displayPrice}</strong> &middot; All 6 companions &middot; {AVAILABLE_TEXT}{UPCOMING_PLATFORMS.length > 0 && <> &middot; {UPCOMING_TEXT} coming soon</>}</p>
+          <a
+            className="now-ph-badge"
+            href="https://www.producthunt.com/products/now-8?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-now-your-desktop-pixel-companion"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img
+              alt="Now - Your Desktop Pixel Companion - Your desktop's pixel companion for time and focus | Product Hunt"
+              width="250"
+              height="54"
+              src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1263557&theme=neutral&t=1790756134283"
+            />
+          </a>
 
           <div className="now-hero-characters">
             {characters.map((c, i) => (
