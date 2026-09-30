@@ -1,11 +1,11 @@
 {
+    "trailingSlash": false,
+    "redirects": [
+      { "source": "/products/now/refund", "destination": "/products/now/terms#refunds", "permanent": true }
+    ],
     "rewrites": [
       { "source": "/products/now", "destination": "/products/now.html" },
       { "source": "/products/now/terms", "destination": "/products/now/terms.html" },
-      { "source": "/products/now/privacy", "destination": "/products/now/privacy.html" },
-      {
-        "source": "/(.*)",
-        "destination": "/index.html"
-      }
+      { "source": "/products/now/privacy", "destination": "/products/now/privacy.html" }
     ]
   }

@@ -18,7 +18,10 @@ function LegalLayout({ title, path, children }: { title: string; path: string; c
   useEffect(() => {
     const prev = document.title
     document.title = `${title} · Now`
-    window.scrollTo(0, 0)
+    // The page renders after the browser's own #hash jump, so do it here (e.g. /products/now/terms#refunds)
+    const target = window.location.hash && document.getElementById(window.location.hash.slice(1))
+    if (target) target.scrollIntoView({ behavior: 'instant' })
+    else window.scrollTo(0, 0)
     return () => { document.title = prev }
   }, [title])
 
@@ -74,7 +77,7 @@ function LegalLayout({ title, path, children }: { title: string; path: string; c
         }
         .now-legal-updated { font-size: 0.85rem; color: var(--muted); margin: 0 0 3rem; }
 
-        .now-legal-body h2 { font-size: 1.15rem; font-weight: 600; color: var(--bright); margin: 2.5rem 0 0.75rem; }
+        .now-legal-body h2 { font-size: 1.15rem; font-weight: 600; color: var(--bright); margin: 2.5rem 0 0.75rem; scroll-margin-top: 2rem; }
         .now-legal-body p { margin: 0 0 1rem; }
         .now-legal-body ul { margin: 0 0 1rem; padding-left: 1.25rem; list-style: square; }
         .now-legal-body li { margin-bottom: 0.5rem; }
@@ -145,7 +148,7 @@ export function NowTerms() {
         <li>The price shown depends on your country. Taxes may be added at checkout where required.</li>
       </ul>
 
-      <h2>Refunds</h2>
+      <h2 id="refunds">Refunds</h2>
       <ul>
         <li>
           <strong>Orders from Indonesia (Mayar) are final.</strong> They can&rsquo;t be refunded once your license key
